@@ -1,5 +1,7 @@
 <template>
-  <div class="sg-toast">{{msg}}</div>
+  <transition :name="'toast-' + direction">
+    <div v-show="visible" :class="'sg-toast sg-toast-' + direction">{{msg}}</div>
+  </transition>
 </template>
 
 <script>
@@ -7,12 +9,19 @@ export default {
   name: 'SgToast',
   data () {
     return {
-      msg: ''
+      direction: 'top',
+      msg: '',
+      visible: false
     }
   },
   methods: {
-    setMsg (msg) {
+    showMsg (msg, options = {}) {
       this.msg = msg
+      this.direction = options.direction || 'top'
+      this.visible = true
+    },
+    hide () {
+      this.visible = false
     }
   }
 }
@@ -21,7 +30,6 @@ export default {
 <style lang="scss" scoped>
 .sg-toast {
   position: fixed;
-  top: 2rem;
   left: 50%;
   padding: 0.5rem 1rem;
   color: white;
@@ -29,5 +37,31 @@ export default {
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 0.6rem;
   transform: translateX(-50%);
+}
+.sg-toast-top {
+  top: 2rem;
+}
+.sg-toast-bottom {
+  bottom: 2rem;
+}
+.sg-toast-middle {
+  top: 50%;
+}
+
+.toast-top-enter-active, .toast-top-leave-active,
+.toast-middle-enter-active, .toast-middle-leave-active,
+.toast-bottom-enter-active, .toast-bottom-leave-active {
+  transition: all 0.3s ease;
+}
+.toast-top-enter, .toast-top-leave-to {
+  top: -2rem;
+  opacity: 0;
+}
+.toast-bottom-enter, .toast-bottom-leave-to {
+  bottom: -2rem;
+  opacity: 0;
+}
+.toast-middle-enter, .toast-middle-leave-to {
+  opacity: 0;
 }
 </style>
