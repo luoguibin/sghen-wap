@@ -15,7 +15,7 @@ export default {
     }
   },
   methods: {
-    showMsg (msg, options = {}) {
+    show (msg, options = {}) {
       this.msg = msg
       this.direction = options.direction || 'top'
       this.visible = true

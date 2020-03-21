@@ -1,20 +1,20 @@
 import Vue from 'vue'
 import SgToast from './sg-toast'
 
-let _sgToast
+let _sgInstance
 
 Vue.prototype.$toast = function (msg, options = {}) {
-  let toast = _sgToast
+  let toast = _sgInstance
   if (!toast) {
     const Func = Vue.component(SgToast.name)
     toast = new Func().$mount()
     document.body.append(toast.$el)
-    _sgToast = toast
+    _sgInstance = toast
   }
   if (toast.visible) {
     return
   }
-  toast.showMsg(msg, options)
+  toast.show(msg, options)
   setTimeout(() => {
     toast.hide()
   }, options.duration || 3000)
