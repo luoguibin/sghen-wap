@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { sgIsPhone } from '@/utils/sgRegExp'
+
 export default {
   name: 'Login',
 
@@ -14,7 +16,7 @@ export default {
     return {
       formData: {
         phone: 15625045984,
-        code: ''
+        pw: ''
       },
       formRules: [
         {
@@ -22,14 +24,23 @@ export default {
           label: '手机号码',
           required: true,
           validator: (v, rule) => {
-            return v ? '' : '请输入' + rule.label
+            return sgIsPhone(v) ? '' : '请输入' + rule.label
           },
           _error: ''
         },
         {
-          key: 'code',
-          label: '文本',
-          type: 'textarea'
+          key: 'pw',
+          label: '密码',
+          required: true,
+          inputType: 'password',
+          validator: (v, rule) => {
+            if (!v) {
+              return '请输入' + rule.label
+            } else {
+              return v.length < 6 || v.length > 20 ? '密码长度为6~20字符' : ''
+            }
+          },
+          _error: ''
         }
       ]
     }
