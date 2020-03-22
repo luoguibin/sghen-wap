@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { sgIsPhone } from '@/utils/sgRegExp'
 
 export default {
@@ -58,13 +59,17 @@ export default {
           return
         }
         this.isRequesting = true
-        setTimeout(() => {
+        this.login(JSON.parse(JSON.stringify(this.formData))).then(() => {
           this.isRequesting = false
-          this.$toast('登录成功')
+          this.$toast('登录成功', { direction: 'bottom' })
           this.$router.push({ name: 'home' })
-        }, 2000)
+        })
       })
-    }
+    },
+
+    ...mapActions({
+      login: 'auth/login'
+    })
   }
 }
 </script>
