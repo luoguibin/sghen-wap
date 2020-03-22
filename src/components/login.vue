@@ -61,6 +61,7 @@ export default {
         setTimeout(() => {
           this.isRequesting = false
           this.$toast('登录成功')
+          this.$router.push({ name: 'home' })
         }, 2000)
       })
     }
