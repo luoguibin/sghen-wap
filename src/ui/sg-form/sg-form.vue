@@ -1,9 +1,9 @@
 <template>
   <div class="sg-form">
     <slot name="header"></slot>
-    <div class="sg-form-item" v-for="item in formRules" :key="item.key" v-show="!item.hidden">
+    <div v-for="item in formRules" class="sg-form-item" :key="item.key" v-show="!item.hidden">
       <textarea v-if="item.type === 'textarea'" v-model="formData[item.key]" v-focus-within></textarea>
-      <input v-else v-model="formData[item.key]" v-focus-within />
+      <input v-else v-model="formData[item.key]" :type="item.inputType" v-focus-within />
       <label :class="{'sg-label-required': item.required}">
         {{item.label}}
         <span v-if="item._error">({{item._error}})</span>
@@ -25,10 +25,11 @@ export default {
     /**
      * [{
      *   key: 'phone', // required, unique
-     *   type: '', // ``, `textarea`
+     *   type: '', // ``, 'input', `textarea`
      *   hidden: false, // true or false
      *   label: '手机号码', // label
      *   required: true, // true or false
+     *   inputType: '', // type of `input`
      *   validator: (v, rule) => { return '请输入手机号码'}, // params fixed
      *   _error: '' // required
      * }]
