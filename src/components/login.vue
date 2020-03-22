@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <sg-form ref="form" :formData="formData" :formRules="formRules">
-      <button @click="onSubmit">登录</button>
+      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">登录</sg-button>
     </sg-form>
   </div>
 </template>
@@ -14,6 +14,7 @@ export default {
 
   data () {
     return {
+      isRequesting: false,
       formData: {
         phone: null,
         pw: ''
@@ -53,9 +54,14 @@ export default {
   methods: {
     onSubmit () {
       this.$refs.form.validate(isValid => {
-        if (isValid) {
-          this.$toast(JSON.stringify(this.formData))
+        if (!isValid) {
+          return
         }
+        this.isRequesting = true
+        setTimeout(() => {
+          this.isRequesting = false
+          this.$toast('登录成功')
+        }, 2000)
       })
     }
   }
@@ -64,5 +70,8 @@ export default {
 
 <style lang="scss" scoped>
 .login {
+  .login-button {
+    margin-top: 2rem;
+  }
 }
 </style>
