@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       formData: {
-        phone: 15625045984,
+        phone: null,
         pw: ''
       },
       formRules: [
