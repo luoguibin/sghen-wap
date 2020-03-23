@@ -1,9 +1,15 @@
 <template>
   <div class="sg-form">
     <slot name="header"></slot>
+    <input type="password" autocomplete="new-password" hidden />
     <div v-for="item in formRules" class="sg-form-item" :key="item.key" v-show="!item.hidden">
-      <textarea v-if="item.type === 'textarea'" v-model="formData[item.key]" v-focus-within></textarea>
-      <input v-else v-model="formData[item.key]" :type="item.inputType" v-focus-within />
+      <template v-if="item.slot">
+        <slot :name="item.key"></slot>
+      </template>
+      <template v-else>
+        <textarea v-if="item.type === 'textarea'" v-model="formData[item.key]" v-focus-within></textarea>
+        <input v-else v-model="formData[item.key]" :type="item.inputType" v-focus-within />
+      </template>
       <label :class="{'sg-label-required': item.required}">
         {{item.label}}
         <span v-if="item._error">({{item._error}})</span>
@@ -27,6 +33,7 @@ export default {
      *   key: 'phone', // required, unique
      *   type: '', // ``, 'input', `textarea`
      *   hidden: false, // true or false
+     *   slot: false, // true or false
      *   label: '手机号码', // label
      *   required: true, // true or false
      *   inputType: '', // type of `input`

@@ -2,20 +2,34 @@ import Vue from 'vue'
 
 const blurHandler = function (e) {
   const el = e.target
-  const parentEl = el.parentElement
-  parentEl.classList.remove('sg-focus-within')
-  if (el.value) {
-    parentEl.classList.add('sg-input-value')
-  } else {
-    parentEl.classList.remove('sg-input-value')
+  let tempEl = el.parentElement
+  while (tempEl) {
+    const classList = [...tempEl.classList]
+    if (classList.includes('sg-form-item')) {
+      tempEl.classList.remove('sg-focus-within')
+      if (el.value) {
+        tempEl.classList.add('sg-input-value')
+      } else {
+        tempEl.classList.remove('sg-input-value')
+      }
+      el.removeEventListener('blur', blurHandler)
+      break
+    }
+    tempEl = tempEl.parentElement
   }
-  el.removeEventListener('blur', blurHandler)
 }
 
 const focusHandler = function (e) {
-  const parentEl = e.target.parentElement
-  parentEl.classList.add('sg-focus-within')
-  e.target.addEventListener('blur', blurHandler)
+  let tempEl = e.target.parentElement
+  while (tempEl) {
+    const classList = [...tempEl.classList]
+    if (classList.includes('sg-form-item')) {
+      tempEl.classList.add('sg-focus-within')
+      e.target.addEventListener('blur', blurHandler)
+      break
+    }
+    tempEl = tempEl.parentElement
+  }
 }
 
 Vue.directive('focus-within', {
