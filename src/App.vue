@@ -16,5 +16,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#app {}
+#app {
+  height: 100%;
+}
 </style>
