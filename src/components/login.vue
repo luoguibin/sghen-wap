@@ -1,6 +1,15 @@
 <template>
   <div class="login">
     <sg-form ref="form" :formData="formData" :formRules="formRules">
+      <div class="login-code" slot="code">
+        <input v-model="formData.code" v-focus-within />
+        <span class="code-divider"></span>
+        <span v-show="countdown > 0" class="code-countdown">{{countdownText}}</span>
+        <sg-button v-show="countdown <= 0" :isLoading="smsLoading" @click="getSmsCode">获&nbsp;取</sg-button>
+      </div>
+      <div class="login-type" slot="loginType">
+        <sg-button @click="onChangeLoginType">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
+      </div>
       <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">登录</sg-button>
     </sg-form>
   </div>
@@ -18,13 +27,16 @@ export default {
       isRequesting: false,
       formData: {
         phone: null,
-        pw: ''
+        pw: '',
+        code: '',
+        loginType: 'pw'
       },
       formRules: [
         {
           key: 'phone',
           label: '手机号码',
           required: true,
+          hidden: false,
           validator: (v, rule) => {
             return sgIsPhone(v) ? '' : '请输入' + rule.label
           },
@@ -43,8 +55,30 @@ export default {
             }
           },
           _error: ''
+        },
+        {
+          key: 'code',
+          slot: true,
+          label: '动态码',
+          hidden: true,
+          required: false,
+          validator: (v, rule) => {
+            if (!v) {
+              return '请输入' + rule.label
+            } else {
+              return v.length !== 4 ? '动态码长度为4字符' : ''
+            }
+          },
+          _error: ''
+        }, {
+          key: 'loginType',
+          slot: true,
+          noneClass: true
         }
-      ]
+      ],
+
+      smsLoading: false,
+      countdown: 0
     }
   },
 
@@ -52,7 +86,44 @@ export default {
     window.login = this
   },
 
+  computed: {
+    countdownText () {
+      return this.countdown + 'S后获取'
+    }
+  },
+
   methods: {
+    onChangeLoginType () {
+      let type = this.formData.loginType
+      type = type === 'pw' ? 'code' : 'pw'
+      this.formData.loginType = type
+
+      let item = this.formRules.find(o => o.key === type)
+      item.hidden = false
+      item.required = true
+
+      type = type === 'pw' ? 'code' : 'pw'
+      item = this.formRules.find(o => o.key === type)
+      item.hidden = true
+      item.required = false
+
+      this.$refs.form.clearErrors()
+    },
+
+    getSmsCode () {
+      this.smsLoading = true
+      setTimeout(() => {
+        this.countdown = 60
+        clearInterval(this.countdownHandle)
+        this.countdownHandle = setInterval(() => {
+          this.countdown--
+          if (this.countdown === 0) {
+            clearInterval(this.countdownHandle)
+          }
+        }, 1000)
+      }, 2000)
+    },
+
     onSubmit () {
       this.$refs.form.validate(isValid => {
         if (!isValid) {
@@ -70,12 +141,45 @@ export default {
     ...mapActions({
       login: 'auth/login'
     })
+  },
+  beforeDestroy () {
+    clearInterval(this.countdownHandle)
   }
 }
 </script>
 
 <style lang="scss" scoped>
 .login {
+  .login-code {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    input {
+      flex: 1;
+    }
+    .code-divider {
+      margin: 0 1rem;
+      width: 0.1rem;
+      height: 1.6rem;
+      background-color: rgb(151, 151, 151);
+    }
+    .code-countdown {
+      display: inline-block;
+      width: 6rem;
+      color: rgb(167, 167, 167);
+    }
+    .sg-button {
+      width: 6rem;
+      font-size: 1.3rem;
+    }
+  }
+  .login-type {
+    .sg-button {
+      display: inline-block;
+      width: inherit;
+      font-size: 1.2rem;
+    }
+  }
   .login-button {
     margin-top: 2rem;
   }
