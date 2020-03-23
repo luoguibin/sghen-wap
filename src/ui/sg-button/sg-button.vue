@@ -54,8 +54,9 @@ export default {
     display: inline-block;
     width: 1rem;
     height: 1rem;
+    vertical-align: sub;
     border-radius: 50%;
-    border: 0.2rem solid white;
+    border: 0.2rem solid $main-color;
     border-left-color: transparent;
     animation: sg-rotate 1s infinite linear;
   }
@@ -77,6 +78,10 @@ export default {
     &:disabled {
       background-color: $main-disabled-color;
     }
+  }
+  span {
+    border: 0.2rem solid white;
+    border-left-color: transparent;
   }
 }
 
