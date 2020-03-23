@@ -10,7 +10,7 @@
       <div class="login-type" slot="loginType">
         <sg-button @click="onChangeLoginType">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
       </div>
-      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">登录</sg-button>
+      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">登&nbsp;&nbsp;录</sg-button>
     </sg-form>
   </div>
 </template>
