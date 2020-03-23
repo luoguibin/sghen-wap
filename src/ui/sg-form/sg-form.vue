@@ -2,7 +2,7 @@
   <div class="sg-form">
     <slot name="header"></slot>
     <input type="password" autocomplete="new-password" hidden />
-    <div v-for="item in formRules" class="sg-form-item" :key="item.key" v-show="!item.hidden">
+    <div v-for="item in formRules" :key="item.key" :class="{'sg-form-item': !item.noneClass}" v-show="!item.hidden">
       <template v-if="item.slot">
         <slot :name="item.key"></slot>
       </template>
@@ -35,6 +35,7 @@ export default {
      *   hidden: false, // true or false
      *   slot: false, // true or false
      *   label: '手机号码', // label
+     *   noneClass: false, // true or false
      *   required: true, // true or false
      *   inputType: '', // type of `input`
      *   validator: (v, rule) => { return '请输入手机号码'}, // params fixed
@@ -56,6 +57,14 @@ export default {
   },
 
   methods: {
+    clearErrors () {
+      this.formRules.forEach(o => {
+        if (o._error !== undefined) {
+          o._error = ''
+        }
+      })
+    },
+
     validate (call) {
       const tempValidator = (v, rule) => {
         return v ? '' : (rule.label || rule.key) + '不能为空'
