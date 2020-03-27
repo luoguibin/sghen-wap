@@ -2,7 +2,7 @@
   <div class="home">
     <div class="home-header">
       <span>{{username}}</span>
-      <span>|</span>
+      <span class="divider"></span>
       <span @click="onConfirm">退出</span>
     </div>
 
@@ -67,7 +67,11 @@ export default {
     font-size: 1.6rem;
     background-color: rgb(102, 102, 102);
     span {
-      padding: 0 0.2rem;
+      margin: 0 0.2rem;
+    }
+    .divider {
+      padding: 0 0.1rem;
+      background-color: rgb(126, 126, 126);
     }
   }
   .home-main {

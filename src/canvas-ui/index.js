@@ -1,50 +1,110 @@
+import { SgcContainer } from './components/sgc-container'
 import { SgcText } from './components/sgc-text'
 
-export class SgcUi {
-  children = []
-
+export class SgcUi extends SgcContainer {
   /**
    * 构造函数
    * @param {HTMLCanvasElement} canvas
    */
   constructor (canvas) {
+    super(null)
     this.canvas = canvas
     this.ctx = canvas.getContext('2d')
-    this.width = canvas.clientWidth
-    this.height = canvas.clientHeight
+    this.measureWidth = canvas.clientWidth
+    this.measureHeight = canvas.clientHeight
+    this.root = this
+
+    this.name = 'root'
+    this.backgroundColor = 'transparent'
+
     this.init()
     this.test()
-    this.measure()
-    this.draw()
   }
 
   test () {
     window.sgcUi = this
 
-    const o0 = new SgcText(this, 'hello world. fjYiQ 你好，世界。')
-    o0.setStyle({
-      width: '90%'
+    const c = new SgcContainer(this)
+    c.name = '0'
+    c.setStyle({
+      display: 'block',
+      height: '100%',
+      backgroundColor: 'white'
     })
-    this.addChild(o0)
 
-    const o1 = new SgcText(this, 'adflsdflasdjflsdj')
-    o1.setStyle({
-      position: 'relative',
-      backgroundColor: 'gray',
-      fontSize: 30,
-      x: 5,
-      y: 5
+    const c0 = new SgcContainer(c)
+    c0.name = '0-0'
+    c0.setStyle({
+      display: 'inline',
+      width: '30%',
+      height: 60,
+      backgroundColor: '#16C6D8'
     })
-    this.addChild(o1)
+
+    const c1 = new SgcContainer(c)
+    c1.name = '0-1'
+    c1.setStyle({
+      display: 'inline',
+      width: '40%',
+      height: 70,
+      backgroundColor: '#148ACF'
+    })
+
+    const c2 = new SgcContainer(c)
+    c2.name = '0-2'
+    c2.setStyle({
+      display: 'inline',
+      width: '150%',
+      height: 40,
+      backgroundColor: 'rgba(207, 20, 138, 0.3)'
+    })
+
+    const c3 = new SgcContainer(c)
+    c3.name = '0-3'
+    c3.setStyle({
+      display: 'block',
+      width: '60%',
+      height: '50%',
+      backgroundColor: 'rgba(207, 138, 20, 0.3)'
+    })
+
+    const o = new SgcText(c3, `好棒哦！下雪了！是时候堆个雪人了。詹姆斯跑了出去。他弄了一大堆雪。他把一个大雪球放到了最上面来充当头部。他给雪人加了一个围巾和一个帽子，又给雪人添了一个桔子当鼻子。他就加了煤炭来充当眼睛和纽扣。傍晚，詹姆斯打开了门。他看见了什么？雪人在移动！詹姆斯邀请它进来。雪人从来没有去过房间里面。它对猫咪打了个招呼。猫咪玩着纸巾。不久之后，雪人牵着詹姆斯的手出去了。他们一直向上升，一直升到空中！他们在飞翔！多么美妙的夜晚！第二天早上，詹姆斯从床上蹦了起来。他向门口跑去。他想感谢雪人，但是它已经消失了。`)
+    o.name = '4'
+    o.setStyle({
+      width: '100%',
+      whiteSpace: 'wrap',
+      textMaxLine: 3,
+      backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    })
 
     this.measure()
     this.layout()
     this.draw()
+
+    this.ratio = 0
+    this.testAnimation()
+  }
+
+  testAnimation () {
+    if (this.ratio >= 1) {
+      return
+    }
+    this.drawFrame(this.ratio)
+    this.ratio += 0.02
+    requestAnimationFrame(() => {
+      this.testAnimation()
+    })
   }
 
   init () {
+    this._copyCanvas()
     this._initListeners()
     this.resize()
+  }
+
+  _copyCanvas () {
+    this._canvas = this.canvas.cloneNode()
+    this._ctx = this._canvas.getContext('2d')
   }
 
   _initListeners () {}
@@ -56,34 +116,39 @@ export class SgcUi {
     this.height = p.clientHeight
     c.setAttribute('width', this.width)
     c.setAttribute('height', this.height)
-  }
 
-  addChild (o) {
-    this.children.push(o)
-  }
-
-  layout () {
-    const children = this.children
-    if (!children.length) {
-      return
-    }
-    children[0].layout()
-    for (let i = 1; i < children.length; i++) {
-      children[i].layout(children[i - 1])
-    }
+    const _c = this._canvas
+    _c.setAttribute('width', this.width)
+    _c.setAttribute('height', this.height)
   }
 
   measure () {
-    this.children.forEach(o => {
-      o.measure(this.ctx)
-    })
+    super.measure(this._ctx)
+  }
+
+  layout () {
+    super.layout()
   }
 
   draw () {
+    const ctx = this._ctx
+    super.draw(ctx)
+    this.drawFrame()
+  }
+
+  drawFrame () {
     this.ctx.clearRect(0, 0, this.width, this.height)
-    this.children.forEach(o => {
-      o.draw(this.ctx)
-    })
+    const imageData = this._ctx.getImageData(0, 0, this.width, this.height)
+    const data = imageData.data
+    const len = data.length
+    const ratio = this.ratio || 1
+    for (let i = 0; i < len; i = i + 4) {
+      data[i] *= ratio
+      data[i + 1] *= ratio
+      data[i + 2] *= ratio
+      data[i + 3] *= ratio
+    }
+    this.ctx.putImageData(imageData, 0, 0)
   }
 
   release () {}
