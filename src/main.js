@@ -13,6 +13,10 @@ if (temp) {
   store.commit('auth/setUserInfo', JSON.parse(temp))
 }
 
+document.body.addEventListener('touchemove', function (e) {
+  e.preventDefault()
+})
+
 new Vue({
   router,
   store,
