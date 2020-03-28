@@ -48,20 +48,26 @@ export default {
   top: 50%;
 }
 
-.toast-top-enter-active, .toast-top-leave-active,
-.toast-middle-enter-active, .toast-middle-leave-active,
-.toast-bottom-enter-active, .toast-bottom-leave-active {
+.toast-top-enter-active,
+.toast-top-leave-active,
+.toast-middle-enter-active,
+.toast-middle-leave-active,
+.toast-bottom-enter-active,
+.toast-bottom-leave-active {
   transition: all 0.3s ease;
 }
-.toast-top-enter, .toast-top-leave-to {
+.toast-top-enter,
+.toast-top-leave-to {
   top: -2rem;
   opacity: 0;
 }
-.toast-bottom-enter, .toast-bottom-leave-to {
+.toast-bottom-enter,
+.toast-bottom-leave-to {
   bottom: -2rem;
   opacity: 0;
 }
-.toast-middle-enter, .toast-middle-leave-to {
+.toast-middle-enter,
+.toast-middle-leave-to {
   opacity: 0;
 }
 </style>

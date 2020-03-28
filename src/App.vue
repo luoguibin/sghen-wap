@@ -5,16 +5,14 @@
 </template>
 
 <script>
-
 export default {
   name: 'App',
 
-  methods: {
-
-  }
+  methods: {}
 }
 </script>
 
 <style lang="scss" scoped>
-#app {}
+#app {
+}
 </style>

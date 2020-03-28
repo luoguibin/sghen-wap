@@ -2,7 +2,12 @@
   <div class="sg-form">
     <slot name="header"></slot>
     <input type="password" autocomplete="new-password" hidden />
-    <div v-for="item in formRules" :key="item.key" :class="{'sg-form-item': !item.noneClass}" v-show="!item.hidden">
+    <div
+      v-for="item in formRules"
+      :key="item.key"
+      :class="{'sg-form-item': !item.noneClass}"
+      v-show="!item.hidden"
+    >
       <template v-if="item.slot">
         <slot :name="item.key"></slot>
       </template>
@@ -97,7 +102,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/style/colors.scss";
+@import "../style/colors.scss";
 
 .sg-form {
   padding: 1rem;
@@ -106,7 +111,8 @@ export default {
     position: relative;
     padding-top: 0.5rem;
     border-bottom: 0.2rem solid $border-color;
-    input, textarea {
+    input,
+    textarea {
       display: block;
       width: 100%;
       padding: 0.3rem 0.5rem;
