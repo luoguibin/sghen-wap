@@ -8,6 +8,11 @@ import './style/index.scss'
 
 Vue.config.productionTip = false
 
+const temp = sessionStorage.getItem('sg-userinfo')
+if (temp) {
+  store.commit('auth/setUserInfo', JSON.parse(temp))
+}
+
 new Vue({
   router,
   store,
