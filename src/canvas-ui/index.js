@@ -87,6 +87,8 @@ export class SgcUi extends SgcContainer {
 
   testAnimation () {
     if (this.ratio >= 1) {
+      this.ratio = 1
+      this.drawFrame(this.ratio)
       return
     }
     this.drawFrame(this.ratio)
@@ -137,18 +139,23 @@ export class SgcUi extends SgcContainer {
   }
 
   drawFrame () {
-    this.ctx.clearRect(0, 0, this.width, this.height)
-    const imageData = this._ctx.getImageData(0, 0, this.width, this.height)
-    const data = imageData.data
-    const len = data.length
-    const ratio = this.ratio || 1
-    for (let i = 0; i < len; i = i + 4) {
-      data[i] *= ratio
-      data[i + 1] *= ratio
-      data[i + 2] *= ratio
-      data[i + 3] *= ratio
-    }
-    this.ctx.putImageData(imageData, 0, 0)
+    const ctx = this.ctx
+    ctx.save()
+    ctx.clearRect(0, 0, this.width, this.height)
+    const ratio = 1 - this.ratio || 0
+    const imageData = this._ctx.getImageData(this.width * ratio, 0, this.width, this.height)
+    // const data = imageData.data
+    // const len = data.length
+    // // run slowly
+    // for (let i = 0; i < len; i = i + 4) {
+    //   data[i] *= ratio
+    //   data[i + 1] *= ratio
+    //   data[i + 2] *= ratio
+    //   data[i + 3] *= ratio
+    // }
+
+    ctx.putImageData(imageData, 0, 0)
+    ctx.restore()
   }
 
   release () {}
