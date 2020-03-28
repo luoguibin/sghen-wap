@@ -93,7 +93,7 @@ export default {
       }
       // console.log('onMouseDown', this.isPullHanding)
       this.moveHandle = e => {
-        e.preventDefault()
+        // e.preventDefault()
         // e.stopPropagation()
         this.onMouseMove(e)
       }
@@ -140,7 +140,7 @@ export default {
       }
     },
     onMouseUp (e) {
-      e.preventDefault()
+      // e.preventDefault()
       // e.stopPropagation()
       if (!this.moveHandle) {
         return
