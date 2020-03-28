@@ -82,12 +82,19 @@ export default {
       this.marginTop = -50
       this.pullStatus = undefined
     },
+    /**
+     * @param{Event} e
+     */
     onMouseDown (e) {
+      e.preventDefault()
+      e.stopPropagation()
       if (this.pullStatus !== undefined || this.isPullHanding) {
         return
       }
       // console.log('onMouseDown', this.isPullHanding)
       this.moveHandle = e => {
+        e.preventDefault()
+        e.stopPropagation()
         this.onMouseMove(e)
       }
       this.previouseY = e.touches[0].clientY
@@ -133,6 +140,8 @@ export default {
       }
     },
     onMouseUp (e) {
+      e.preventDefault()
+      e.stopPropagation()
       if (!this.moveHandle) {
         return
       }
