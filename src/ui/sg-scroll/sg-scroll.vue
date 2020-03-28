@@ -86,7 +86,7 @@ export default {
      * @param{Event} e
      */
     onMouseDown (e) {
-      e.preventDefault()
+      // e.preventDefault()
       // e.stopPropagation()
       if (this.pullStatus !== undefined || this.isPullHanding) {
         return
