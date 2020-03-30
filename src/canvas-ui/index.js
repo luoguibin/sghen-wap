@@ -36,7 +36,7 @@ export class SgcUi extends SgcContainer {
     c0.name = '0-0'
     c0.setStyle({
       display: 'inline',
-      width: '30%',
+      width: 450,
       height: 60,
       backgroundColor: '#16C6D8'
     })
@@ -45,7 +45,7 @@ export class SgcUi extends SgcContainer {
     c1.name = '0-1'
     c1.setStyle({
       display: 'inline',
-      width: '40%',
+      width: 180,
       height: 70,
       backgroundColor: '#148ACF'
     })
@@ -54,7 +54,7 @@ export class SgcUi extends SgcContainer {
     c2.name = '0-2'
     c2.setStyle({
       display: 'inline',
-      width: '150%',
+      width: 300,
       height: 40,
       backgroundColor: 'rgba(207, 20, 138, 0.3)'
     })
@@ -102,6 +102,13 @@ export class SgcUi extends SgcContainer {
     this._copyCanvas()
     this._initListeners()
     this.resize()
+    this._resizeHandle = e => {
+      this.resize()
+      this.measure()
+      this.layout()
+      this.draw()
+    }
+    window.addEventListener('resize', this._resizeHandle)
   }
 
   _copyCanvas () {
@@ -158,5 +165,7 @@ export class SgcUi extends SgcContainer {
     ctx.restore()
   }
 
-  release () {}
+  release () {
+    window.removeEventListener('resize', this._resizeHandle)
+  }
 }
