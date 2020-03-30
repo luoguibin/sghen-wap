@@ -36,7 +36,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/style/colors.scss';
+@import '../style/colors.scss';
 
 .sg-button {
   display: block;
