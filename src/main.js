@@ -13,15 +13,9 @@ if (temp) {
   store.commit('auth/setUserInfo', JSON.parse(temp))
 }
 
-// document.body.ontouchstart = function (e) {
-//   e.preventDefault()
-// }
-// document.body.ontouchmove = function (e) {
-//   e.preventDefault()
-// }
-// document.body.ontouchend = function (e) {
-//   e.preventDefault()
-// }
+document.body.addEventListener('touchmove', function (e) {
+  e.preventDefault()
+}, { passive: false })
 
 new Vue({
   router,
