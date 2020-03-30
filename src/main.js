@@ -13,15 +13,15 @@ if (temp) {
   store.commit('auth/setUserInfo', JSON.parse(temp))
 }
 
-document.body.ontouchstart = function (e) {
-  e.preventDefault()
-}
-document.body.ontouchmove = function (e) {
-  e.preventDefault()
-}
-document.body.ontouchend = function (e) {
-  e.preventDefault()
-}
+// document.body.ontouchstart = function (e) {
+//   e.preventDefault()
+// }
+// document.body.ontouchmove = function (e) {
+//   e.preventDefault()
+// }
+// document.body.ontouchend = function (e) {
+//   e.preventDefault()
+// }
 
 new Vue({
   router,
