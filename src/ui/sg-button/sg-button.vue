@@ -1,10 +1,8 @@
 <template>
-  <div :class="`sg-button sg-button-` + type">
-    <button :disabled="disabled || isLoading" @click="onClick">
-      <span v-show="isLoading"></span>
-      <slot v-if="!isLoading"></slot>
-    </button>
-  </div>
+  <button :class="`sg-button sg-button-` + type" :disabled="disabled || isLoading" @click="onClick">
+    <i v-show="isLoading"></i>
+    <slot></slot>
+  </button>
 </template>
 
 <script>
@@ -41,20 +39,18 @@ export default {
 @import '@/style/colors.scss';
 
 .sg-button {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
   text-align: center;
   font-size: 1.6rem;
-  button {
-    display: block;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    font-size: inherit;
-    border-radius: 0.3rem;
-  }
-  span {
+
+  i {
     display: inline-block;
     width: 1rem;
     height: 1rem;
-    vertical-align: sub;
+    margin-right: 0.5rem;
     border-radius: 50%;
     border: 0.2rem solid $main-color;
     border-left-color: transparent;
@@ -63,23 +59,19 @@ export default {
 }
 
 .sg-button-default {
-  button {
-    color: $main-color;
-  }
+  color: $main-color;
 }
 
 .sg-button-primary {
-  button {
-    color: white;
-    background-color: $main-color;
-    &:active {
-      background-color: $main-active-color;
-    }
-    &:disabled {
-      background-color: $main-disabled-color;
-    }
+  color: white;
+  background-color: $main-color;
+  &:active {
+    background-color: $main-active-color;
   }
-  span {
+  &:disabled {
+    background-color: $main-disabled-color;
+  }
+  i {
     border: 0.2rem solid white;
     border-left-color: transparent;
   }
