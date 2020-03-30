@@ -11,7 +11,7 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+body, #app {
     height: 100%;
 }
 
@@ -45,12 +45,4 @@ body {
     }
 }
 
-button {
-    padding: 0;
-    outline: none;
-    border: none;
-    background-color: transparent;
-    &:focus {
-        outline: none;
-    }
-}
+@import './common.scss';

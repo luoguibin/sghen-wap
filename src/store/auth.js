@@ -6,6 +6,7 @@ export default {
   },
   mutations: {
     setUserInfo (state, data = {}) {
+      sessionStorage.setItem('sg-userinfo', JSON.stringify(data))
       state.phone = data.phone
       state.username = data.username
     }

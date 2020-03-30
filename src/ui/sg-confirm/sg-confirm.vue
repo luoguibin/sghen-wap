@@ -50,7 +50,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/style/colors';
+@import "../style/colors.scss";
 .sg-confirm-mask {
   position: fixed;
   top: 0;
@@ -104,7 +104,7 @@ export default {
       background-color: transparent;
     }
     .cancel {
-      color: $title-color;;
+      color: $title-color;
     }
     .confirm {
       color: $main-color;
@@ -112,10 +112,12 @@ export default {
   }
 }
 
-.confirm-enter-active, .confirm-leave-active {
+.confirm-enter-active,
+.confirm-leave-active {
   transition: all 0.3s ease;
 }
-.confirm-enter, .confirm-leave-to {
+.confirm-enter,
+.confirm-leave-to {
   opacity: 0;
 }
 </style>

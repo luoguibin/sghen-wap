@@ -8,6 +8,21 @@ import './style/index.scss'
 
 Vue.config.productionTip = false
 
+const temp = sessionStorage.getItem('sg-userinfo')
+if (temp) {
+  store.commit('auth/setUserInfo', JSON.parse(temp))
+}
+
+document.body.ontouchstart = function (e) {
+  e.preventDefault()
+}
+document.body.ontouchmove = function (e) {
+  e.preventDefault()
+}
+document.body.ontouchend = function (e) {
+  e.preventDefault()
+}
+
 new Vue({
   router,
   store,

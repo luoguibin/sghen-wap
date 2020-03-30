@@ -1,5 +1,8 @@
 <template>
   <div class="login">
+    <div class="login-header">
+      <h2>Sghen-UI测试</h2>
+    </div>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
       <div class="login-code" slot="code">
         <input v-model="formData.code" v-focus-within />
@@ -70,7 +73,8 @@ export default {
             }
           },
           _error: ''
-        }, {
+        },
+        {
           key: 'loginType',
           slot: true,
           noneClass: true
@@ -150,6 +154,10 @@ export default {
 
 <style lang="scss" scoped>
 .login {
+  .login-header {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
   .login-code {
     display: flex;
     flex-direction: row;

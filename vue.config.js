@@ -4,7 +4,7 @@ const argv = require('yargs').argv
 module.exports = {
   lintOnSave: true,
 
-  publicPath: process.env.NODE_ENV === 'production' ? '/peotry-wap/' : './',
+  publicPath: process.env.NODE_ENV === 'production' ? '/sghen-wap/' : './',
 
   chainWebpack: config => {
     // config
