@@ -120,8 +120,10 @@ export default {
         // console.log('pullStatus', this.pullStatus, yValue)
       } else {
         let unit = parseInt(yValue * 0.618)
-        if (unit > -2 && unit < 2) {
-          unit = unit < 0 ? -2 : 2
+        if (unit > 0 && unit < 3) {
+          unit = 3
+        } else if (unit > -3 && unit < 0) {
+          unit = -3
         }
         this.previouseY = clientY
         this.marginTop += unit
