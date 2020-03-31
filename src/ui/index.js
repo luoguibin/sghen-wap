@@ -1,5 +1,5 @@
 import Vue from 'vue'
-
+import './config'
 import SgButton from './sg-button'
 import SgForm from './sg-form'
 import SgToast from './sg-toast'

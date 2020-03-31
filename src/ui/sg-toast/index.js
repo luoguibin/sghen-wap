@@ -2,8 +2,7 @@ import Vue from 'vue'
 import SgToast from './sg-toast'
 
 let _sgInstance
-
-Vue.prototype.$toast = function (msg, options = {}) {
+const toastFunc = function (msg, options = {}) {
   let toast = _sgInstance
   if (!toast) {
     const Func = Vue.component(SgToast.name)
@@ -19,6 +18,9 @@ Vue.prototype.$toast = function (msg, options = {}) {
     toast.hide()
   }, options.duration || 3000)
 }
+
+Vue.prototype.$toast = toastFunc
+window._sgGlobal.$toast = toastFunc
 
 export default {
   install: function () {
