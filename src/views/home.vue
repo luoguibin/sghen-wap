@@ -6,6 +6,12 @@
       <span @click="onConfirm">退出</span>
     </div>
 
+    <sg-swipper :items="swipperItems">
+      <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">
+        {{item.slot}}
+      </div>
+    </sg-swipper>
+
     <sg-scroll
       ref="sgScroll"
       class="home-body sg-flex-one"
@@ -16,7 +22,7 @@
       <div class="scroll-item" style="text-align: center;">
         上拉加载，下拉刷新（请在移动端测试）
       </div>
-      <div v-for="(item, index) in items" :key="index" class="scroll-item">{{index}}</div>
+      <div v-for="(item, index) in scrollItems" :key="index" class="scroll-item">{{index}}</div>
       <div class="scroll-item" style="text-align: center;">共{{totalCount}}项目</div>
     </sg-scroll>
   </div>
@@ -33,7 +39,12 @@ export default {
       isEnd: false,
       totalCount: 50,
       loadCount: 0,
-      items: []
+      scrollItems: [],
+      swipperItems: [
+        { slot: 'item-0' },
+        { slot: 'item-1' },
+        { slot: 'item-2' }
+      ]
     }
   },
 
@@ -60,7 +71,7 @@ export default {
         for (let i = 0; i < count; i++) {
           items.push(i)
         }
-        this.items = items
+        this.scrollItems = items
         this.$refs.sgScroll.reset()
       }, 1500)
     },
