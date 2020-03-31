@@ -8,6 +8,10 @@
 export default {
   name: 'App',
 
+  created () {
+    window.app = this
+  },
+
   methods: {}
 }
 </script>

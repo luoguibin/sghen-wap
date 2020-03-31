@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { sgIsPhone } from '@/utils/sgRegExp'
 
 export default {
@@ -88,12 +88,18 @@ export default {
 
   created () {
     window.login = this
+    if (this.isLogin) {
+      this.$router.push({ name: 'home' })
+    }
   },
 
   computed: {
     countdownText () {
       return this.countdown + 'S后获取'
-    }
+    },
+    ...mapState({
+      isLogin: state => state.auth.phone
+    })
   },
 
   methods: {
@@ -115,17 +121,24 @@ export default {
     },
 
     getSmsCode () {
-      this.smsLoading = true
-      setTimeout(() => {
-        this.countdown = 60
-        clearInterval(this.countdownHandle)
-        this.countdownHandle = setInterval(() => {
-          this.countdown--
-          if (this.countdown === 0) {
-            clearInterval(this.countdownHandle)
-          }
-        }, 1000)
-      }, 2000)
+      this.$refs.form.validateField('phone', errMsg => {
+        if (errMsg) {
+          return
+        }
+        this.smsLoading = true
+        this._getSmsCode(this.formData.phone).then(() => {
+          this.countdown = 60
+          clearInterval(this.countdownHandle)
+          this.countdownHandle = setInterval(() => {
+            this.countdown--
+            if (this.countdown === 0) {
+              clearInterval(this.countdownHandle)
+            }
+          }, 1000)
+        }).finally(() => {
+          this.smsLoading = false
+        })
+      })
     },
 
     onSubmit () {
@@ -134,16 +147,28 @@ export default {
           return
         }
         this.isRequesting = true
-        this.login(JSON.parse(JSON.stringify(this.formData))).then(() => {
-          this.isRequesting = false
+
+        const { phone, pw, code } = this.formData
+        const params = { id: phone }
+        if (code) {
+          params.code = code
+          params.pw = '******'
+        } else {
+          params.pw = pw
+        }
+
+        this.login(params).then(() => {
           this.$toast('登录成功', { direction: 'bottom' })
           this.$router.push({ name: 'home' })
+        }).finally(() => {
+          this.isRequesting = false
         })
       })
     },
 
     ...mapActions({
-      login: 'auth/login'
+      login: 'auth/login',
+      _getSmsCode: 'auth/getSmsCode'
     })
   },
   beforeDestroy () {
