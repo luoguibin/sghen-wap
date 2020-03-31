@@ -167,7 +167,7 @@ export default {
     }
     .code-divider {
       margin: 0 1rem;
-      width: 0.1rem;
+      width: 1px;
       height: 1.6rem;
       background-color: rgb(151, 151, 151);
     }

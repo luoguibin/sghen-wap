@@ -77,7 +77,7 @@ export default {
     font-weight: bold;
   }
   .sg-confirm-content {
-    padding: 0.2rem 1rem 2rem;
+    padding: 2px 1rem 2rem;
     text-align: center;
     color: $content-color;
     font-size: 1.6rem;
@@ -87,14 +87,14 @@ export default {
     display: flex;
     align-items: center;
     line-height: 4rem;
-    border-top: 0.1rem solid $border-color;
+    border-top: 1px solid $border-color;
     div {
       flex: 1;
       text-align: center;
     }
     span {
       display: inline-block;
-      width: 0.1rem;
+      width: 1px;
       height: 3rem;
       background-color: $border-color;
     }

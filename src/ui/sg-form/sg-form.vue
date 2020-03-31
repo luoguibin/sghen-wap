@@ -110,7 +110,7 @@ export default {
   .sg-form-item {
     position: relative;
     padding-top: 0.5rem;
-    border-bottom: 0.2rem solid $border-color;
+    border-bottom: 2px solid $border-color;
     input,
     textarea {
       display: block;
@@ -140,9 +140,9 @@ export default {
       position: absolute;
       left: 0;
       right: 0;
-      bottom: -0.2rem;
+      bottom: -2px;
       width: 100%;
-      height: 0.2rem;
+      height: 2px;
       background-color: $border-color;
       transform: scaleX(0);
       transition: transform 0.3s;
@@ -168,7 +168,7 @@ export default {
   .sg-label-required::before {
     content: "*";
     color: $error-color;
-    padding-right: 0.2rem;
+    padding-right: 2px;
   }
 }
 </style>

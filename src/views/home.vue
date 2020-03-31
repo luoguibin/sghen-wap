@@ -6,11 +6,13 @@
       <span @click="onConfirm">退出</span>
     </div>
 
-    <sg-swipper :items="swipperItems">
-      <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">
-        {{item.slot}}
-      </div>
-    </sg-swipper>
+    <div style="padding: 1rem;">
+      <sg-swipper :items="swipperItems">
+        <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">
+          {{item.slot}}
+        </div>
+      </sg-swipper>
+    </div>
 
     <sg-scroll
       ref="sgScroll"
@@ -98,9 +100,9 @@ export default {
     padding: 1rem 0.5rem;
     text-align: right;
     font-size: 1.6rem;
-    border-bottom: 0.1rem solid #eee;
+    border-bottom: 1px solid #eee;
     span {
-      padding: 0 0.2rem;
+      padding: 0 2px;
     }
   }
   .home-body {
