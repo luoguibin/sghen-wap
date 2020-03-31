@@ -70,6 +70,25 @@ export default {
       })
     },
 
+    validateField (fieldKey, call) {
+      const fieldRule = this.formRules.find(o => o.key === fieldKey)
+      if (!fieldRule) {
+        call && call('未定义该字段')
+        return
+      }
+      if (!fieldRule.required) {
+        call && call()
+        return
+      }
+      const tempValidator = (v, rule) => {
+        return v ? '' : (rule.label || rule.key) + '不能为空'
+      }
+      const validator = fieldRule.validator || tempValidator
+      const msg = validator(this.formData[fieldRule.key], fieldRule)
+      fieldRule._error = msg || ''
+      call && call(msg)
+    },
+
     validate (call) {
       const tempValidator = (v, rule) => {
         return v ? '' : (rule.label || rule.key) + '不能为空'
