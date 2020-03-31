@@ -119,7 +119,10 @@ export default {
         }
         // console.log('pullStatus', this.pullStatus, yValue)
       } else {
-        const unit = parseInt(yValue * 0.618)
+        let unit = parseInt(yValue * 0.618)
+        if (unit > -2 && unit < 2) {
+          unit = unit < 0 ? -2 : 2
+        }
         this.previouseY = clientY
         this.marginTop += unit
         if (this.pullStatus === PULL_DOWN) {
