@@ -179,6 +179,8 @@ export default {
     .sg-button {
       width: 6rem;
       font-size: 1.3rem;
+      padding-right: 0;
+      padding-left: 0;
     }
   }
   .login-type {

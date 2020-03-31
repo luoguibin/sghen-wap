@@ -70,7 +70,7 @@ export default {
         content: '退出后需要重新登录验证',
         confirm: () => {
           this.logout()
-          this.$router.go(-1)
+          this.$router.go({ name: 'login' })
         }
       })
     },

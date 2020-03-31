@@ -52,7 +52,7 @@ export default {
     height: 1rem;
     margin-right: 0.5rem;
     border-radius: 50%;
-    border: 0.2rem solid $main-color;
+    border: 2px solid $main-color;
     border-left-color: transparent;
     animation: sg-rotate 1s infinite linear;
   }
@@ -72,7 +72,7 @@ export default {
     background-color: $main-disabled-color;
   }
   i {
-    border: 0.2rem solid white;
+    border: 2px solid white;
     border-left-color: transparent;
   }
 }
