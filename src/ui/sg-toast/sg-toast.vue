@@ -17,7 +17,7 @@ export default {
   methods: {
     show (msg, options = {}) {
       this.msg = msg
-      this.direction = options.direction || 'top'
+      this.direction = options.direction || 'bottom'
       this.visible = true
     },
     hide () {
