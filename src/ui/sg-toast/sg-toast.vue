@@ -9,7 +9,7 @@ export default {
   name: 'SgToast',
   data () {
     return {
-      direction: 'top',
+      direction: 'bottom',
       msg: '',
       visible: false
     }
