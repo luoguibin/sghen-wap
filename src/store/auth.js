@@ -1,5 +1,4 @@
 import { apiURL, apiPostData } from '@/api'
-import { MD5, enc } from 'crypto-js'
 
 export default {
   namespaced: true,
@@ -15,13 +14,32 @@ export default {
     }
   },
   actions: {
-    async login (context, data) {
-      if (data.pw) {
-        data.pw = enc.Base64.stringify(MD5(data.pw))
-      }
-      const resp = await apiPostData(apiURL.login, data)
-      context.commit('setUserInfo', resp.data)
-      return resp
+    login (context, data) {
+      return new Promise(function (resolve, reject) {
+        const func = function (data_) {
+          apiPostData(apiURL.login, data_).then(resp => {
+            context.commit('setUserInfo', resp.data)
+            resolve(resp)
+          }).catch(err => {
+            reject(err)
+          })
+        }
+        if (data.pw) {
+          // todo: crypto-js的core中加载了所有crypto包。。。
+          require(['crypto-js/enc-base64.js', 'crypto-js/md5.js'], function (Base64, MD5) {
+            data.pw = Base64.stringify(MD5(data.pw))
+          }, function (err) {
+            if (err) {
+              reject(new Error('配置文件加载失败'))
+              window._sgGlobal.$toast('配置文件加载失败', { direction: 'bottom' })
+            } else {
+              func(data)
+            }
+          })
+        } else {
+          func(data)
+        }
+      })
     },
     async getSmsCode (context, phone) {
       const resp = await apiPostData(apiURL.smsCode, { phone })
