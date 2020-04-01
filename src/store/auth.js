@@ -31,7 +31,7 @@ export default {
           }, function (err) {
             if (err) {
               reject(new Error('配置文件加载失败'))
-              window._sgGlobal.$toast('配置文件加载失败', { direction: 'bottom' })
+              window._sgGlobal.$toast('配置文件加载失败')
             } else {
               func(data)
             }

@@ -27,7 +27,7 @@ axios.interceptors.response.use(
     const status = Number(res.status) || 0
     const data = res.data || {}
     if (status !== 200 || data.code !== 1000) {
-      window._sgGlobal.$toast(data.msg || '操作失败', { direction: 'bottom' })
+      window._sgGlobal.$toast(data.msg || '操作失败')
       return Promise.reject(res)
     }
 

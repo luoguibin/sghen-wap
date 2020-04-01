@@ -158,7 +158,7 @@ export default {
         }
 
         this.login(params).then(() => {
-          this.$toast('登录成功', { direction: 'bottom' })
+          this.$toast('登录成功')
           this.$router.push({ name: 'home' })
         }).finally(() => {
           this.isRequesting = false
