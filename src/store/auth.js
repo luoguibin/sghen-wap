@@ -3,14 +3,18 @@ import { apiURL, apiPostData } from '@/api'
 export default {
   namespaced: true,
   state: {
-    phone: '',
-    username: ''
+    userID: '',
+    userName: '',
+    userAvatar: '',
+    phone: ''
   },
   mutations: {
     setUserInfo (state, data = {}) {
       sessionStorage.setItem('sg-userinfo', JSON.stringify(data))
+      state.userID = data.id
+      state.userAvatar = data.iconUrl
+      state.userName = data.userName || data.name
       state.phone = data.phone || data.id
-      state.username = data.username || data.name
     }
   },
   actions: {
