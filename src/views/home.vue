@@ -1,32 +1,21 @@
 <template>
-  <div class="home sg-flex">
+  <div class="home">
     <div class="home-header">
-      <span>{{username}}</span>
+      <span>{{userName}}</span>
       <span>|</span>
       <span @click="onConfirm">退出</span>
     </div>
 
-    <div style="padding: 1rem;">
-      <sg-swipper :items="swipperItems">
-        <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">
-          {{item.slot}}
-        </div>
-      </sg-swipper>
-    </div>
-
-    <sg-scroll
-      ref="sgScroll"
-      class="home-body sg-flex-one"
-      :isEnd="isEnd"
-      @load="handleLoad"
-      @refresh="handleRefresh"
-    >
-      <div class="scroll-item" style="text-align: center;">
-        上拉加载，下拉刷新（请在移动端测试）
+    <!-- 内容 -->
+    <div class="home-body">
+      <div style="padding: 1rem;">
+        <sg-swipper :items="swipperItems">
+          <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">{{item.slot}}</div>
+        </sg-swipper>
       </div>
-      <div v-for="(item, index) in scrollItems" :key="index" class="scroll-item">{{index}}</div>
-      <div class="scroll-item" style="text-align: center;">共{{totalCount}}项目</div>
-    </sg-scroll>
+
+      <sg-dropdown :options="dropdownOptions" style="width: 10rem; margin: 0 auto;"></sg-dropdown>
+    </div>
   </div>
 </template>
 
@@ -36,47 +25,41 @@ import { mapState, mapActions } from 'vuex'
 export default {
   name: 'Home',
 
+  components: {
+  },
+
   data () {
     return {
-      isEnd: false,
-      totalCount: 50,
-      loadCount: 0,
-      scrollItems: [],
-      swipperItems: [
-        { slot: 'item-0' },
-        { slot: 'item-1' },
-        { slot: 'item-2' }
+      hotPeotries: [],
+      swipperItems: [{ slot: 'item-0' }, { slot: 'item-1' }, { slot: 'item-2' }],
+      dropdownOptions: [
+        { label: 'label-0', value: '0' },
+        { label: 'label-1', value: '1' },
+        { label: 'labelabellabellabellabellabellabell-2', value: '0-2' },
+        { label: 'label-1', value: '2' },
+        { label: 'label-1', value: '3' },
+        { label: 'label-1', value: '4' },
+        { label: 'label-1', value: '5' },
+        { label: 'label-1', value: '6' },
+        { label: 'label-1', value: '7' },
+        { label: 'label-1', value: '8' },
+        { label: 'label-1', value: '9' },
+        { label: 'label-1', value: '10' }
       ]
     }
   },
 
   computed: {
     ...mapState({
-      username: state => state.auth.username
+      userName: state => state.auth.userName
     })
   },
 
+  created () {
+    window.home = this
+  },
+
   methods: {
-    handleLoad () {
-      this.loadCount += 20
-      this.getItems()
-    },
-    handleRefresh () {
-      this.loadCount = 20
-      this.getItems()
-    },
-    getItems () {
-      setTimeout(() => {
-        const items = []
-        const count = Math.min(this.totalCount, this.loadCount)
-        this.isEnd = count === this.totalCount
-        for (let i = 0; i < count; i++) {
-          items.push(i)
-        }
-        this.scrollItems = items
-        this.$refs.sgScroll.reset()
-      }, 1500)
-    },
     onConfirm () {
       this.$confirm({
         title: '提示',
@@ -96,6 +79,9 @@ export default {
 
 <style lang="scss" scoped>
 .home {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   .home-header {
     padding: 1rem 0.5rem;
     text-align: right;
@@ -105,14 +91,11 @@ export default {
       padding: 0 2px;
     }
   }
-  .home-body {
-    background-color: #f8f8f8;
-  }
 
-  .scroll-item {
-    padding: 1.6rem 1rem;
-    margin-bottom: 2rem;
-    background-color: white;
+  .home-body {
+    flex: 1;
+    height: 100%;
+    overflow: hidden auto;
   }
 }
 </style>
