@@ -1,0 +1,41 @@
+.sg-text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.sg-flex {
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+    .sg-flex-one {
+        overflow: hidden;
+    }
+}
+.sg-flex-column {
+    flex-direction: column;
+    height: 100%;
+    .sg-flex-one {
+        height: 100%;
+    }
+}
+.sg-flex-one {
+    flex: 1;
+}
+
+button {
+    padding: 0;
+    outline: none;
+    border: none;
+    background-color: transparent;
+    &:focus {
+        outline: none;
+    }
+}
+
+.iconfont {
+    width: 1.6rem;
+    height: 1.6rem;
+    line-height: 1.6rem;
+    font-size: 1.6rem;
+}
