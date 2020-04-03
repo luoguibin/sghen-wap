@@ -32,6 +32,10 @@ export const apiURL = {
   login: '/v1/user/login',
   // 验证码
   smsCode: '/v1/sms/send',
+
+  // 诗词热门列表
+  peotryHot: '/v1/peotry/query-popular',
+
   // 诗词词频列表
   peotryHotWord: '/v1/api/get/peotry/hot-word',
   // 热门诗词选集
@@ -39,5 +43,10 @@ export const apiURL = {
   // 年度诗词选集
   peotrySetListYear: '/v1/api/get/peotry-set/list-year',
   // 根据年度诗词创建数获取诗词作者列表
-  peotryUserListYear: '/v1/api/get/peotry-user/list-year'
+  peotryUserListYear: '/v1/api/get/peotry-user/list-year',
+
+  // 评论创建
+  commentCreate: '/v1/comment/create',
+  // 评论删除
+  commentDelete: '/v1/comment/delete'
 }
