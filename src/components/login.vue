@@ -182,6 +182,7 @@ export default {
   .login-header {
     margin-bottom: 2rem;
     text-align: center;
+    overflow: hidden;
   }
   .login-code {
     display: flex;
