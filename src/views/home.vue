@@ -15,6 +15,8 @@
       </div>
 
       <sg-dropdown :options="dropdownOptions" style="width: 10rem; margin: 0 auto;"></sg-dropdown>
+
+      <sg-time></sg-time>
     </div>
   </div>
 </template>

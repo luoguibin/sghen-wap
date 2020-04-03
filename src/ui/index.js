@@ -8,6 +8,7 @@ import SgConfirm from './sg-confirm'
 import SgScroll from './sg-scroll'
 import SgSwipper from './sg-swipper'
 import SgDropdown from './sg-dropdown'
+import SgTime from './sg-time'
 
 Vue.use(SgButton)
 Vue.use(SgForm)
@@ -16,3 +17,4 @@ Vue.use(SgConfirm)
 Vue.use(SgScroll)
 Vue.use(SgSwipper)
 Vue.use(SgDropdown)
+Vue.use(SgTime)
