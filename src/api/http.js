@@ -1,9 +1,7 @@
 import axios from 'axios'
 import Qs from 'qs'
-import { baseUrl } from './config'
 
 axios.defaults.timeout = 10000
-axios.defaults.baseURL = baseUrl
 
 axios.interceptors.request.use(
   config => {
@@ -21,9 +19,6 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   res => {
-    if (res.config.baseURL !== baseUrl) {
-      return res
-    }
     const status = Number(res.status) || 0
     const data = res.data || {}
     if (status !== 200 || data.code !== 1000) {

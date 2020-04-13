@@ -166,7 +166,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { baseUrl, imagePrefixPath } from '@/api/config'
 import { apiURL, apiPostData } from '@/api'
 
 export default {
@@ -258,8 +257,6 @@ export default {
   },
   data () {
     return {
-      imagePrefixPath,
-
       inComment: false,
       newComment: {
         type: 1,
@@ -294,15 +291,17 @@ export default {
       const imageObj = this.peotry.image
       if (imageObj && imageObj.count) {
         return JSON.parse(imageObj.images).map(v => {
+          let path
           if (v.indexOf('.') === 0) {
             if (v.indexOf('./file') === 0) {
-              return baseUrl + v.substr(1)
+              path = '/sapi' + v.substr(1)
             } else {
-              return imagePrefixPath + v.substr(1)
+              path = '/sapi/file/peotry/img' + v.substr(1)
             }
           } else {
-            return imagePrefixPath + v
+            path = '/sapi/file/peotry/img/' + v
           }
+          return path
         })
       } else {
         return []

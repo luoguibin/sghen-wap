@@ -58,8 +58,18 @@ module.exports = {
 
   devServer: {
     port: 8080,
-    https: false,
-    hotOnly: false,
-    proxy: null
+    // https: false,
+    // hotOnly: false,
+    proxy: {
+      '/sapi/': {
+        target: 'https://www.sghen.cn',
+        ws: false,
+        secure: true,
+        changeOrigin: true
+        // pathRewrite: {
+        //   '^/rng': ''
+        // }
+      }
+    }
   }
 }

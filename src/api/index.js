@@ -29,24 +29,24 @@ export const apiPostData = (url, data) =>
  */
 export const apiURL = {
   // 用户登陆
-  login: '/v1/user/login',
+  login: '/sapi/v1/user/login',
   // 验证码
-  smsCode: '/v1/sms/send',
+  smsCode: '/sapi/v1/sms/send',
 
   // 诗词热门列表
-  peotryHot: '/v1/peotry/query-popular',
+  peotryHot: '/sapi/v1/peotry/query-popular',
 
   // 诗词词频列表
-  peotryHotWord: '/v1/api/get/peotry/hot-word',
+  peotryHotWord: '/sapi/v1/api/get/peotry/hot-word',
   // 热门诗词选集
-  poetrySetPopular: '/v1/api/get/peotry-set/popular',
+  poetrySetPopular: '/sapi/v1/api/get/peotry-set/popular',
   // 年度诗词选集
-  peotrySetListYear: '/v1/api/get/peotry-set/list-year',
+  peotrySetListYear: '/sapi/v1/api/get/peotry-set/list-year',
   // 根据年度诗词创建数获取诗词作者列表
-  peotryUserListYear: '/v1/api/get/peotry-user/list-year',
+  peotryUserListYear: '/sapi/v1/api/get/peotry-user/list-year',
 
   // 评论创建
-  commentCreate: '/v1/comment/create',
+  commentCreate: '/sapi/v1/comment/create',
   // 评论删除
-  commentDelete: '/v1/comment/delete'
+  commentDelete: '/sapi/v1/comment/delete'
 }
