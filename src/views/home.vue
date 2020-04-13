@@ -10,7 +10,14 @@
     <div class="home-body">
       <div style="padding: 1rem;">
         <sg-swipper :items="swipperItems">
-          <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">{{item.slot}}</div>
+          <div v-for="(item, index) in swipperItems" :key="item.slot" :slot="item.slot">
+            <template v-if="index > 0">
+              {{item.slot}}
+            </template>
+            <div v-else>
+              <sg-button @click="$router.push({name: 'peotry-list'})">peotry-list</sg-button>
+            </div>
+          </div>
         </sg-swipper>
       </div>
 

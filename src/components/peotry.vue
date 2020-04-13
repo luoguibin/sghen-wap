@@ -1,7 +1,12 @@
 <template>
   <div :class="{'peotry': true, 'peotry-peot-icon': hasPeotIcon}" @click="onClickPeotIcon($event)">
     <!-- 诗人头像 -->
-    <img v-if="hasPeotIcon" class="peot-icon" img-type="user-peot" :src="peotry.user | user-icon" />
+    <img
+      v-if="hasPeotIcon"
+      class="peot-icon"
+      img-type="user-peot"
+      :src="(peotry.user && peotry.user.iconUrl) | imgFilter"
+    />
 
     <!-- 诗词选集及标题 -->
     <div :class="{'peotry-title': true, 'peotry-inline': titleInline}">
@@ -17,8 +22,8 @@
     <!-- 诗词点赞数 -->
     <div v-if="showRank" :class="{'peotry-rank': true, 'peotry-inline': titleInline}">
       <span class="peotry-count" v-show="showPraiseCount && praiseComments.length">
-      <i class="el-icon-s-data"></i>
-      {{praiseComments.length}}
+        <i class="el-icon-s-data"></i>
+        {{praiseComments.length}}
       </span>
       <span @click="onCommentPraise(true)" class="rank-praise">
         <i :class="[isPraise ? 'el-icon-star-on' : 'el-icon-star-off']"></i>
@@ -29,7 +34,9 @@
     <div :class="{'peot-name': true, 'peotry-inline': titleInline && !showRank}">
       <template v-if="titleInline">
         {{peotry.user ? '--' + peotry.user.name : ""}}
-        <span v-if="showTime">于{{peotry.time | time-format}}</span>
+        <span
+          v-if="showTime"
+        >于{{peotry.time | time-format}}</span>
       </template>
       <template v-else>
         {{peotry.user ? peotry.user.name : ""}}
@@ -51,17 +58,18 @@
     </div>
 
     <!-- 诗词图片 -->
-    <div v-if="showImage && peotryImages.length" class="images">
-      <div v-for="value in peotryImages" :key="value">
-        <img :src="value" />
+    <div v-if="showImage && thumbnails.length" class="images">
+      <div v-for="value in thumbnails" :key="value" class="image-wrapper">
+        <div class="image-wrapper__inner">
+          <img :src="value" />
+        </div>
       </div>
     </div>
 
     <!-- 诗词功能按钮 -->
-    <div v-show="showMore" class="peotry-more">
+    <!-- <div v-show="showMore" class="peotry-more">
       <template v-if="showMoreDirect">
         <sg-button @click="onCommandMore('praise')">{{isPraise ? "取消点赞" : "点赞"}}</sg-button>
-        <!-- 冒泡事件会触发其他区域点击从而隐藏输入框？ -->
         <sg-button @click.stop="onCommandMore('comment')">评论</sg-button>
       </template>
       <el-dropdown v-else @command="onCommandMore" trigger="click">
@@ -99,7 +107,7 @@
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-    </div>
+    </div>-->
 
     <!-- 诗词评论 -->
     <div v-if="showComment && peotry.comments && peotry.comments.length" class="comments">
@@ -169,6 +177,8 @@ import { mapState } from 'vuex'
 import { apiURL, apiPostData } from '@/api'
 
 export default {
+  name: 'Peotry',
+
   props: {
     peotry: {
       type: Object,
@@ -276,6 +286,21 @@ export default {
       showUserInfo: {}
     }
   },
+  filters: {
+    imgFilter (v) {
+      let path
+      if (v.indexOf('.') === 0) {
+        if (v.indexOf('./file') === 0) {
+          path = '/sapi' + v.substr(1)
+        } else {
+          path = '/sapi/file/peotry/img' + v.substr(1)
+        }
+      } else {
+        path = '/sapi/file/peotry/img/' + v
+      }
+      return path
+    }
+  },
   computed: {
     /**
      * @returns {Boolean} 返回是否为当前用户创建的诗词
@@ -288,24 +313,24 @@ export default {
      * @returns {Array} 返回诗词的直接可用图片列表
      */
     peotryImages () {
+      window.peotry = this
       const imageObj = this.peotry.image
       if (imageObj && imageObj.count) {
+        const imgFilter = this.$options.filters['imgFilter']
         return JSON.parse(imageObj.images).map(v => {
-          let path
-          if (v.indexOf('.') === 0) {
-            if (v.indexOf('./file') === 0) {
-              path = '/sapi' + v.substr(1)
-            } else {
-              path = '/sapi/file/peotry/img' + v.substr(1)
-            }
-          } else {
-            path = '/sapi/file/peotry/img/' + v
-          }
-          return path
+          return imgFilter(v)
         })
       } else {
         return []
       }
+    },
+    thumbnails () {
+      return this.peotryImages.map(v => {
+        v = v.replace(/.jpg$/, '_100.jpg')
+        v = v.replace(/.jpeg$/, '_100.jpeg')
+        v = v.replace(/.png$/, '_100.png')
+        return v
+      })
     },
 
     /**
@@ -369,7 +394,6 @@ export default {
     }
   },
   mounted () {
-    console.log(this.$refs.contentEl)
     this.checkCanExpand(true)
   },
   methods: {
@@ -408,7 +432,11 @@ export default {
       comment.content = ''
       comment.typeId = this.peotry.id
       comment.fromId = this.userID
-      comment.fromUser = { id: this.userID, name: this.userName, iconUrl: this.userAvatar }
+      comment.fromUser = {
+        id: this.userID,
+        name: this.userName,
+        iconUrl: this.userAvatar
+      }
       comment.toId = toId
       if (toId > 1 && toId !== comment.fromId) {
         const fromComment = this.realComments.find(o => o.fromId === toId)
@@ -430,7 +458,8 @@ export default {
       }
     },
     onClickExpand () {
-      this.contentHeight = this.contentHeight === 'initial' ? '105px' : 'initial'
+      this.contentHeight =
+        this.contentHeight === 'initial' ? '105px' : 'initial'
     },
 
     openComment (toId) {
@@ -527,7 +556,10 @@ export default {
       apiPostData(apiURL.commentCreate, this.newComment).then(resp => {
         const comment = resp.data.data
         this.addComment(comment)
-        this.$emit('update', { type: 'comment-create', isPraise: comment.toId === -1 })
+        this.$emit('update', {
+          type: 'comment-create',
+          isPraise: comment.toId === -1
+        })
       })
 
       this.setOutClick(false)
@@ -538,7 +570,11 @@ export default {
      */
     addComment (comment) {
       if (comment.fromId > 1) {
-        comment.fromUser = { id: this.userID, name: this.userName, iconUrl: this.userAvatar }
+        comment.fromUser = {
+          id: this.userID,
+          name: this.userName,
+          iconUrl: this.userAvatar
+        }
         delete comment.fromUser.token
       }
       // 正常流程都是点击评论列表中的某个用户，所以存在用户
@@ -558,15 +594,17 @@ export default {
      * @param {Boolean} needEmit 是否需要抛出事件
      */
     onCommentDelete (id, needEmit) {
-      apiPostData(apiURL.commentDelete, { id, fromId: this.userID }).then(resp => {
-        const index = this.peotry.comments.findIndex(o => o.id === id)
-        const comment = this.peotry.comments.splice(index, 1)[0]
-        this.$emit('update', {
-          type: 'comment-delete',
-          peotryId: this.peotry.id,
-          isPraise: comment.toId === -1
-        })
-      })
+      apiPostData(apiURL.commentDelete, { id, fromId: this.userID }).then(
+        resp => {
+          const index = this.peotry.comments.findIndex(o => o.id === id)
+          const comment = this.peotry.comments.splice(index, 1)[0]
+          this.$emit('update', {
+            type: 'comment-delete',
+            peotryId: this.peotry.id,
+            isPraise: comment.toId === -1
+          })
+        }
+      )
     },
 
     /**
@@ -697,6 +735,7 @@ $padding-set: 12px;
   }
 
   .content-expand {
+    margin-bottom: 2rem;
     font-size: $size-content;
 
     span {
@@ -707,9 +746,27 @@ $padding-set: 12px;
   }
 
   .images {
-    padding-bottom: $padding-set;
-    margin-top: 16px;
-    font-size: 0;
+    .image-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 30%;
+      height: 0;
+      padding-bottom: 30%;
+      margin-right: 3%;
+      margin-bottom: 3%;
+    }
+    .image-wrapper__inner {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 3px;
+    }
+    img {
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+    }
   }
 
   .peotry-more {
@@ -820,22 +877,5 @@ $padding-set: 12px;
 
 .peotry-peot-icon {
   padding-left: 38px;
-}
-
-</style>
-
-<style lang="scss">
-.peotry {
-  .images {
-    margin: -3px;
-    .el-image {
-      width: 90px;
-      height: 80px;
-      margin: 3px;
-      .image-slot {
-        font-size: 25px;
-      }
-    }
-  }
 }
 </style>
