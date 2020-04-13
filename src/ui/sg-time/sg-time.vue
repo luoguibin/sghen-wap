@@ -3,7 +3,11 @@
     <!-- <div>currentTimeText</div> -->
 
     <div class="sg-flex">
-      <div class="sg-flex-two sg-time_year" @touchstart="onActionStart($event, 'year')">
+      <div
+        v-show="ymdVisible"
+        class="sg-flex-two sg-time_year"
+        @touchstart="onActionStart($event, 'year')"
+      >
         <div
           ref="yearPanel"
           class="sg-time-panel"
@@ -12,8 +16,12 @@
           <div v-for="item in listMap.year" :key="item" class="sg-time-item">{{item}}</div>
         </div>
       </div>
-      <span>-</span>
-      <div class="sg-flex-one sg-time_month" @touchstart="onActionStart($event, 'month')">
+      <span v-show="ymdVisible">-</span>
+      <div
+        v-show="ymdVisible"
+        class="sg-flex-one sg-time_month"
+        @touchstart="onActionStart($event, 'month')"
+      >
         <div
           ref="monthPanel"
           class="sg-time-panel"
@@ -22,8 +30,12 @@
           <div v-for="item in listMap.month" :key="item" class="sg-time-item">{{item}}</div>
         </div>
       </div>
-      <span>-</span>
-      <div class="sg-flex-one sg-time_date" @touchstart="onActionStart($event, 'date')">
+      <span v-show="ymdVisible">-</span>
+      <div
+        v-show="ymdVisible"
+        class="sg-flex-one sg-time_date"
+        @touchstart="onActionStart($event, 'date')"
+      >
         <div
           ref="datePanel"
           class="sg-time-panel"
@@ -32,8 +44,14 @@
           <div v-for="item in listMap.date" :key="item" class="sg-time-item">{{item}}</div>
         </div>
       </div>
-      <span>&nbsp;&nbsp;</span>
-      <div class="sg-flex-one sg-time_hour" @touchstart="onActionStart($event, 'hour')">
+
+      <span v-show="ymdVisible && hmsVisible">&nbsp;&nbsp;</span>
+
+      <div
+        v-show="hmsVisible"
+        class="sg-flex-one sg-time_hour"
+        @touchstart="onActionStart($event, 'hour')"
+      >
         <div
           ref="hourPanel"
           class="sg-time-panel"
@@ -42,8 +60,12 @@
           <div v-for="item in listMap.hour" :key="item" class="sg-time-item">{{item}}</div>
         </div>
       </div>
-      <span>:</span>
-      <div class="sg-flex-one sg-time_minute" @touchstart="onActionStart($event, 'minute')">
+      <span v-show="hmsVisible">:</span>
+      <div
+        v-show="hmsVisible"
+        class="sg-flex-one sg-time_minute"
+        @touchstart="onActionStart($event, 'minute')"
+      >
         <div
           ref="minutePanel"
           class="sg-time-panel"
@@ -52,8 +74,12 @@
           <div v-for="item in listMap.minute" :key="item" class="sg-time-item">{{item}}</div>
         </div>
       </div>
-      <span>:</span>
-      <div class="sg-flex-one sg-time_second" @touchstart="onActionStart($event, 'second')">
+      <span v-show="hmsVisible">:</span>
+      <div
+        v-show="hmsVisible"
+        class="sg-flex-one sg-time_second"
+        @touchstart="onActionStart($event, 'second')"
+      >
         <div
           ref="secondPanel"
           class="sg-time-panel"
@@ -70,7 +96,16 @@
 export default {
   name: 'SgTime',
 
-  props: {},
+  props: {
+    ymdVisible: {
+      type: Boolean,
+      default: true
+    },
+    hmsVisible: {
+      type: Boolean,
+      default: true
+    }
+  },
 
   data () {
     return {
@@ -269,8 +304,14 @@ export default {
         const index = Math.round(originY / itemHeight)
         return this.listMap[key][index]
       }
-
-      return ['year', 'month', 'date', 'hour', 'minute', 'second'].map(func)
+      const timeKeys = []
+      if (this.ymdVisible) {
+        timeKeys.push('year', 'month', 'date')
+      }
+      if (this.hmsVisible) {
+        timeKeys.push('hour', 'minute', 'second')
+      }
+      return timeKeys.map(func)
     }
   }
 }
