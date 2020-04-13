@@ -129,6 +129,7 @@ export default {
     height: 100%;
     background-color: white;
     box-sizing: border-box;
+    overflow: hidden;
   }
   .sg-swipper-item_active {
   }
