@@ -69,6 +69,7 @@ export default {
 
 <style lang="scss" scoped>
 @import "../style/colors.scss";
+@import "../style/size.scss";
 
 .sg-dropdown {
   position: relative;
@@ -95,6 +96,7 @@ export default {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: white;
     border-radius: 0.3rem;
+    z-index: $zIndex100;
     .options-wrapper {
       padding: 0 1rem;
       max-height: 16rem;
