@@ -18,6 +18,10 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    auto: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -48,8 +52,12 @@ export default {
         const itemWidth = this.$refs.wrapper.clientWidth
         this.currentIndex = index
         this.translateX = -index * itemWidth
+        this.$emit('change', index)
       })
 
+      if (!this.auto) {
+        return
+      }
       this._clearLoop()
       this.loopTimer = setTimeout(() => {
         let index = this.currentIndex + 1
