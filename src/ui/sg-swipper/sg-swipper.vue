@@ -2,7 +2,7 @@
   <div class="sg-swipper">
     <div ref="wrapper" :class="{ 'sg-swipper-wrapper': true, 'sg-swipper-wrapper_anime': !isTouching }"
       :style="wrapperStyle" @touchstart="onMouseDown" @touchend="onMouseUp">
-      <div v-for="(item, index) in items" :key="index"
+      <div v-for="(item, index) in items" :key="index" ref="swipperItems"
         :class="{ 'sg-swipper-item': true, 'sg-swipper-item_active': index === currentIndex }">
         <slot :name="item.slot"></slot>
       </div>
@@ -52,7 +52,10 @@ export default {
         const itemWidth = this.$refs.wrapper.clientWidth
         this.currentIndex = index
         this.translateX = -index * itemWidth
-        this.$emit('change', index)
+        if (this.originIndex !== index) {
+          this.$emit('change', index)
+        }
+        this.originIndex = index
       })
 
       if (!this.auto) {
@@ -86,6 +89,10 @@ export default {
       this.$el.addEventListener('touchmove', this.moveHandle)
     },
     onMouseMove (e) {
+      const item = this.$refs.swipperItems[this.currentIndex]
+      if (item.scrollLeft > 0 && item.scrollLeft + item.clientWidth < item.scrollWidth) {
+        return
+      }
       const clientX = e.touches[0].clientX
       this.translateX += clientX - this.previouseX
       if (this.translateX > 200) {
@@ -136,8 +143,9 @@ export default {
     width: 100%;
     height: 100%;
     background-color: white;
+    vertical-align: top;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: auto;
   }
   .sg-swipper-item_active {
   }
