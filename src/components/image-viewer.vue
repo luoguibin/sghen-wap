@@ -2,20 +2,22 @@
   <div class="image-viewer-mask" v-show="visible">
     <div class="image-viewer">
       <div class="image-viewer-header">
-        <div @click="$emit('update:visible', false)">&lt;</div>
-        <span>|</span>
+        <div class="back" @click="$emit('update:visible', false)">
+          <i class="iconfont icon-down"></i>
+        </div>
+        <span></span>
         <div class="image-name">{{currentName}}</div>
       </div>
-      <div :class="{'image-viewer-wrapper': true, 'image-view-origin': showType}">
+      <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
         <sg-swipper ref="swipper" :items="swipperItems" :auto="false" @change="hanleChange">
           <div v-for="(item, index) in imageOptions" :key="index" :slot="'img-' + index" class="image-wrapper">
             <img v-if="item.visible" :src="item.src" />
           </div>
         </sg-swipper>
       </div>
-      <!-- <div class="image-viewer-footer">
-        <sg-button @click="showType = !showType">原图/自适应</sg-button>
-      </div> -->
+      <div class="image-viewer-footer">
+        <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button>
+      </div>
     </div>
   </div>
 </template>
@@ -42,7 +44,7 @@ export default {
   data () {
     return {
       imageOptions: [],
-      showType: false
+      isShowNatural: false
     }
   },
 
@@ -69,7 +71,6 @@ export default {
       if (v) {
         const swipper = this.$refs.swipper
         swipper && swipper.setCurrentIndex(this.index)
-        console.log(swipper, this.index)
         this.imageOptions = this.images.map(v => {
           return { src: v, visible: false }
         })
@@ -84,6 +85,10 @@ export default {
   methods: {
     hanleChange (index) {
       this.currentIndex = index
+      this.isShowNatural = false
+      if (!this.imageOptions.length) {
+        return
+      }
       const min = Math.max(index - 2, 0)
       const max = Math.min(index + 2, this.images.length - 1)
       for (let i = min; i <= max; i++) {
@@ -116,10 +121,18 @@ export default {
     width: 100%;
     display: flex;
     flex-direction: row;
+    padding: 1rem;
+    box-sizing: border-box;
     font-size: 1.8rem;
     color: white;
     div {
       display: inline-block;
+    }
+    .back {
+      transform: rotate(90deg);
+      .iconfont {
+        font-size: inherit;
+      }
     }
     .image-name {
       flex: 1;
@@ -136,21 +149,30 @@ export default {
     bottom: 0;
     z-index: 10;
     width: 100%;
-    text-align: center;
+    text-align: right;
+    .sg-button {
+      display: inline-block;
+      width: initial;
+    }
   }
   .image-viewer-wrapper {
+    // width: 100%;
     height: 100%;
-    overflow: hidden;
+    // overflow: auto;
   }
   .image-wrapper {
-    position: absolute;
-    top: 50%;
-    transform: translate(0, -50%);
+    // position: absolute;
+    // top: 50%;
+    // transform: translate(0, -50%);
+    // height: 100%;
+    box-sizing: border-box;
     padding: 1rem;
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     img {
       width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
   }
 }
@@ -163,6 +185,15 @@ export default {
     .sg-swipper-item {
       position: relative;
       background-color: transparent;
+    }
+  }
+  .image-view-origin .sg-swipper-item_active {
+    .image-wrapper {
+      img {
+        width: initial;
+        height: initial;
+        object-fit: none;
+      }
     }
   }
 }

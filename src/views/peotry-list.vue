@@ -81,6 +81,9 @@ export default {
 
   .peotry {
     margin-bottom: 3rem;
+    &:first-child {
+      margin-top: 2rem;
+    }
   }
 }
 </style>
