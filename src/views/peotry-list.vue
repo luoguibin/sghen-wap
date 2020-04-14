@@ -1,20 +1,24 @@
 <template>
   <div class="peotry-list">
     <sg-scroll ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
-      <peotry v-for="item in peotries" :key="item.id" :peotry="item"></peotry>
+      <peotry v-for="item in peotries" :key="item.id" :peotry="item" @img="handleImage"></peotry>
     </sg-scroll>
+
+    <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
   </div>
 </template>
 
 <script>
 import { apiURL, apiGetData } from '@/api'
 import Peotry from '@/components/peotry'
+import ImageViewer from '@/components/image-viewer'
 
 export default {
   nae: 'PeotryList',
 
   components: {
-    Peotry
+    Peotry,
+    ImageViewer
   },
 
   data () {
@@ -23,7 +27,11 @@ export default {
       peotries: [],
 
       page: 1,
-      limit: 20
+      limit: 20,
+
+      viewerVisible: false,
+      images: [],
+      imageIndex: 0
     }
   },
 
@@ -54,6 +62,12 @@ export default {
     handleRefresh () {
       this.page = 1
       this.handleLoad(true)
+    },
+
+    handleImage (e) {
+      this.viewerVisible = true
+      this.images = e.images
+      this.imageIndex = e.index
     }
   }
 }
@@ -61,6 +75,7 @@ export default {
 
 <style lang="scss" scoped>
 .peotry-list {
+  position: relative;
   height: 100%;
   overflow: hidden;
 

@@ -58,7 +58,7 @@
     </div>
 
     <!-- 诗词图片 -->
-    <div v-if="showImage && thumbnails.length" class="images">
+    <div v-if="showImage && thumbnails.length" class="images" @click="onClickImg">
       <div v-for="value in thumbnails" :key="value" class="image-wrapper">
         <div class="image-wrapper__inner">
           <img :src="value" />
@@ -288,6 +288,9 @@ export default {
   },
   filters: {
     imgFilter (v) {
+      if (!v) {
+        return require('@/assets/logo.png')
+      }
       let path
       if (v.indexOf('.') === 0) {
         if (v.indexOf('./file') === 0) {
@@ -326,9 +329,16 @@ export default {
     },
     thumbnails () {
       return this.peotryImages.map(v => {
-        v = v.replace(/.jpg$/, '_100.jpg')
-        v = v.replace(/.jpeg$/, '_100.jpeg')
-        v = v.replace(/.png$/, '_100.png')
+        if (v.endsWith('.jpg')) {
+          v = v.replace(/.jpg$/, '_100.jpg')
+        } else if (v.endsWith('.png')) {
+          v = v.replace(/.png$/, '_100.png')
+        } else if (v.endsWith('.jpeg')) {
+          v = v.replace(/.jpeg$/, '_100.jpeg')
+        } else {
+          v += '_100.jpg'
+        }
+
         return v
       })
     },
@@ -634,6 +644,21 @@ export default {
           }
         }
       }
+    },
+
+    onClickImg (e) {
+      let el = e.target
+      if (el.tagName !== 'IMG') {
+        return
+      }
+
+      let index = -1
+      el = el.parentElement.parentElement
+      while (el) {
+        index++
+        el = el.previousElementSibling
+      }
+      this.$emit('img', { index, images: this.peotryImages })
     }
   }
 }
