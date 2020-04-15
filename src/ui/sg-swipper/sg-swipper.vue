@@ -22,6 +22,10 @@ export default {
     auto: {
       type: Boolean,
       default: true
+    },
+    index: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -35,7 +39,7 @@ export default {
 
   mounted () {
     window.sgSwipper = this
-    this.setCurrentIndex(0)
+    this.setCurrentIndex(this.index)
   },
 
   computed: {

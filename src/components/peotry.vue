@@ -1,37 +1,22 @@
 <template>
-  <div :class="{'peotry': true, 'peotry-peot-icon': hasPeotIcon}" @click="onClickPeotIcon($event)">
+  <div :class="{'peotry': true, 'avatar-visible': showAvatar}" item-type="peotry">
     <!-- 诗人头像 -->
     <img
-      v-if="hasPeotIcon"
-      class="peot-icon"
-      img-type="user-peot"
+      v-if="showAvatar"
+      class="peot-avatar"
+      item-type="peot-avatar"
       :src="(peotry.user && peotry.user.iconUrl) | imgFilter"
     />
 
     <!-- 诗词选集及标题 -->
     <div :class="{'peotry-title': true, 'peotry-inline': titleInline}">
-      <span
-        v-if="peotry.set"
-        class="tooltip peotry-set"
-        :tooltip="'选集：' + peotry.set.name"
-      >{{peotry.set.name}}</span>
-      <span v-if="peotry.set && peotry.title" class="peotry-set_dot">*</span>
-      <span class="peotry-title" v-show="peotry.title">{{peotry.title}}</span>
-    </div>
-
-    <!-- 诗词点赞数 -->
-    <div v-if="showRank" :class="{'peotry-rank': true, 'peotry-inline': titleInline}">
-      <span class="peotry-count" v-show="showPraiseCount && praiseComments.length">
-        <i class="el-icon-s-data"></i>
-        {{praiseComments.length}}
-      </span>
-      <span @click="onCommentPraise(true)" class="rank-praise">
-        <i :class="[isPraise ? 'el-icon-star-on' : 'el-icon-star-off']"></i>
-      </span>
+      <span v-if="peotry.set" class="peotry-set">{{peotry.set.name}}</span>
+      <span v-if="peotry.set && peotry.title" class="peotry-dot">*</span>
+      <span class="peotry-title" v-if="peotry.title">{{peotry.title}}</span>
     </div>
 
     <!-- 诗词作者及创建时间 -->
-    <div :class="{'peot-name': true, 'peotry-inline': titleInline && !showRank}">
+    <div :class="{'peot-name': true, 'peotry-inline': titleInline}">
       <template v-if="titleInline">
         {{peotry.user ? '--' + peotry.user.name : ""}}
         <span
@@ -54,127 +39,55 @@
     <!-- 诗词扩展按钮 -->
     <div v-if="canExpand" class="content-expand">
       <p v-show="contentHeight !== 'initial'">...</p>
-      <span @click="onClickExpand">{{contentHeight === 'initial' ? '收起' : expandText}}</span>
+      <span @click.stop="onClickExpand">{{contentHeight === 'initial' ? '收起' : expandText}}</span>
     </div>
 
     <!-- 诗词图片 -->
-    <div v-if="showImage && thumbnails.length" class="images" @click="onClickImg">
+    <div v-if="showImage && thumbnails.length" class="images">
       <div v-for="value in thumbnails" :key="value" class="image-wrapper">
         <div class="image-wrapper__inner">
-          <img :src="value" />
+          <img item-type="peotry-image" :src="value" />
         </div>
       </div>
     </div>
 
-    <!-- 诗词功能按钮 -->
-    <!-- <div v-show="showMore" class="peotry-more">
-      <template v-if="showMoreDirect">
-        <sg-button @click="onCommandMore('praise')">{{isPraise ? "取消点赞" : "点赞"}}</sg-button>
-        <sg-button @click.stop="onCommandMore('comment')">评论</sg-button>
-      </template>
-      <el-dropdown v-else @command="onCommandMore" trigger="click">
-        <i class="peotry-more_icon el-icon-more-outline"></i>
-
-        <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="comment">
-            <span>
-              评论
-              <i class="el-icon-chat-dot-square"></i>
-            </span>
-          </el-dropdown-item>
-
-          <el-dropdown-item command="praise">
-            <span>
-              {{isPraise ? "取消点赞" : "点赞"}}
-              <i
-                :class="[isPraise ? 'el-icon-star-on' : 'el-icon-star-off']"
-              ></i>
-            </span>
-          </el-dropdown-item>
-
-          <el-dropdown-item v-if="isSelfPeotry" command="update">
-            <span>
-              更新
-              <i class="el-icon-edit-outline"></i>
-            </span>
-          </el-dropdown-item>
-
-          <el-dropdown-item v-if="isSelfPeotry" command="delete">
-            <span>
-              删除
-              <i class="el-icon-delete"></i>
-            </span>
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </el-dropdown>
-    </div>-->
-
     <!-- 诗词评论 -->
-    <div v-if="showComment && peotry.comments && peotry.comments.length" class="comments">
-      <div class="praise-users" v-show="praiseComments.length">
+    <div v-if="showComment && hasComments" class="comments">
+      <div class="praise-users" v-show="peotry.praiseComments.length">
         <img
-          v-for="comment in praiseComments"
+          v-for="comment in peotry.praiseComments"
           :key="comment.id"
-          img-type="user-list"
-          :src="comment.fromUser && comment.fromUser.iconUrl"
+          :src="comment.fromPeot && comment.fromPeot.iconUrl | imgFilter"
+          item-type="comment-avatar"
+          alt
         />
       </div>
 
-      <div v-show="praiseComments.length && realComments.length" class="comments-divider"></div>
+      <div v-show="hasComments" class="comments-divider"></div>
 
-      <div
-        v-for="comment in realComments"
-        class="comment"
-        :key="comment.id"
-        @click.stop="onCommentUser($event)"
-      >
+      <div v-for="comment in peotry.realComments" class="comment" :key="comment.id">
         <div class="users">
           <span
             class="user"
             :user-id="comment.fromId"
             :comment-id="comment.id"
-          >{{comment.fromUser ? comment.fromUser.name : comment.fromId}}</span>
+          >{{comment.fromPeot ? comment.fromPeot.name : comment.fromId}}</span>
           <span v-if="comment.toId !== comment.fromId" class="comment_to">回复</span>
           <span
             v-if="comment.toId !== comment.fromId"
             class="user"
             :user-id="comment.toId"
-          >{{comment.toUser ? comment.toUser.name : comment.toId}}</span>
+          >{{comment.toPeot ? comment.toPeot.name : comment.toId}}</span>
           <span class="comment_dot">:</span>
         </div>
         <p>{{comment.content}}</p>
       </div>
     </div>
-
-    <!-- 诗词评论输入框 -->
-    <div v-if="inComment" class="comment-input">
-      <h5
-        v-if="newComment.toId !== userID"
-        style="text-align: left;"
-      >回复：{{newComment.toUser ? newComment.toUser.name : newComment.toId}}</h5>
-      <el-input
-        ref="commentEl"
-        type="textarea"
-        :autosize="{ maxRows: 4}"
-        maxlength="100"
-        show-word-limit
-        placeholder="请输入内容"
-        v-model="newComment.content"
-      ></el-input>
-      <el-button
-        @click.stop="onCommentSubmit"
-        size="small"
-        :disabled="!newComment.content.trim()"
-      >提交</el-button>
-    </div>
-
-    <!-- 作者基本信息 -->
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { apiURL, apiPostData } from '@/api'
 
 export default {
   name: 'Peotry',
@@ -188,7 +101,7 @@ export default {
     /**
      * 是否有
      */
-    hasPeotIcon: {
+    showAvatar: {
       type: Boolean,
       default: true
     },
@@ -250,14 +163,6 @@ export default {
     },
 
     /**
-     * 是否显示排行
-     */
-    showRank: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
      * 扩展按钮
      */
     expandText: {
@@ -267,15 +172,14 @@ export default {
   },
   data () {
     return {
-      inComment: false,
       newComment: {
         type: 1,
         typeId: 0,
         content: '',
         fromId: 0,
-        fromUser: null,
+        fromPeot: null,
         toId: 0,
-        toUser: null
+        toPeot: null
       },
       clickTime: 0,
       canExpand: false,
@@ -343,34 +247,10 @@ export default {
       })
     },
 
-    /**
-     * @returns {Array} 返回用户评论列表
-     */
-    realComments () {
-      if (!this.peotry.comments) return []
-      return this.peotry.comments
-        .filter(comment => comment.toId > 0)
-        .sort(function (o0, o1) {
-          // 按时间排序评论列表
-          const time0 = new Date(o0.createTime).getTime()
-          const time1 = new Date(o1.createTime).getTime()
-          return time0 < time1 ? -1 : 1
-        })
-    },
-
-    /**
-     * @returns {Array} 返回用户点赞列表
-     */
-    praiseComments () {
-      if (!this.peotry.comments) return []
-      return this.peotry.comments
-        .filter(comment => comment.toId === -1 && comment.content === 'praise')
-        .sort(function (o0, o1) {
-          // 按时间排序评论列表
-          const time0 = new Date(o0.createTime).getTime()
-          const time1 = new Date(o1.createTime).getTime()
-          return time0 < time1 ? -1 : 1
-        })
+    hasComments () {
+      return (
+        this.peotry.realComments.length && this.peotry.praiseComments.length
+      )
     },
 
     /**
@@ -379,7 +259,7 @@ export default {
     myPraiseComment () {
       const userID = this.userID
       if (!userID) return
-      return this.praiseComments.find(
+      return this.peotry.praiseComments.find(
         comment => comment.toId === -1 && comment.fromId === userID
       )
     },
@@ -407,54 +287,6 @@ export default {
     this.checkCanExpand(true)
   },
   methods: {
-    /**
-     * 分发诗词操作
-     */
-    onCommandMore (key) {
-      switch (key) {
-        case 'comment':
-          this.openComment(this.userID)
-          break
-        case 'praise':
-          this.onCommentPraise()
-          break
-        case 'update':
-          this.$emit('on-update', this.peotry)
-          break
-        case 'delete':
-          this.$emit('on-delete', this.peotry)
-          break
-        default:
-          break
-      }
-    },
-
-    /**
-     * 检测当前评论对象
-     * 若toId===fromId，表示直接评论诗词；
-     * 若toId===-1，表示点赞诗词；
-     * 否则为回复某用户的评论
-     * @param {Integer} toId
-     */
-    checkComment (toId) {
-      window.testPeotry = this
-      const comment = this.newComment
-      comment.content = ''
-      comment.typeId = this.peotry.id
-      comment.fromId = this.userID
-      comment.fromUser = {
-        id: this.userID,
-        name: this.userName,
-        iconUrl: this.userAvatar
-      }
-      comment.toId = toId
-      if (toId > 1 && toId !== comment.fromId) {
-        const fromComment = this.realComments.find(o => o.fromId === toId)
-        comment.toUser = { ...fromComment.fromUser }
-      } else {
-        comment.toUser = null
-      }
-    },
     checkCanExpand (widthExpand) {
       const contentEl = this.$refs.contentEl
       if (!contentEl) {
@@ -470,195 +302,6 @@ export default {
     onClickExpand () {
       this.contentHeight =
         this.contentHeight === 'initial' ? '105px' : 'initial'
-    },
-
-    openComment (toId) {
-      if (!this.userID) {
-        this.$message.warning('请登录后再操作')
-        return
-      }
-      this.inComment = true
-      this.checkComment(toId)
-      this.$nextTick(() => {
-        this.$refs.commentEl.focus()
-        this.setOutClick(true)
-      })
-    },
-
-    setOutClick (flag) {
-      if (flag) {
-        if (!this.onOutClick) {
-          this.onOutClick = e => {
-            let el = e.srcElement
-            let count = 0
-            const commentEl = this.$refs.commentEl
-            if (!commentEl.$el) {
-              this.inComment = false
-              this.setOutClick(false)
-              return
-            }
-            const parentElement = commentEl.$el.parentElement
-            // 3代节点内检测是否还处于评论编辑框附近
-            while (el && count < 3) {
-              if (el === parentElement) {
-                break
-              } else {
-                count++
-                el = el.parentElement
-              }
-            }
-            if (el === parentElement) {
-              return
-            }
-            this.setOutClick(false)
-            this.inComment = false
-          }
-        }
-        window.addEventListener('click', this.onOutClick)
-      } else {
-        window.removeEventListener('click', this.onOutClick)
-      }
-    },
-
-    onCommentUser (e) {
-      if (!this.userID) {
-        this.$message.warning('请登录后再操作')
-        return
-      }
-      const userID = e.srcElement.getAttribute('user-id')
-      if (userID) {
-        const toId = parseInt(userID)
-        const commentId = parseInt(e.srcElement.getAttribute('comment-id'))
-        if (toId !== this.userID) {
-          this.openComment(toId)
-        } else if (commentId) {
-          this.$confirm('是否删除该评论？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          })
-            .then(() => {
-              this.inComment = false
-              this.onCommentDelete(commentId)
-            })
-            .catch(e => {})
-        }
-      }
-    },
-    onCommentPraise (needEmit) {
-      if (!this.userID) {
-        this.$message.warning('请登录后再操作')
-        return
-      }
-
-      if (this.isPraise) {
-        this.onCommentDelete(this.myPraiseComment.id, needEmit)
-      } else {
-        this.checkComment(-1)
-        this.newComment.content = 'praise'
-        this.onCommentSubmit(needEmit)
-      }
-    },
-    /**
-     * 提交诗词评论
-     */
-    onCommentSubmit (needEmit) {
-      apiPostData(apiURL.commentCreate, this.newComment).then(resp => {
-        const comment = resp.data.data
-        this.addComment(comment)
-        this.$emit('update', {
-          type: 'comment-create',
-          isPraise: comment.toId === -1
-        })
-      })
-
-      this.setOutClick(false)
-      this.inComment = false
-    },
-    /**
-     * 添加诗词本地评论
-     */
-    addComment (comment) {
-      if (comment.fromId > 1) {
-        comment.fromUser = {
-          id: this.userID,
-          name: this.userName,
-          iconUrl: this.userAvatar
-        }
-        delete comment.fromUser.token
-      }
-      // 正常流程都是点击评论列表中的某个用户，所以存在用户
-      const comments = this.peotry.comments
-      if (comment.toId > 1) {
-        const toComment = comments.find(o => o.fromId === comment.toId)
-        comment.toUser = { ...toComment.fromUser }
-      }
-      if (!comments) {
-        this.$set(this.peotry, 'comments', [])
-      }
-      comments.push(comment)
-    },
-    /**
-     * 删除某条评论
-     * @param {Integer} id 评论对象id
-     * @param {Boolean} needEmit 是否需要抛出事件
-     */
-    onCommentDelete (id, needEmit) {
-      apiPostData(apiURL.commentDelete, { id, fromId: this.userID }).then(
-        resp => {
-          const index = this.peotry.comments.findIndex(o => o.id === id)
-          const comment = this.peotry.comments.splice(index, 1)[0]
-          this.$emit('update', {
-            type: 'comment-delete',
-            peotryId: this.peotry.id,
-            isPraise: comment.toId === -1
-          })
-        }
-      )
-    },
-
-    /**
-     * 点击作者头像
-     * @param {Event} e
-     */
-    onClickPeotIcon (e) {
-      const el = e.srcElement
-      if (el.tagName === 'IMG') {
-        const imgType = el.getAttribute('img-type')
-        if (imgType === 'user-peot') {
-          this.showUserInfo = { ...this.peotry.user }
-          this.showUser = true
-        } else if (imgType === 'user-list') {
-          let index = 0
-          let tempEl = el
-          while (tempEl.previousElementSibling) {
-            index++
-            tempEl = tempEl.previousElementSibling
-          }
-          const user = this.praiseComments[index].fromUser
-          if (user) {
-            this.showUserInfo = { ...user }
-            this.showUser = true
-          } else {
-            this.$message.info('获取用户信息失败')
-          }
-        }
-      }
-    },
-
-    onClickImg (e) {
-      let el = e.target
-      if (el.tagName !== 'IMG') {
-        return
-      }
-
-      let index = -1
-      el = el.parentElement.parentElement
-      while (el) {
-        index++
-        el = el.previousElementSibling
-      }
-      this.$emit('img', { index, images: this.peotryImages })
     }
   }
 }
@@ -671,8 +314,9 @@ $padding-set: 12px;
 .peotry {
   position: relative;
   box-sizing: border-box;
+  padding-right: 1rem;
 
-  .peot-icon {
+  .peot-avatar {
     width: 26px;
     height: 26px;
     object-fit: contain;
@@ -694,7 +338,7 @@ $padding-set: 12px;
     .peotry-set {
       font-size: 18px;
     }
-    .peotry-set_dot {
+    .peotry-dot {
       font-size: 16px;
       padding: 0 5px;
     }
@@ -900,7 +544,7 @@ $padding-set: 12px;
   }
 }
 
-.peotry-peot-icon {
+.avatar-visible {
   padding-left: 38px;
 }
 </style>

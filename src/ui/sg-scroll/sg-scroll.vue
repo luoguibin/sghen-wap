@@ -19,6 +19,11 @@
           <template v-else>上拉加载</template>
         </div>
       </div>
+
+      <!-- 返回顶部按钮 -->
+      <div class="sg-scroll-top" v-show="topVisible" @click="onScrollToTop">
+        <i class="iconfont icon-top"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -49,7 +54,8 @@ export default {
       isTouching: false,
       isPullHanding: false,
 
-      isLoading: false
+      isLoading: false,
+      topVisible: false
     }
   },
 
@@ -142,6 +148,10 @@ export default {
       this.pullResult = ''
       this.translateY = 0
     },
+    onScrollToTop () {
+      this.$refs.scrollEl.scrollTop = 0
+      this.topVisible = false
+    },
     /**
      * @param{Event} e
      */
@@ -167,7 +177,10 @@ export default {
 
       const scrollEl = this.$refs.scrollEl
       const scrollTop = scrollEl.scrollTop
+      const clientHeight = scrollEl.clientHeight
       const sliceHeight = this.sliceHeight
+
+      this.topVisible = scrollTop > clientHeight * 2
 
       // console.log(`translateY=${this.translateY}, scrollTop=${scrollTop},`)
       // console.log(`scrollEl.clientHeight=${scrollEl.clientHeight}, scrollEl.scrollHeight=${scrollEl.scrollHeight}`)
@@ -235,6 +248,22 @@ export default {
   position: relative;
   height: 100%;
   overflow: hidden;
+
+  .sg-scroll-top {
+    position: absolute;
+    right: 5px;
+    bottom: 2rem;
+    i {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      font-size: 30px;
+      border-radius: 50%;
+      box-sizing: border-box;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      background-color: white;
+    }
+  }
 
   .sg-scroll-wrapper {
     height: 100%;

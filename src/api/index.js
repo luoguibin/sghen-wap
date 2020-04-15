@@ -34,6 +34,9 @@ export const apiURL = {
   // 验证码
   smsCode: `${preffix}/v1/sms/send`,
 
+  // 获取作者基本信息
+  userInfoList: `${preffix}/v1/user/query-list`,
+
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
