@@ -176,7 +176,7 @@ export default {
       let tempY = this.translateY
       if (scrollTop === 0) {
         // 可进入下拉，translateY应该为正数
-        if (yValue) {
+        if (yValue > 0) {
           e.preventDefault()
           e.stopPropagation()
         }
