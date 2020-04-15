@@ -55,8 +55,9 @@ export default {
         }
 
         this.isEnd = this.peotries.length === data.totalCount
-      }).finally(() => {
-        this.$refs.sgScroll.reset()
+        this.$refs.sgScroll.success()
+      }).catch(() => {
+        this.$refs.sgScroll.fail()
       })
     },
     handleRefresh () {
