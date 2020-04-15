@@ -1,19 +1,23 @@
 <template>
-  <div class="sg-scroll" @touchstart="onMouseDown" @touchend="onMouseUp">
-    <div class="sg-scroll-wrapper" :style="wrapperStyle">
-      <div class="sg-scroll-slice">
-        <template v-if="isPullHanding">{{isLoading ? '加载中...' : '松开后刷新'}}</template>
-        <template v-else>下拉刷新</template>
-      </div>
-      <div :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" ref="scrollEl">
-        <div>
-          <slot></slot>
+  <div class="sg-scroll-outter">
+    <div class="sg-scroll" @touchstart="onMouseDown" @touchend="onMouseUp">
+      <div :class="{'sg-scroll-wrapper': true, 'sg-scroll-anime': !isTouching}" :style="wrapperStyle">
+        <div class="sg-scroll-slice" :style="topSliceStyle">
+          <template v-if="pullResult">{{pullResult}}</template>
+          <template v-else-if="isPullHanding">{{isLoading ? '加载中...' : '松开后刷新'}}</template>
+          <template v-else>下拉刷新</template>
         </div>
-      </div>
-      <div class="sg-scroll-slice">
-        <template v-if="isEnd">暂无更多数据</template>
-        <template v-else-if="isPullHanding">{{isLoading ? '加载中...' : '松开后加载'}}</template>
-        <template v-else>上拉加载</template>
+        <div :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" ref="scrollEl">
+          <div>
+            <slot></slot>
+          </div>
+        </div>
+        <div class="sg-scroll-slice" :style="bottomSliceStyle">
+          <template v-if="pullResult">{{pullResult}}</template>
+          <template v-else-if="isEnd">暂无更多数据</template>
+          <template v-else-if="isPullHanding">{{isLoading ? '加载中...' : '松开后加载'}}</template>
+          <template v-else>上拉加载</template>
+        </div>
       </div>
     </div>
   </div>
@@ -35,10 +39,17 @@ export default {
 
   data () {
     return {
-      marginTop: -50,
+      sliceHeight: 50,
+      translateY: 0,
+      topScale: 1,
+      bottomScale: 1,
+
+      pullResult: '',
       pullStatus: undefined,
-      isLoading: false,
-      isPullHanding: false
+      isTouching: false,
+      isPullHanding: false,
+
+      isLoading: false
     }
   },
 
@@ -50,7 +61,27 @@ export default {
   computed: {
     wrapperStyle () {
       return {
-        'margin-top': this.marginTop + 'px'
+        'transform': `translate(0, ${this.translateY}px)`
+      }
+    },
+    topSliceStyle () {
+      const pxStr = this.sliceHeight + 'px'
+      const topScale = this.topScale
+      return {
+        'height': pxStr,
+        'line-height': pxStr,
+        'margin-top': '-' + pxStr,
+        'transform': `scale(${topScale}, ${topScale})`
+      }
+    },
+    bottomSliceStyle () {
+      const pxStr = this.sliceHeight + 'px'
+      const bottomScale = this.bottomScale
+      return {
+        'height': pxStr,
+        'line-height': pxStr,
+        'margin-bottom': '-' + pxStr,
+        'transform': `scale(${bottomScale}, ${bottomScale})`
       }
     }
   },
@@ -59,15 +90,17 @@ export default {
     refresh () {
       this.isPullHanding = true
       this.isLoading = true
-      this.marginTop = 0
+      this.translateY = this.sliceHeight
       this.pullStatus = PULL_DOWN
+      this.topScale = 1
       this.$emit('refresh')
     },
     load () {
       this.isPullHanding = true
       this.isLoading = true
-      this.marginTop = -100
+      this.translateY = -this.sliceHeight
       this.pullStatus = PULL_UP
+      this.bottomScale = 1
       if (this.isEnd) {
         this.$nextTick(() => {
           this.reset()
@@ -76,11 +109,38 @@ export default {
         this.$emit('load')
       }
     },
+    success () {
+      this.pullResult = this.pullStatus === PULL_DOWN ? '刷新成功' : '加载成功'
+      const scrollEl = this.$refs.scrollEl
+      const scrollTop = scrollEl.scrollTop
+      setTimeout(() => {
+        if (this.pullStatus === PULL_UP) {
+          const targetScrollTop = scrollTop + this.$el.clientHeight * 0.9
+          this.intervalTimer = setInterval(() => {
+            if (targetScrollTop > scrollEl.scrollTop) {
+              scrollEl.scrollTop += 50
+            } else {
+              clearInterval(this.intervalTimer)
+              this.intervalTimer = null
+            }
+          }, 20)
+        }
+        this.reset()
+      }, 800)
+    },
+    fail () {
+      this.pullResult = this.pullStatus === PULL_DOWN ? '刷新失败，请重试' : '加载失败，请重试'
+      setTimeout(() => {
+        this.reset()
+      }, 800)
+    },
     reset () {
       this.isPullHanding = false
       this.isLoading = false
-      this.marginTop = -50
+      this.isTouching = false
       this.pullStatus = undefined
+      this.pullResult = ''
+      this.translateY = 0
     },
     /**
      * @param{Event} e
@@ -92,11 +152,14 @@ export default {
         return
       }
       // console.log('onMouseDown', this.isPullHanding)
-      this.moveHandle = e => {
-        // e.preventDefault()
-        // e.stopPropagation()
-        this.onMouseMove(e)
+      if (!this.moveHandle) {
+        this.moveHandle = e => {
+          // e.preventDefault()
+          // e.stopPropagation()
+          this.onMouseMove(e)
+        }
       }
+      this.isTouching = true
       this.previouseY = e.touches[0].clientY
       this.$el.addEventListener('touchmove', this.moveHandle)
     },
@@ -104,45 +167,40 @@ export default {
     onMouseMove (e) {
       const clientY = e.touches[0].clientY
       const yValue = clientY - this.previouseY
-      if (this.pullStatus === undefined) {
-        const scrollEl = this.$refs.scrollEl
-        const clientHeight = scrollEl.clientHeight
-        const scrollTop = scrollEl.scrollTop
-        const scrollHeight = scrollEl.scrollHeight
+      this.previouseY = clientY
 
-        this.previouseY = clientY
-        // console.log(scrollTop, clientHeight, scrollHeight)
-        if (scrollTop < 2 && yValue > 0) {
-          this.pullStatus = PULL_DOWN
-        } else if (scrollTop + clientHeight + 2 > scrollHeight && yValue < 0) {
-          this.pullStatus = PULL_UP
-        }
-        // console.log('pullStatus', this.pullStatus, yValue)
+      const scrollEl = this.$refs.scrollEl
+      const scrollTop = scrollEl.scrollTop
+      const sliceHeight = this.sliceHeight
+
+      // console.log(`translateY=${this.translateY}, scrollTop=${scrollTop},`)
+      // console.log(`scrollEl.clientHeight=${scrollEl.clientHeight}, scrollEl.scrollHeight=${scrollEl.scrollHeight}`)
+      // console.log('')
+
+      let tempY = this.translateY
+      if (scrollTop === 0) {
+        // 可进入下拉，translateY应该为正数
+        tempY += yValue
+        tempY = Math.max(tempY, 0)
+        tempY = Math.min(tempY, sliceHeight * 3)
+
+        this.isPullHanding = tempY > sliceHeight * 0.75
+        this.topScale = Math.max(1, tempY / sliceHeight)
+        this.pullStatus = PULL_DOWN
+      } else if (scrollTop + scrollEl.clientHeight === scrollEl.scrollHeight) {
+        // 可进入上拉，translateY应该为负数
+        tempY += yValue
+        tempY = Math.max(tempY, -sliceHeight * 3)
+        tempY = Math.min(tempY, 0)
+
+        this.isPullHanding = tempY < -sliceHeight * 0.75
+        this.bottomScale = Math.max(1, -tempY / sliceHeight)
+        this.pullStatus = PULL_UP
       } else {
-        let unit = parseInt(yValue * 0.618)
-        if (unit > 0 && unit < 3) {
-          unit = 3
-        } else if (unit > -3 && unit < 0) {
-          unit = -3
-        }
-        this.previouseY = clientY
-        this.marginTop += unit
-        if (this.pullStatus === PULL_DOWN) {
-          if (this.marginTop < -50) {
-            this.marginTop = -50
-          } else if (this.marginTop > 0) {
-            this.marginTop = 0
-          }
-          this.isPullHanding = this.marginTop > -10
-        } else {
-          if (this.marginTop < -100) {
-            this.marginTop = -100
-          } else if (this.marginTop > -50) {
-            this.marginTop = -50
-          }
-          this.isPullHanding = this.marginTop < -90
-        }
+        // 默认区域上下滑动
+        tempY = 0
       }
+      this.translateY = tempY
     },
     onMouseUp (e) {
       // e.preventDefault()
@@ -152,6 +210,7 @@ export default {
       }
       this.$el.removeEventListener('touchmove', this.moveHandle)
       this.moveHandle = null
+      this.isTouching = false
 
       if (this.isPullHanding) {
         if (this.pullStatus === PULL_DOWN) {
@@ -168,6 +227,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.sg-scroll-outter {
+  height: 100%;
+  touch-action: none;
+}
 .sg-scroll {
   position: relative;
   height: 100%;
@@ -176,15 +239,19 @@ export default {
   .sg-scroll-wrapper {
     height: 100%;
     margin-top: 0;
-    transition: margin-top 250ms;
+  }
+
+  .sg-scroll-anime {
+    transition: transform 250ms;
+    .sg-scroll-slice {
+      transition: inherit;
+    }
   }
 
   .sg-scroll-slice {
-    height: 50px;
-    background-color: white;
+    background-color: rgb(240, 240, 240);
     box-sizing: border-box;
     text-align: center;
-    line-height: 50px;
   }
 
   .sg-scroll-content {
