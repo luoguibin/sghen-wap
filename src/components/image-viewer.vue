@@ -9,7 +9,7 @@
         <div class="image-name">{{currentName}}</div>
       </div>
       <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
-        <sg-swipper ref="swipper" :items="swipperItems" :auto="false" @change="hanleChange">
+        <sg-swipper v-if="images.length" ref="swipper" :items="swipperItems" :auto="false" @change="hanleChange">
           <div v-for="(item, index) in imageOptions" :key="index" :slot="'img-' + index" class="image-wrapper">
             <img v-if="item.visible" :src="item.src" />
           </div>
