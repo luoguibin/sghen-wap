@@ -3,43 +3,34 @@
     <!-- 诗人头像 -->
     <img
       v-if="showAvatar"
-      class="peot-avatar"
+      class="avatar"
       item-type="peot-avatar"
-      :src="(peotry.user && peotry.user.iconUrl) | imgFilter"
+      :src="(peotry.user && peotry.user.iconUrl) | img-src"
     />
 
     <!-- 诗词选集及标题 -->
-    <div :class="{'peotry-title': true, 'peotry-inline': titleInline}">
-      <span v-if="peotry.set" class="peotry-set">{{peotry.set.name}}</span>
-      <span v-if="peotry.set && peotry.title" class="peotry-dot">*</span>
-      <span class="peotry-title" v-if="peotry.title">{{peotry.title}}</span>
+    <div class="set--title">
+      <span v-if="peotry.set" class="set">{{peotry.set.name}}</span>
+      <span v-if="peotry.set && peotry.title" class="dot">*</span>
+      <span class="title" v-if="peotry.title">{{peotry.title}}</span>
     </div>
 
     <!-- 诗词作者及创建时间 -->
-    <div :class="{'peot-name': true, 'peotry-inline': titleInline}">
-      <template v-if="titleInline">
-        {{peotry.user ? '--' + peotry.user.name : ""}}
-        <span
-          v-if="showTime"
-        >于{{peotry.time | time-format}}</span>
-      </template>
-      <template v-else>
-        {{peotry.user ? peotry.user.name : ""}}
-        <span v-if="showTime">--{{peotry.time | time-format}}</span>
-      </template>
+    <div class="peot--time">
+      {{peotry.user ? peotry.user.name : ""}}
+      <span v-if="showTime">--{{peotry.time | time-format}}</span>
     </div>
 
-    <!-- `white-wrap: pre-wrap` and code's format -->
     <!-- 诗词内容 -->
-    <div class="content-container" ref="contentEl" :style="{height: contentHeight}">
-      <div :class="{'content': true }" v-html="peotry.content"></div>
+    <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
+      <div class="content" v-html="peotry.content"></div>
       <div class="end" v-if="peotry.end">{{peotry.end}}</div>
     </div>
 
     <!-- 诗词扩展按钮 -->
-    <div v-if="canExpand" class="content-expand">
-      <p v-show="contentHeight !== 'initial'">...</p>
-      <span @click.stop="onClickExpand">{{contentHeight === 'initial' ? '收起' : expandText}}</span>
+    <div v-if="hasExpand" class="expand-tip">
+      <p v-show="!isExpand">...</p>
+      <p @click.stop="onClickExpand">{{isExpand ? '收起' : '展开全文'}}</p>
     </div>
 
     <!-- 诗词图片 -->
@@ -52,45 +43,21 @@
     </div>
 
     <!-- 诗词评论 -->
-    <div v-if="showComment && hasComments" class="comments">
-      <div class="praise-users" v-show="peotry.praiseComments.length">
-        <img
-          v-for="comment in peotry.praiseComments"
-          :key="comment.id"
-          :src="comment.fromPeot && comment.fromPeot.iconUrl | imgFilter"
-          item-type="comment-avatar"
-          alt
-        />
-      </div>
-
-      <div v-show="hasComments" class="comments-divider"></div>
-
-      <div v-for="comment in peotry.realComments" class="comment" :key="comment.id">
-        <div class="users">
-          <span
-            class="user"
-            :user-id="comment.fromId"
-            :comment-id="comment.id"
-          >{{comment.fromPeot ? comment.fromPeot.name : comment.fromId}}</span>
-          <span v-if="comment.toId !== comment.fromId" class="comment_to">回复</span>
-          <span
-            v-if="comment.toId !== comment.fromId"
-            class="user"
-            :user-id="comment.toId"
-          >{{comment.toPeot ? comment.toPeot.name : comment.toId}}</span>
-          <span class="comment_dot">:</span>
-        </div>
-        <p>{{comment.content}}</p>
-      </div>
-    </div>
+    <comments v-if="showComment" :praises="peotry.praiseComments" :comments="peotry.realComments"></comments>
   </div>
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState } from 'vuex'
+import Comments from './comments'
 
 export default {
   name: 'Peotry',
+
+  components: {
+    Comments
+  },
 
   props: {
     peotry: {
@@ -102,22 +69,6 @@ export default {
      * 是否有
      */
     showAvatar: {
-      type: Boolean,
-      default: true
-    },
-
-    /**
-     * 标题和作者内联排列
-     */
-    titleInline: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
-     * 是否显示点赞数
-     */
-    showPraiseCount: {
       type: Boolean,
       default: true
     },
@@ -144,30 +95,6 @@ export default {
     showImage: {
       type: Boolean,
       default: true
-    },
-
-    /**
-     * 是否显示更多操作
-     */
-    showMore: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
-     * 是否直接展示操作按钮
-     */
-    showMoreDirect: {
-      type: Boolean,
-      default: false
-    },
-
-    /**
-     * 扩展按钮
-     */
-    expandText: {
-      type: String,
-      default: '展开全文'
     }
   },
   data () {
@@ -182,32 +109,15 @@ export default {
         toPeot: null
       },
       clickTime: 0,
-      canExpand: false,
-      contentHeight: 'initial',
+      hasExpand: false,
+      isExpand: false,
       mainScrollBox: null,
 
       showUser: false,
       showUserInfo: {}
     }
   },
-  filters: {
-    imgFilter (v) {
-      if (!v) {
-        return require('@/assets/logo.png')
-      }
-      let path
-      if (v.indexOf('.') === 0) {
-        if (v.indexOf('./file') === 0) {
-          path = '/sapi' + v.substr(1)
-        } else {
-          path = '/sapi/file/peotry/img' + v.substr(1)
-        }
-      } else {
-        path = '/sapi/file/peotry/img/' + v
-      }
-      return path
-    }
-  },
+  filters: {},
   computed: {
     /**
      * @returns {Boolean} 返回是否为当前用户创建的诗词
@@ -220,12 +130,11 @@ export default {
      * @returns {Array} 返回诗词的直接可用图片列表
      */
     peotryImages () {
-      window.peotry = this
       const imageObj = this.peotry.image
       if (imageObj && imageObj.count) {
-        const imgFilter = this.$options.filters['imgFilter']
+        const srcFilter = Vue.filter('img-src')
         return JSON.parse(imageObj.images).map(v => {
-          return imgFilter(v)
+          return srcFilter(v)
         })
       } else {
         return []
@@ -245,12 +154,6 @@ export default {
 
         return v
       })
-    },
-
-    hasComments () {
-      return (
-        this.peotry.realComments.length && this.peotry.praiseComments.length
-      )
     },
 
     /**
@@ -284,41 +187,31 @@ export default {
     }
   },
   mounted () {
-    this.checkCanExpand(true)
+    this.checkCanExpand()
   },
   methods: {
-    checkCanExpand (widthExpand) {
-      const contentEl = this.$refs.contentEl
-      if (!contentEl) {
-        return
-      }
-      if (contentEl.clientHeight >= 120) {
-        this.canExpand = true
-        if (widthExpand) {
-          this.onClickExpand()
-        }
+    checkCanExpand () {
+      const el = this.$refs.contentEnd
+      if (el) {
+        this.hasExpand = el.scrollHeight > el.clientHeight
       }
     },
     onClickExpand () {
-      this.contentHeight =
-        this.contentHeight === 'initial' ? '105px' : 'initial'
+      this.isExpand = !this.isExpand
     }
   }
 }
 </script>
 
 <style scoped lang="scss">
-$size-content: 18px;
-$padding-set: 12px;
-
 .peotry {
   position: relative;
-  box-sizing: border-box;
   padding-right: 1rem;
+  box-sizing: border-box;
 
-  .peot-avatar {
-    width: 26px;
-    height: 26px;
+  .avatar {
+    width: 2.6rem;
+    height: 2.6rem;
     object-fit: contain;
     position: absolute;
     left: 3px;
@@ -332,51 +225,23 @@ $padding-set: 12px;
     }
   }
 
-  .peotry-title {
-    padding-bottom: $padding-set;
+  .set--title {
+    padding-bottom: 1.2rem;
 
-    .peotry-set {
+    .set {
       font-size: 18px;
     }
-    .peotry-dot {
+    .dot {
       font-size: 16px;
       padding: 0 5px;
     }
-    .peotry-title {
+    .title {
       font-size: 16px;
     }
   }
-  .peotry-title.peotry-inline {
-    margin-right: 10px;
-  }
 
-  .peotry-rank {
-    padding: 2px 5px;
-    background-color: #eeeeee;
-
-    .peotry-count {
-      font-size: 14px;
-      i {
-        font-size: 20px;
-        color: #a4c8ff;
-        vertical-align: bottom;
-      }
-    }
-    .rank-praise {
-      cursor: pointer;
-      margin-left: 8px;
-      .el-icon-star-on {
-        font-size: 15px;
-        color: #e6a23c;
-      }
-      .el-icon-star-off {
-        font-size: 15px;
-      }
-    }
-  }
-
-  .peot-name {
-    padding-bottom: $padding-set;
+  .peot--time {
+    padding-bottom: 1.2rem;
     font-size: 14px;
     color: #888888;
     span {
@@ -384,52 +249,40 @@ $padding-set: 12px;
     }
   }
 
-  .content-container {
-    overflow: hidden;
+  .content--end {
     box-sizing: border-box;
 
     .content {
-      font-size: $size-content;
-      line-height: 26px;
+      font-size: 1.5rem;
+      line-height: 2.2rem;
       white-space: pre-wrap;
       word-break: break-all;
       box-sizing: border-box;
-      padding-bottom: $padding-set;
     }
     .end {
+      margin-top: 1.2rem;
       font-size: 12px;
       color: #333;
-      padding-bottom: $padding-set;
     }
   }
-
-  .content-expand {
-    margin-bottom: 2rem;
-    font-size: $size-content;
-
-    span {
-      cursor: pointer;
-      color: rgb(112, 112, 112);
+  .max-height {
+    overflow: hidden;
+    max-height: 11rem;
+  }
+  .expand-tip {
+    p {
+      font-size: 1.8rem;
+    }
+    p:last-child {
+      display: inline-block;
+      line-height: 2.2rem;
+      color: rgb(126, 126, 126);
       font-size: 14px;
     }
   }
 
   .images {
-    .image-wrapper {
-      position: relative;
-      display: inline-block;
-      width: 30%;
-      height: 0;
-      padding-bottom: 30%;
-      margin-right: 3%;
-      margin-bottom: 3%;
-    }
-    .image-wrapper__inner {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
+    margin-top: 1rem;
     img {
       object-fit: cover;
       width: 100%;
@@ -438,113 +291,29 @@ $padding-set: 12px;
     }
   }
 
-  .peotry-more {
-    margin: 5px 0;
-    text-align: right;
-    .peotry-more_icon {
-      font-size: 20px;
-      cursor: pointer;
-
-      &:active {
-        color: #148acf;
-      }
-    }
-  }
-
   .comments {
-    position: relative;
-    margin: 0;
-    padding: 5px 10px;
-    background-color: rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-
-    .comments-divider {
-      border-bottom: 1px solid white;
-    }
-
-    .praise-users {
-      user-select: none;
-
-      img {
-        width: 30px;
-        height: 30px;
-        margin-right: 3px;
-        cursor: pointer;
-        object-fit: contain;
-
-        &:hover {
-          background-color: rgba(250, 250, 250, 0.8);
-          border-radius: 3px;
-        }
-      }
-    }
-
-    &::before {
-      content: "";
-      width: 0;
-      height: 0;
-      position: absolute;
-      left: 8px;
-      top: -10px;
-      border: solid 10px transparent;
-      border-bottom-color: rgba(0, 0, 0, 0.1);
-      border-top-width: 0;
-    }
-
-    .comment {
-      padding: 5px 3px;
-
-      .users {
-        float: left;
-        font-weight: bold;
-        margin-right: 8px;
-
-        .user {
-          cursor: pointer;
-
-          &:hover {
-            color: #148acf;
-          }
-        }
-      }
-
-      .comment_to {
-        padding: 0 5px;
-        font-weight: initial;
-        font-size: 0.9rem;
-        color: #555555;
-      }
-
-      .comment_dot {
-        font-weight: initial;
-        font-size: 0.9rem;
-        color: #555555;
-      }
-
-      p {
-        white-space: pre-line;
-        word-break: break-all;
-        line-height: 21px;
-      }
-    }
-  }
-
-  .comment-input {
-    text-align: right;
-    margin-top: 5px;
-    padding-right: 10px;
-
-    .el-button {
-      margin-top: 5px;
-    }
-  }
-
-  .peotry-inline {
-    display: inline-block;
+    margin-top: 1rem;
   }
 }
 
 .avatar-visible {
   padding-left: 38px;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 30%;
+  height: 0;
+  padding-bottom: 30%;
+  margin-right: 3%;
+  margin-bottom: 3%;
+
+  .image-wrapper__inner {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
 }
 </style>
