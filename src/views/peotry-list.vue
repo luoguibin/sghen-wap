@@ -5,20 +5,29 @@
     </sg-scroll>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+    <comment-input
+      :visible.sync="commentVisible"
+      :id="commentID"
+      :toId="commentToID"
+      :placeholder="commentTip"
+      @ok="handleCommentOk"
+    ></comment-input>
+    <div v-show="praiseVisible" ref="praise" class="peotry-praise" :style="praiseStyle">赞</div>
   </div>
 </template>
 
 <script>
-import { apiURL, apiGetData } from '@/api'
+import { mapState } from 'vuex'
+import { apiURL, apiGetData, apiPostData } from '@/api'
 import Peotry from '@/components/peotry'
-import ImageViewer from '@/components/image-viewer'
 
 export default {
   nae: 'PeotryList',
 
   components: {
     Peotry,
-    ImageViewer
+    'image-viewer': () => import('@/components/image-viewer'),
+    'comment-input': () => import('@/components/comment-input')
   },
 
   data () {
@@ -31,8 +40,22 @@ export default {
 
       viewerVisible: false,
       images: [],
-      imageIndex: 0
+      imageIndex: 0,
+
+      commentVisible: false,
+      commentID: 0,
+      commentToID: 0,
+      commentTip: '请输入',
+
+      praiseVisible: false,
+      praiseStyle: {}
     }
+  },
+
+  computed: {
+    ...mapState({
+      userID: state => state.auth.userID
+    })
   },
 
   created () {
@@ -49,19 +72,21 @@ export default {
         page: this.page,
         limit: this.limit,
         needComment: true
-      }).then(data => {
-        const list = data.data
-        this.checkPeotries(list)
-        if (isRefresh) {
-          this.peotries = list
-        } else {
-          this.peotries.push(...list)
-        }
-        this.isEnd = this.peotries.length === data.totalCount
-        this.$refs.sgScroll.success()
-      }).catch(() => {
-        this.$refs.sgScroll.fail()
       })
+        .then(data => {
+          const list = data.data
+          this.checkPeotries(list)
+          if (isRefresh) {
+            this.peotries = list
+          } else {
+            this.peotries.push(...list)
+          }
+          this.isEnd = this.peotries.length === data.totalCount
+          this.$refs.sgScroll.success()
+        })
+        .catch(() => {
+          this.$refs.sgScroll.fail()
+        })
     },
     handleRefresh () {
       this.page = 1
@@ -73,7 +98,7 @@ export default {
      */
     checkPeotries (list) {
       const peotInfoMap = this.peotInfoMap
-      const peotIds = []
+      const peotIdMap = []
       const timeFunc = function (o0, o1) {
         // 按时间排序评论列表
         const time0 = new Date(o0.createTime).getTime()
@@ -83,6 +108,7 @@ export default {
 
       list.forEach(o => {
         if (!o.comments) {
+          o.comments = []
           o.praiseComments = []
           o.realComments = []
         } else {
@@ -93,14 +119,14 @@ export default {
             if (peotInfoMap[o_.fromId]) {
               o_.fromPeot = peotInfoMap[o_.fromId]
             } else {
-              peotIds.push(o_.fromId)
+              peotIdMap[o_.fromId] = true
             }
 
             if (o_.toId > 0) {
               if (peotInfoMap[o_.toId]) {
                 o_.toPeot = peotInfoMap[o_.toId]
               } else {
-                peotIds.push(o_.toId)
+                peotIdMap[o_.toId] = true
               }
               realComments.push(o_)
             } else {
@@ -111,10 +137,10 @@ export default {
           })
           o.praiseComments = praiseComments.sort(timeFunc)
           o.realComments = realComments.sort(timeFunc)
-          delete o.comments
         }
       })
 
+      const peotIds = Object.keys(peotIdMap)
       if (!peotIds.length) {
         return
       }
@@ -124,20 +150,23 @@ export default {
           peotInfoMap[o.id] = o
         })
         list.forEach(o => {
-          o.praiseComments.forEach(o_ => {
-            if (!o_.fromPeot) {
-              this.$set(o_, 'fromPeot', peotInfoMap[o_.fromId])
-            }
-          })
-          o.realComments.forEach(o_ => {
-            if (!o_.fromPeot) {
-              this.$set(o_, 'fromPeot', peotInfoMap[o_.fromId])
-            }
-            if (o_.toId > 0 && !o_.toPeot) {
-              this.$set(o_, 'toPeot', peotInfoMap[o_.toId])
-            }
-          })
+          this.buildPeotryComments(o, peotInfoMap)
         })
+      })
+    },
+    buildPeotryComments (peotry, peotInfoMap) {
+      peotry.praiseComments.forEach(o => {
+        if (!o.fromPeot) {
+          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
+        }
+      })
+      peotry.realComments.forEach(o => {
+        if (!o.fromPeot) {
+          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
+        }
+        if (o.toId > 0 && !o.toPeot) {
+          this.$set(o, 'toPeot', peotInfoMap[o.toId])
+        }
       })
     },
 
@@ -168,34 +197,109 @@ export default {
         return getItemIndex(tempEl)
       }
       const index = getPeotryIndex(target)
-      console.log(itemType, index)
+      const peotry = this.peotries[index]
+      const peotryInstance = this.$refs.peotries[index]
       switch (itemType) {
         case 'peot-avatar':
-
+          break
+        case 'peotry-content':
+          const time = this.previousTime || 0
+          const currentTime = Date.now()
+          if (currentTime - time < 300) {
+            this.onPraisePeotry(peotry, peotryInstance, data => {
+              this.praiseAnime(peotry, peotryInstance, e, data)
+            })
+          }
+          this.previousTime = currentTime
           break
         case 'peotry-image':
-          this.images = this.$refs.peotries[index].peotryImages
+          this.images = peotryInstance.peotryImages
           this.imageIndex = getItemIndex(target.parentElement.parentElement)
           this.viewerVisible = true
           break
         case 'comment-avatar':
-          const praiseComments = this.peotries[index].praiseComments
-          const poet = praiseComments[getItemIndex(target)].fromPeot
+          const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
           console.log(poet)
           break
         case 'comment-from':
-          const fromComments = this.peotries[index].realComments
-          const fromPeot = fromComments[getItemIndex(target.parentElement.parentElement)].fromPeot
-          console.log(fromPeot)
           break
         case 'comment-to':
-          const toComments = this.peotries[index].realComments
-          const toPeot = toComments[getItemIndex(target.parentElement.parentElement)].toPeot
-          console.log(toPeot)
+          break
+        case 'comment-content':
+          const commentIndex = getItemIndex(target.parentElement)
+          this.onClickComment(peotry, peotry.realComments[commentIndex])
           break
         default:
           break
       }
+    },
+    onClickComment (peotry, comment) {
+      if (!this.userID) {
+        this.$toast('请登陆后再操作')
+        return
+      }
+
+      if (this.userID === comment.fromId) {
+        // 当前评论是当前用户创建
+        this.$confirm({
+          title: '提示',
+          content: '是否删除该评论?',
+          confirm: () => {
+            this.deleteComment(peotry, comment)
+          }
+        })
+        return
+      }
+      this.commentVisible = true
+      this.commentID = comment.typeId
+      this.commentToID = comment.fromId
+      this.commentTip = `回复 ${comment.fromPeot.name}`
+    },
+    onPraisePeotry (peotry, instance, call) {
+      if (!this.userID) {
+        this.$toast('请登陆后再操作')
+        return
+      }
+      if (this.praiseRequesting) {
+        return
+      }
+      this.praiseRequesting = true
+      const isPraise = instance.isPraise
+      const comment = instance.myPraiseComment
+      if (isPraise) {
+        apiPostData(apiURL.commentDelete, {
+          id: comment.id,
+          fromId: comment.fromId
+        }).then(data => {
+          const comments = peotry.praiseComments
+          const index = comments.findIndex(o => o.id === comment.id)
+          comments.splice(index, 1)
+        }).finally(() => {
+          this.praiseRequesting = false
+        })
+      } else {
+        apiPostData(apiURL.commentCreate, {
+          type: 1,
+          typeId: peotry.id,
+          content: 'praise',
+          fromId: this.userID,
+          toId: -1
+        }).then(data => {
+          call && call(data.data)
+        }).finally(() => {
+          this.praiseRequesting = false
+        })
+      }
+    },
+    deleteComment (peotry, comment) {
+      apiPostData(apiURL.commentDelete, {
+        id: comment.id,
+        fromId: comment.fromId
+      }).then(data => {
+        const comments = peotry.realComments
+        const index = comments.findIndex(o => o.id === comment.id)
+        comments.splice(index, 1)
+      })
     },
     onClickImg (e) {
       let el = e.target
@@ -210,6 +314,47 @@ export default {
         el = el.previousElementSibling
       }
       this.$emit('img', { index, images: this.peotryImages })
+    },
+
+    handleCommentOk (o) {
+      const peotry = this.peotries.find(o => o.id === this.commentID)
+      if (peotry) {
+        o.fromPeot = this.peotInfoMap[this.userID]
+        o.toPeot = this.peotInfoMap[this.commentToID]
+        peotry.realComments.push(o)
+      } else {
+        console.log('comment peotry is not exist', o)
+      }
+    },
+
+    praiseAnime (peotry, instance, e, data) {
+      const commentsEl = instance.$refs.comments
+      if (!commentsEl) {
+        return
+      }
+      const avatarsEl = commentsEl.$refs.avatars
+      let tempEl = commentsEl.$el
+      if (avatarsEl.children.length) {
+        tempEl = avatarsEl.children[avatarsEl.children.length - 1]
+      }
+      const rect = tempEl.getBoundingClientRect()
+      // console.log(rect)
+      this.praiseVisible = true
+      this.praiseStyle = {
+        left: e.clientX - 20 + 'px',
+        top: e.clientY - 20 + 'px'
+      }
+      setTimeout(() => {
+        this.praiseStyle = {
+          left: rect.left + 40 + 'px',
+          top: rect.top + 'px'
+        }
+      }, 100)
+      setTimeout(() => {
+        this.praiseVisible = false
+        data.fromPeot = this.peotInfoMap[this.userID]
+        peotry.praiseComments.push(data)
+      }, 800)
     }
   }
 }
@@ -226,6 +371,19 @@ export default {
     &:first-child {
       margin-top: 2rem;
     }
+  }
+
+  .peotry-praise {
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 800ms;
+    font-size: 2rem;
+    padding: 1rem;
+    color: steelblue;
+    background-color: white;
+    border-radius: 50%;
+    z-index: 99;
   }
 }
 </style>

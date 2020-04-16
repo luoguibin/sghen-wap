@@ -23,7 +23,7 @@
 
     <!-- 诗词内容 -->
     <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
-      <div class="content" v-html="peotry.content"></div>
+      <div item-type="peotry-content" class="content" v-html="peotry.content"></div>
       <div class="end" v-if="peotry.end">{{peotry.end}}</div>
     </div>
 
@@ -34,7 +34,7 @@
     </div>
 
     <!-- 诗词图片 -->
-    <div v-if="showImage && thumbnails.length" class="images">
+    <div v-if="showImage && thumbnails.length" ref="images" class="images">
       <div v-for="value in thumbnails" :key="value" class="image-wrapper">
         <div class="image-wrapper__inner">
           <img item-type="peotry-image" :src="value" />
@@ -43,7 +43,12 @@
     </div>
 
     <!-- 诗词评论 -->
-    <comments v-if="showComment" :praises="peotry.praiseComments" :comments="peotry.realComments"></comments>
+    <comments
+      v-if="showComment"
+      ref="comments"
+      :praises="peotry.praiseComments"
+      :comments="peotry.realComments"
+    ></comments>
   </div>
 </template>
 

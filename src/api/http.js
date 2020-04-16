@@ -1,10 +1,15 @@
 import axios from 'axios'
 import Qs from 'qs'
+import store from '@/store'
 
 axios.defaults.timeout = 10000
 
 axios.interceptors.request.use(
   config => {
+    const token = store.state.auth.token
+    if (token) {
+      config.headers['Authorization'] = token
+    }
     if (config.data && !config.headers['Content-Type']) {
       config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       config.data = Qs.stringify(config.data)

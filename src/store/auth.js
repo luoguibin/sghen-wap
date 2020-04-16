@@ -6,7 +6,8 @@ export default {
     userID: '',
     userName: '',
     userAvatar: '',
-    phone: ''
+    phone: '',
+    token: ''
   },
   mutations: {
     setUserInfo (state, data = {}) {
@@ -15,6 +16,7 @@ export default {
       state.userAvatar = data.iconUrl
       state.userName = data.userName || data.name
       state.phone = data.phone || data.id
+      state.token = data.token
     }
   },
   actions: {

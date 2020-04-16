@@ -1,7 +1,7 @@
 <template>
   <div class="comments" v-show="praises.length || comments.length">
     <!-- 已点赞的用户头像 -->
-    <div class="avatars" v-show="praises.length">
+    <div ref="avatars" class="avatars" v-show="praises.length">
       <img
         v-for="comment in praises"
         :key="comment.id"
@@ -11,10 +11,10 @@
       />
     </div>
 
-    <div v-show="praises.length && comments.length" style="border-bottom: 1px solid transparent;"></div>
+    <div v-show="praises.length && comments.length" style="border-bottom: 1px solid white;"></div>
 
     <!-- 评论列表 -->
-    <div class="contents">
+    <div class="contents" v-show="comments.length">
       <div v-for="comment in comments" class="comment" :key="comment.id">
         <span class="names">
           <span
@@ -61,6 +61,7 @@ $background: rgba(0, 0, 0, 0.05);
 .comments {
   position: relative;
   border-radius: 8px;
+  background-color: $background;
   &::before {
     content: "";
     width: 0;
@@ -76,9 +77,6 @@ $background: rgba(0, 0, 0, 0.05);
   .avatars {
     padding: 5px 8px;
     user-select: none;
-    background-color: $background;
-    border-top-left-radius: inherit;
-    border-top-right-radius: inherit;
 
     img {
       width: 3rem;
@@ -96,9 +94,6 @@ $background: rgba(0, 0, 0, 0.05);
 
   .contents {
     padding: 5px 8px;
-    background-color: $background;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
   }
   .comment {
     .names {
