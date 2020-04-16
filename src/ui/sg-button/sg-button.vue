@@ -25,11 +25,11 @@ export default {
   },
 
   methods: {
-    onClick () {
+    onClick (e) {
       if (this.isLoading) {
         return
       }
-      this.$emit('click')
+      this.$emit('click', e)
     }
   }
 }
