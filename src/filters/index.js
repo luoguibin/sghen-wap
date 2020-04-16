@@ -31,4 +31,22 @@ export const timeFormat = function (date, fmt = 'yyyy-MM-dd hh:mm:ss') {
   return fmt
 }
 
+export const imgSrcFormat = function (v) {
+  if (!v) {
+    return require('@/assets/logo.png')
+  }
+  let path
+  if (v.indexOf('.') === 0) {
+    if (v.indexOf('./file') === 0) {
+      path = '/sapi' + v.substr(1)
+    } else {
+      path = '/sapi/file/peotry/img' + v.substr(1)
+    }
+  } else {
+    path = '/sapi/file/peotry/img/' + v
+  }
+  return path
+}
+
 Vue.filter('time-format', timeFormat)
+Vue.filter('img-src', imgSrcFormat)
