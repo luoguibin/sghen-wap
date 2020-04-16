@@ -17,15 +17,19 @@
     <div class="contents">
       <div v-for="comment in comments" class="comment" :key="comment.id">
         <span class="names">
-          <span class="name">{{comment.fromPeot ? comment.fromPeot.name : comment.fromId}}</span>
+          <span
+            class="name"
+            item-type="comment-from"
+          >{{comment.fromPeot ? comment.fromPeot.name : comment.fromId}}</span>
           <span v-if="comment.toId !== comment.fromId" class="to">回复</span>
           <span
             v-if="comment.toId !== comment.fromId"
             class="name"
+            item-type="comment-to"
           >{{comment.toPeot ? comment.toPeot.name : comment.toId}}</span>
           <i>:</i>
         </span>
-        <p>{{comment.content}}</p>
+        <p item-type="comment-content">{{comment.content}}</p>
       </div>
     </div>
   </div>
@@ -77,8 +81,8 @@ $background: rgba(0, 0, 0, 0.05);
     border-top-right-radius: inherit;
 
     img {
-      width: 30px;
-      height: 30px;
+      width: 3rem;
+      height: 3rem;
       margin-right: 5px;
       cursor: pointer;
       object-fit: contain;
@@ -105,6 +109,7 @@ $background: rgba(0, 0, 0, 0.05);
       white-space: pre-line;
       word-break: break-all;
       line-height: 2rem;
+      font-size: 1.2rem;
     }
   }
 }
@@ -113,6 +118,7 @@ $background: rgba(0, 0, 0, 0.05);
   .name {
     font-weight: bold;
     line-height: 2rem;
+    font-size: 1.2rem;
     cursor: pointer;
     &:hover {
       color: #148acf;
@@ -120,12 +126,12 @@ $background: rgba(0, 0, 0, 0.05);
   }
   .to {
     padding: 0 3px;
+    font-size: 1.1rem;
     color: #555555;
   }
   i {
     padding: 0 8px 0 3px;
-    font-weight: initial;
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     color: #555555;
   }
 }

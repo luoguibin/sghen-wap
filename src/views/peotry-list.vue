@@ -1,5 +1,5 @@
 <template>
-  <div class="peotry-list" @click="onClickPoetry($event)">
+  <div class="peotry-list" @click.stop="onClickPoetry($event)">
     <sg-scroll ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
       <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries"></peotry>
     </sg-scroll>
@@ -168,9 +168,10 @@ export default {
         return getItemIndex(tempEl)
       }
       const index = getPeotryIndex(target)
+      console.log(itemType, index)
       switch (itemType) {
         case 'peot-avatar':
-          console.log(itemType, index)
+
           break
         case 'peotry-image':
           this.images = this.$refs.peotries[index].peotryImages
@@ -178,7 +179,19 @@ export default {
           this.viewerVisible = true
           break
         case 'comment-avatar':
-          console.log(itemType, getItemIndex(target))
+          const praiseComments = this.peotries[index].praiseComments
+          const poet = praiseComments[getItemIndex(target)].fromPeot
+          console.log(poet)
+          break
+        case 'comment-from':
+          const fromComments = this.peotries[index].realComments
+          const fromPeot = fromComments[getItemIndex(target.parentElement.parentElement)].fromPeot
+          console.log(fromPeot)
+          break
+        case 'comment-to':
+          const toComments = this.peotries[index].realComments
+          const toPeot = toComments[getItemIndex(target.parentElement.parentElement)].toPeot
+          console.log(toPeot)
           break
         default:
           break
