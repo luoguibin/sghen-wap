@@ -33,7 +33,7 @@ export const timeFormat = function (date, fmt = 'yyyy-MM-dd hh:mm:ss') {
 
 export const imgSrcFormat = function (v) {
   if (!v) {
-    return require('@/assets/logo.png')
+    return require('@/assets/favicon.png')
   }
   let path
   if (v.indexOf('.') === 0) {
