@@ -17,7 +17,7 @@
 
     <!-- 诗词作者及创建时间 -->
     <div class="peot--time">
-      {{peotry.user ? peotry.user.name : ""}}
+      <span item-type="peot">{{peotry.user ? peotry.user.name : ""}}</span>
       <span v-if="showTime">--{{peotry.time | time-format}}</span>
     </div>
 
@@ -249,7 +249,7 @@ export default {
     padding-bottom: 1.2rem;
     font-size: 14px;
     color: #888888;
-    span {
+    span + span {
       margin-left: 8px;
     }
   }

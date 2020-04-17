@@ -213,6 +213,9 @@ export default {
       switch (itemType) {
         case 'peot-avatar':
           break
+        case 'peot':
+          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          break
         case 'peotry-content':
           const time = this.previousTime || 0
           const currentTime = Date.now()
@@ -267,10 +270,17 @@ export default {
         })
         return
       }
+      this.openCommentInput(
+        comment.typeId,
+        comment.fromId,
+        `回复 ${comment.fromPeot.name}`
+      )
+    },
+    openCommentInput (typeId, fromId, tip) {
       this.commentVisible = true
-      this.commentID = comment.typeId
-      this.commentToID = comment.fromId
-      this.commentTip = `回复 ${comment.fromPeot.name}`
+      this.commentID = typeId
+      this.commentToID = fromId
+      this.commentTip = tip
     },
     onPraisePeotry (peotry, instance, call) {
       if (!this.userID) {
