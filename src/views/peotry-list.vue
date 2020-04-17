@@ -12,7 +12,14 @@
       :placeholder="commentTip"
       @ok="handleCommentOk"
     ></comment-input>
-    <div v-show="praiseVisible" ref="praise" class="peotry-praise" :style="praiseStyle">赞</div>
+
+    <praise-anime
+      v-if="praiseVisible"
+      :id="praiseId"
+      :from="praiseFromStyle"
+      :to="praiseToStyle"
+      @end="handleAnimeEnd"
+    ></praise-anime>
   </div>
 </template>
 
@@ -27,7 +34,8 @@ export default {
   components: {
     Peotry,
     'image-viewer': () => import('@/components/image-viewer'),
-    'comment-input': () => import('@/components/comment-input')
+    'comment-input': () => import('@/components/comment-input'),
+    'praise-anime': () => import('@/components/praise-anime')
   },
 
   data () {
@@ -48,7 +56,10 @@ export default {
       commentTip: '请输入',
 
       praiseVisible: false,
-      praiseStyle: {}
+      praiseId: 0,
+      praiseFromStyle: {},
+      praiseToStyle: {},
+      praiseMap: {}
     }
   },
 
@@ -207,7 +218,13 @@ export default {
           const currentTime = Date.now()
           if (currentTime - time < 300) {
             this.onPraisePeotry(peotry, peotryInstance, data => {
-              this.praiseAnime(peotry, peotryInstance, e, data)
+              data.fromPeot = this.peotInfoMap[this.userID]
+              data.itemTag = 'opacity'
+              peotry.praiseComments.push(data)
+
+              this.$nextTick(() => {
+                this.onPraiseAnime(peotry, peotryInstance, e, data)
+              })
             })
           }
           this.previousTime = currentTime
@@ -270,13 +287,15 @@ export default {
         apiPostData(apiURL.commentDelete, {
           id: comment.id,
           fromId: comment.fromId
-        }).then(data => {
-          const comments = peotry.praiseComments
-          const index = comments.findIndex(o => o.id === comment.id)
-          comments.splice(index, 1)
-        }).finally(() => {
-          this.praiseRequesting = false
         })
+          .then(data => {
+            const comments = peotry.praiseComments
+            const index = comments.findIndex(o => o.id === comment.id)
+            comments.splice(index, 1)
+          })
+          .finally(() => {
+            this.praiseRequesting = false
+          })
       } else {
         apiPostData(apiURL.commentCreate, {
           type: 1,
@@ -284,11 +303,13 @@ export default {
           content: 'praise',
           fromId: this.userID,
           toId: -1
-        }).then(data => {
-          call && call(data.data)
-        }).finally(() => {
-          this.praiseRequesting = false
         })
+          .then(data => {
+            call && call(data.data)
+          })
+          .finally(() => {
+            this.praiseRequesting = false
+          })
       }
     },
     deleteComment (peotry, comment) {
@@ -300,20 +321,6 @@ export default {
         const index = comments.findIndex(o => o.id === comment.id)
         comments.splice(index, 1)
       })
-    },
-    onClickImg (e) {
-      let el = e.target
-      if (el.tagName !== 'IMG') {
-        return
-      }
-
-      let index = -1
-      el = el.parentElement.parentElement
-      while (el) {
-        index++
-        el = el.previousElementSibling
-      }
-      this.$emit('img', { index, images: this.peotryImages })
     },
 
     handleCommentOk (o) {
@@ -327,7 +334,7 @@ export default {
       }
     },
 
-    praiseAnime (peotry, instance, e, data) {
+    onPraiseAnime (peotry, instance, e, data) {
       const commentsEl = instance.$refs.comments
       if (!commentsEl) {
         return
@@ -338,23 +345,30 @@ export default {
         tempEl = avatarsEl.children[avatarsEl.children.length - 1]
       }
       const rect = tempEl.getBoundingClientRect()
-      // console.log(rect)
-      this.praiseVisible = true
-      this.praiseStyle = {
-        left: e.clientX - 20 + 'px',
-        top: e.clientY - 20 + 'px'
+      // console.log(tempEl, rect, this.$refs.anime)
+      this.praiseFromStyle = {
+        left: e.clientX + 'px',
+        top: e.clientY + 'px'
       }
-      setTimeout(() => {
-        this.praiseStyle = {
-          left: rect.left + 40 + 'px',
-          top: rect.top + 'px'
-        }
-      }, 100)
-      setTimeout(() => {
-        this.praiseVisible = false
-        data.fromPeot = this.peotInfoMap[this.userID]
-        peotry.praiseComments.push(data)
-      }, 800)
+      this.praiseToStyle = {
+        left: rect.left + rect.width / 2 + 'px',
+        top: rect.top + rect.height / 2 + 'px'
+      }
+      this.praiseId = peotry.id
+      this.praiseVisible = true
+      this.praiseMap[peotry.id] = {
+        peotry,
+        data
+      }
+    },
+    handleAnimeEnd (id) {
+      const obj = this.praiseMap[id]
+      if (!obj) {
+        return
+      }
+      this.praiseVisible = false
+      obj.data.itemTag = ''
+      delete this.praiseMap[id]
     }
   }
 }
@@ -371,19 +385,6 @@ export default {
     &:first-child {
       margin-top: 2rem;
     }
-  }
-
-  .peotry-praise {
-    position: fixed;
-    top: 0;
-    left: 0;
-    transition: all 800ms;
-    font-size: 2rem;
-    padding: 1rem;
-    color: steelblue;
-    background-color: white;
-    border-radius: 50%;
-    z-index: 99;
   }
 }
 </style>

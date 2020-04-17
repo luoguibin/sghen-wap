@@ -6,6 +6,7 @@
         v-for="comment in praises"
         :key="comment.id"
         :src="comment.fromPeot && comment.fromPeot.iconUrl | img-src"
+        :item-tag="comment.itemTag"
         item-type="comment-avatar"
         alt
       />
@@ -89,6 +90,9 @@ $background: rgba(0, 0, 0, 0.05);
         background-color: rgba(250, 250, 250, 0.8);
         border-radius: 3px;
       }
+    }
+    img[item-tag=opacity] {
+      opacity: 0;
     }
   }
 
