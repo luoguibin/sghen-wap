@@ -1,8 +1,9 @@
 <template>
   <div class="peotry-list" @click.stop="onClickPoetry($event)">
-    <sg-scroll ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
+    <sg-scroll v-if="!isEmpty" ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
       <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries"></peotry>
     </sg-scroll>
+    <div v-else class="empty">暂未有诗词</div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
     <comment-input
@@ -40,11 +41,12 @@ export default {
 
   data () {
     return {
-      isEnd: false,
-      peotries: [],
-
+      uuid: '',
       page: 1,
       limit: 20,
+      isEnd: false,
+      peotries: [],
+      peotriesLoadCount: 0,
 
       viewerVisible: false,
       images: [],
@@ -64,13 +66,25 @@ export default {
   },
 
   computed: {
+    isEmpty () {
+      return !this.peotries.length && this.peotriesLoadCount
+    },
     ...mapState({
       userID: state => state.auth.userID
     })
   },
 
+  watch: {
+    $route (o) {
+      this.uuid = o.query.uuid || ''
+      this.peotriesLoadCount = 0
+      this.handleRefresh()
+    }
+  },
+
   created () {
     window.peotryList = this
+    this.uuid = this.$route.query.uuid || ''
     this.peotInfoMap = {}
   },
 
@@ -79,11 +93,16 @@ export default {
       if (!isRefresh) {
         this.page += 1
       }
-      apiGetData(apiURL.peotryList, {
+
+      const params = {
         page: this.page,
         limit: this.limit,
         needComment: true
-      })
+      }
+      if (this.uuid) {
+        params.userId = this.uuid
+      }
+      apiGetData(apiURL.peotryList, params)
         .then(data => {
           const list = data.data
           this.checkPeotries(list)
@@ -92,6 +111,7 @@ export default {
           } else {
             this.peotries.push(...list)
           }
+          this.peotriesLoadCount++
           this.isEnd = this.peotries.length === data.totalCount
           this.$refs.sgScroll.success()
         })
@@ -211,11 +231,6 @@ export default {
       const peotry = this.peotries[index]
       const peotryInstance = this.$refs.peotries[index]
       switch (itemType) {
-        case 'peot-avatar':
-          break
-        case 'peot':
-          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
-          break
         case 'peotry-content':
           const time = this.previousTime || 0
           const currentTime = Date.now()
@@ -237,13 +252,25 @@ export default {
           this.imageIndex = getItemIndex(target.parentElement.parentElement)
           this.viewerVisible = true
           break
+        case 'peot':
+          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          break
+        case 'peot-avatar':
+          this.$router.push({ name: 'peotry-list', query: { uuid: peotry.user.id } })
+          break
         case 'comment-avatar':
           const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
-          console.log(poet)
+          this.$router.push({ name: 'peotry-list', query: { uuid: poet.id } })
           break
         case 'comment-from':
+          const fromIndex = getItemIndex(target.parentElement.parentElement)
+          const fromComment = peotry.realComments[fromIndex]
+          this.$router.push({ name: 'peotry-list', query: { uuid: fromComment.fromId } })
           break
         case 'comment-to':
+          const toIndex = getItemIndex(target.parentElement.parentElement)
+          const toComment = peotry.realComments[toIndex]
+          this.$router.push({ name: 'peotry-list', query: { uuid: toComment.toId } })
           break
         case 'comment-content':
           const commentIndex = getItemIndex(target.parentElement)
@@ -395,6 +422,13 @@ export default {
     &:first-child {
       margin-top: 2rem;
     }
+  }
+
+  .empty {
+    padding: 50% 1rem 1rem;
+    text-align: center;
+    font-size: 1.2rem;
+    color: rgb(161, 161, 161);
   }
 }
 </style>
