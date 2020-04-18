@@ -176,8 +176,8 @@ export default {
         return
       }
 
-      apiGetData(apiURL.userInfoList, { idStrs: peotIds.join() }).then(data => {
-        data.data.forEach(o => {
+      this.getUserInfoList(peotIds).then(data => {
+        data.forEach(o => {
           peotInfoMap[o.id] = o
         })
         list.forEach(o => {
@@ -198,6 +198,24 @@ export default {
         if (o.toId > 0 && !o.toPeot) {
           this.$set(o, 'toPeot', peotInfoMap[o.toId])
         }
+      })
+    },
+    getUserInfoList (ids) {
+      const reqs = []
+      const max = 99
+      const len = Math.ceil(ids.length / max)
+      for (let i = 0; i < len; i++) {
+        reqs.push(apiGetData(apiURL.userInfoList, {
+          idStrs: ids.slice(i * max, i * max + max).toString()
+        })
+        )
+      }
+      return Promise.all(reqs).then(results => {
+        let data = []
+        results.forEach(o => {
+          data = data.concat(o.data)
+        })
+        return data
       })
     },
 
