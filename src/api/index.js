@@ -35,7 +35,7 @@ export const apiURL = {
   smsCode: `${preffix}/v1/sms/send`,
 
   // 获取作者基本信息
-  userInfoList: `${preffix}/v1/user/query-list`,
+  userInfoList: `${preffix}/v1/api/get/user/list`,
 
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,

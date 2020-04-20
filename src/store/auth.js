@@ -13,8 +13,8 @@ export default {
     setUserInfo (state, data = {}) {
       sessionStorage.setItem('sg-userinfo', JSON.stringify(data))
       state.userID = data.id
-      state.userAvatar = data.iconUrl
-      state.userName = data.userName || data.name
+      state.userAvatar = data.avatar
+      state.userName = data.username || data.name
       state.phone = data.phone || data.id
       state.token = data.token
     }

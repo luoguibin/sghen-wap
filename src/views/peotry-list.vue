@@ -202,11 +202,11 @@ export default {
     },
     getUserInfoList (ids) {
       const reqs = []
-      const max = 99
+      const max = 100
       const len = Math.ceil(ids.length / max)
       for (let i = 0; i < len; i++) {
         reqs.push(apiGetData(apiURL.userInfoList, {
-          idStrs: ids.slice(i * max, i * max + max).toString()
+          datas: ids.slice(i * max, i * max + max).toString()
         })
         )
       }

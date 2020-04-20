@@ -21,13 +21,13 @@
           <span
             class="name"
             item-type="comment-from"
-          >{{comment.fromPeot ? comment.fromPeot.name : comment.fromId}}</span>
+          >{{comment.fromPeot ? comment.fromPeot.username : comment.fromId}}</span>
           <span v-if="comment.toId !== comment.fromId" class="to">回复</span>
           <span
             v-if="comment.toId !== comment.fromId"
             class="name"
             item-type="comment-to"
-          >{{comment.toPeot ? comment.toPeot.name : comment.toId}}</span>
+          >{{comment.toPeot ? comment.toPeot.username : comment.toId}}</span>
           <i>:</i>
         </span>
         <p item-type="comment-content">{{comment.content}}</p>

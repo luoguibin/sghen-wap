@@ -5,7 +5,7 @@
       v-if="showAvatar"
       class="avatar"
       item-type="peot-avatar"
-      :src="(peotry.user && peotry.user.iconUrl) | img-src"
+      :src="(peotry.user && peotry.user.avatar) | img-src"
     />
 
     <!-- 诗词选集及标题 -->
@@ -17,7 +17,7 @@
 
     <!-- 诗词作者及创建时间 -->
     <div class="peot--time">
-      <span item-type="peot">{{peotry.user ? peotry.user.name : ""}}</span>
+      <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
       <span v-if="showTime">--{{peotry.time | time-format}}</span>
     </div>
 

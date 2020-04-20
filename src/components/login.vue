@@ -149,7 +149,7 @@ export default {
         this.isRequesting = true
 
         const { phone, pw, code } = this.formData
-        const params = { id: phone }
+        const params = { account: phone }
         if (code) {
           params.code = code
           params.pw = '******'
