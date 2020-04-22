@@ -5,7 +5,7 @@
       <img
         v-for="comment in praises"
         :key="comment.id"
-        :src="comment.fromPeot && comment.fromPeot.iconUrl | img-src"
+        :src="comment.fromPeot && comment.fromPeot.avatar | img-src"
         :item-tag="comment.itemTag"
         item-type="comment-avatar"
         alt

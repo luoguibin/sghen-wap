@@ -318,7 +318,7 @@ export default {
       this.openCommentInput(
         comment.typeId,
         comment.fromId,
-        `回复 ${comment.fromPeot.name}`
+        `回复 ${comment.fromPeot.username}`
       )
     },
     openCommentInput (typeId, fromId, tip) {
