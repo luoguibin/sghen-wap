@@ -12,7 +12,7 @@
         <input v-model="formData.code" v-focus-within />
         <span class="code-divider"></span>
         <span v-show="countdown > 0" class="code-countdown">{{countdownText}}</span>
-        <sg-button v-show="countdown <= 0" :isLoading="smsLoading" @click="getSmsCode">获&nbsp;取</sg-button>
+        <sg-button v-show="countdown <= 0" :isLoading="smsLoading" @click="onGetSmsCode">获&nbsp;取</sg-button>
       </div>
       <div class="login-type" slot="loginType">
         <sg-button @click="onChangeLoginType">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
@@ -25,7 +25,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { sgIsPhone } from '@/utils/sgRegExp'
-import { apiURL, apiGetData } from '@/api'
+import { apiURL, apiGetData, apiPostData } from '@/api'
 
 export default {
   name: 'Login',
@@ -72,8 +72,9 @@ export default {
           hidden: true,
           required: false,
           validator: (v, rule) => {
-            return v ? '请输入图形运算结果' : ''
-          }
+            return v ? '' : '请输入图形运算结果'
+          },
+          _error: ''
         },
         {
           key: 'code',
@@ -150,7 +151,7 @@ export default {
         this.captcha = resp.data
       })
     },
-    getSmsCode () {
+    onGetSmsCode () {
       this.$refs.form.validateFields(['phone', 'captchaValue'], errors => {
         if (errors) {
           return
@@ -161,7 +162,7 @@ export default {
           captchaId: this.captcha.id,
           captchaValue: this.formData.captchaValue
         }
-        this._getSmsCode(params).then(() => {
+        apiPostData(apiURL.smsCode, params).then(() => {
           this.countdown = 60
           clearInterval(this.countdownHandle)
           this.countdownHandle = setInterval(() => {
@@ -202,8 +203,7 @@ export default {
     },
 
     ...mapActions({
-      login: 'auth/login',
-      _getSmsCode: 'auth/getSmsCode'
+      login: 'auth/login'
     })
   },
   beforeDestroy () {

@@ -46,10 +46,6 @@ export default {
         }
       })
     },
-    async getSmsCode (context, { phone, captchaId, captchaValue }) {
-      const resp = await apiPostData(apiURL.smsCode, { phone, captchaId, captchaValue })
-      return resp
-    },
     logout (context) {
       context.commit('setUserInfo')
     }
