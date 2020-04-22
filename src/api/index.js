@@ -31,6 +31,8 @@ const preffix = '/sapi'
 export const apiURL = {
   // 用户登陆
   login: `${preffix}/v1/user/login`,
+  // 校验码
+  captcha: `${preffix}/v1/sms/captcha`,
   // 验证码
   smsCode: `${preffix}/v1/sms/send`,
 

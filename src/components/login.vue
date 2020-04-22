@@ -4,6 +4,10 @@
       <h2>Sghen-UI测试</h2>
     </div>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
+      <div class="login-captcha" slot="captchaValue">
+        <input v-model="formData.captchaValue" v-focus-within />
+        <img v-if="captcha.id" :src="captcha.base64" @click="onGetCaptcha" />
+      </div>
       <div class="login-code" slot="code">
         <input v-model="formData.code" v-focus-within />
         <span class="code-divider"></span>
@@ -21,6 +25,7 @@
 <script>
 import { mapState, mapActions } from 'vuex'
 import { sgIsPhone } from '@/utils/sgRegExp'
+import { apiURL, apiGetData } from '@/api'
 
 export default {
   name: 'Login',
@@ -32,7 +37,8 @@ export default {
         phone: null,
         pw: '',
         code: '',
-        loginType: 'pw'
+        loginType: 'pw',
+        captchaValue: ''
       },
       formRules: [
         {
@@ -60,9 +66,19 @@ export default {
           _error: ''
         },
         {
+          key: 'captchaValue',
+          slot: true,
+          label: '图形运算',
+          hidden: true,
+          required: false,
+          validator: (v, rule) => {
+            return v ? '请输入图形运算结果' : ''
+          }
+        },
+        {
           key: 'code',
           slot: true,
-          label: '动态码',
+          label: '验证码',
           hidden: true,
           required: false,
           validator: (v, rule) => {
@@ -80,7 +96,10 @@ export default {
           noneClass: true
         }
       ],
-
+      captcha: {
+        id: '',
+        base64: ''
+      },
       smsLoading: false,
       countdown: 0
     }
@@ -104,29 +123,45 @@ export default {
 
   methods: {
     onChangeLoginType () {
-      let type = this.formData.loginType
-      type = type === 'pw' ? 'code' : 'pw'
+      const type = this.formData.loginType === 'pw' ? 'code' : 'pw'
       this.formData.loginType = type
 
-      let item = this.formRules.find(o => o.key === type)
-      item.hidden = false
-      item.required = true
+      const isPwType = type === 'pw'
+      let item = this.formRules.find(o => o.key === 'pw')
+      item.hidden = !isPwType
+      item.required = isPwType
 
-      type = type === 'pw' ? 'code' : 'pw'
-      item = this.formRules.find(o => o.key === type)
-      item.hidden = true
-      item.required = false
+      item = this.formRules.find(o => o.key === 'code')
+      item.hidden = isPwType
+      item.required = !isPwType
+
+      item = this.formRules.find(o => o.key === 'captchaValue')
+      item.hidden = isPwType
+      item.required = !isPwType
+
+      if (!isPwType) {
+        this.onGetCaptcha()
+      }
 
       this.$refs.form.clearErrors()
     },
-
+    onGetCaptcha () {
+      apiGetData(apiURL.captcha).then(resp => {
+        this.captcha = resp.data
+      })
+    },
     getSmsCode () {
-      this.$refs.form.validateField('phone', errMsg => {
-        if (errMsg) {
+      this.$refs.form.validateFields(['phone', 'captchaValue'], errors => {
+        if (errors) {
           return
         }
         this.smsLoading = true
-        this._getSmsCode(this.formData.phone).then(() => {
+        const params = {
+          phone: this.formData.phone,
+          captchaId: this.captcha.id,
+          captchaValue: this.formData.captchaValue
+        }
+        this._getSmsCode(params).then(() => {
           this.countdown = 60
           clearInterval(this.countdownHandle)
           this.countdownHandle = setInterval(() => {
@@ -142,8 +177,8 @@ export default {
     },
 
     onSubmit () {
-      this.$refs.form.validate(isValid => {
-        if (!isValid) {
+      this.$refs.form.validate(errors => {
+        if (errors) {
           return
         }
         this.isRequesting = true
@@ -183,6 +218,14 @@ export default {
     margin-bottom: 2rem;
     text-align: center;
     overflow: hidden;
+  }
+  .login-captcha {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    input {
+      flex: 1;
+    }
   }
   .login-code {
     display: flex;
