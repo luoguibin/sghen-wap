@@ -70,51 +70,44 @@ export default {
       })
     },
 
-    validateField (fieldKey, call) {
-      const fieldRule = this.formRules.find(o => o.key === fieldKey)
-      if (!fieldRule) {
-        call && call('未定义该字段')
-        return
-      }
-      if (!fieldRule.required) {
-        call && call()
-        return
-      }
+    validateFields (fieldKeys, call) {
+      const errors = []
       const tempValidator = (v, rule) => {
         return v ? '' : (rule.label || rule.key) + '不能为空'
       }
-      const validator = fieldRule.validator || tempValidator
-      const msg = validator(this.formData[fieldRule.key], fieldRule)
-      fieldRule._error = msg || ''
-      call && call(msg)
-    },
-
-    validate (call) {
-      const tempValidator = (v, rule) => {
-        return v ? '' : (rule.label || rule.key) + '不能为空'
-      }
-      const formData = this.formData
-      let errCount = 0
+      const ruleMap = {}
       this.formRules.forEach(o => {
-        if (!formData.hasOwnProperty(o.key)) {
-          return
-        }
-        if (!o.required) {
-          return
-        }
+        ruleMap[o.key] = o
+      })
 
-        const validator = o.validator || tempValidator
-        const msg = validator(formData[o.key], o)
+      fieldKeys.forEach(fieldKey => {
+        const fieldRule = ruleMap[fieldKey]
+        if (!fieldRule) {
+          errors.push({ fieldKey, msg: '未定义该字段' })
+        }
+        if (fieldRule.required) {
+          const validator = fieldRule.validator || tempValidator
+          const msg = validator(this.formData[fieldRule.key], fieldRule)
+          fieldRule._error = msg || ''
 
-        if (msg) {
-          o._error = msg
-          errCount++
+          if (msg) {
+            errors.push({ fieldKey, msg })
+          }
         } else {
-          o._error = ''
+          fieldRule._error = ''
         }
       })
 
-      call && call(!errCount)
+      call && call(errors.length ? errors : '')
+    },
+
+    validate (call) {
+      const fieldKeys = this.formRules
+        .filter(o => o.required)
+        .map(o => {
+          return o.key
+        })
+      this.validateFields(fieldKeys, call)
     }
   }
 }
