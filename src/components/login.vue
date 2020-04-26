@@ -15,9 +15,16 @@
         <sg-button v-show="countdown <= 0" :isLoading="smsLoading" @click="onGetSmsCode">获&nbsp;取</sg-button>
       </div>
       <div class="login-type" slot="loginType">
-        <sg-button @click="onChangeLoginType">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
+        <div class="left">
+          <sg-button v-show="formData.loginType !== 'create'" @click="onChangeLoginType('code')">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
+        </div>
+        <div class="right">
+          <sg-button v-show="formData.loginType !== 'code'" @click="onChangeLoginType('create')">{{formData.loginType === 'pw' ? '账号注册' : '已有账号？'}}</sg-button>
+        </div>
       </div>
-      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">登&nbsp;&nbsp;录</sg-button>
+      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">
+        {{formData.loginType === 'create' ? '注&nbsp;&nbsp;册' : '登&nbsp;&nbsp;录'}}
+      </sg-button>
     </sg-form>
   </div>
 </template>
@@ -52,15 +59,43 @@ export default {
           _error: ''
         },
         {
+          key: 'name',
+          label: '昵称',
+          required: false,
+          hidden: true,
+          validator: (v, rule) => {
+            return v ? '' : '请输入' + rule.label
+          },
+          _error: ''
+        },
+        {
           key: 'pw',
           label: '密码',
           required: true,
+          hidden: false,
           inputType: 'password',
           validator: (v, rule) => {
             if (!v) {
               return '请输入' + rule.label
             } else {
               return v.length < 6 || v.length > 20 ? '密码长度为6~20字符' : ''
+            }
+          },
+          _error: ''
+        },
+        {
+          key: 'pw2',
+          label: '重复密码',
+          required: false,
+          hidden: true,
+          inputType: 'password',
+          validator: (v, rule) => {
+            if (!v) {
+              return '请输入' + rule.label
+            } else if (v.length < 6 || v.length > 20) {
+              return '密码长度为6~20字符'
+            } else {
+              return this.formData.pw !== v ? '两次密码不一致' : ''
             }
           },
           _error: ''
@@ -123,14 +158,23 @@ export default {
   },
 
   methods: {
-    onChangeLoginType () {
-      const type = this.formData.loginType === 'pw' ? 'code' : 'pw'
+    onChangeLoginType (otherType) {
+      const type = this.formData.loginType === 'pw' ? otherType : 'pw'
+      const isPwType = type === 'pw'
+      const isCreateType = type === 'create'
       this.formData.loginType = type
 
-      const isPwType = type === 'pw'
-      let item = this.formRules.find(o => o.key === 'pw')
-      item.hidden = !isPwType
-      item.required = isPwType
+      let item = this.formRules.find(o => o.key === 'name')
+      item.hidden = !isCreateType
+      item.required = isCreateType
+
+      item = this.formRules.find(o => o.key === 'pw')
+      item.hidden = !isPwType && !isCreateType
+      item.required = isPwType || isCreateType
+
+      item = this.formRules.find(o => o.key === 'pw2')
+      item.hidden = !isCreateType
+      item.required = isCreateType
 
       item = this.formRules.find(o => o.key === 'code')
       item.hidden = isPwType
@@ -140,7 +184,7 @@ export default {
       item.hidden = isPwType
       item.required = !isPwType
 
-      if (!isPwType) {
+      if (!isPwType || isCreateType) {
         this.onGetCaptcha()
       }
 
@@ -184,7 +228,7 @@ export default {
         }
         this.isRequesting = true
 
-        const { phone, pw, code } = this.formData
+        const { phone, pw, code, name, loginType } = this.formData
         const params = { account: phone }
         if (code) {
           params.code = code
@@ -192,8 +236,12 @@ export default {
         } else {
           params.pw = pw
         }
+        if (loginType === 'create') {
+          params.name = name
+        }
 
-        this.login(params).then(() => {
+        const method = loginType === 'create' ? this.createUser : this.login
+        method(params).then(() => {
           this.$toast('登录成功')
           this.$router.push({ name: 'home' })
         }).finally(() => {
@@ -203,6 +251,7 @@ export default {
     },
 
     ...mapActions({
+      createUser: 'auth/createUser',
       login: 'auth/login'
     })
   },
@@ -253,9 +302,21 @@ export default {
     }
   }
   .login-type {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+    .right {
+      flex: 1;
+      text-align: right;
+    }
+    .left {
+      flex: 1;
+      text-align: left;
+    }
     .sg-button {
       display: inline-block;
       width: inherit;
+      padding: 0.5rem 0;
       font-size: 1.2rem;
     }
   }

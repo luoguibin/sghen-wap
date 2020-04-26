@@ -20,10 +20,15 @@ export default {
     }
   },
   actions: {
+    createUser ({ dispatch }, data) {
+      data.isCreateUser = true
+      return dispatch('login', data)
+    },
     login (context, data) {
       return new Promise(function (resolve, reject) {
         const func = function (_data, _resolve, _reject) {
-          apiPostData(apiURL.login, _data).then(resp => {
+          const postURL = data.isCreateUser ? apiURL.userCreate : apiURL.login
+          apiPostData(postURL, _data).then(resp => {
             context.commit('setUserInfo', resp.data)
             _resolve(resp)
           }).catch(err => {
