@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import Peotry from '@/components/peotry'
 
@@ -70,7 +70,8 @@ export default {
       return !this.peotries.length && this.peotriesLoadCount
     },
     ...mapState({
-      userID: state => state.auth.userID
+      userID: state => state.auth.userID,
+      userInfoMap: state => state.data.userInfoMap
     })
   },
 
@@ -85,7 +86,6 @@ export default {
   created () {
     window.peotryList = this
     this.uuid = this.$route.query.uuid || ''
-    this.peotInfoMap = {}
   },
 
   methods: {
@@ -121,6 +121,7 @@ export default {
     },
     handleRefresh () {
       this.page = 1
+      this.clearUsersInfo()
       this.handleLoad(true)
     },
 
@@ -128,7 +129,7 @@ export default {
      * @param {Array} list
      */
     checkPeotries (list) {
-      const peotInfoMap = this.peotInfoMap
+      const peotInfoMap = this.userInfoMap
       const peotIdMap = []
       const timeFunc = function (o0, o1) {
         // 按时间排序评论列表
@@ -138,6 +139,9 @@ export default {
       }
 
       list.forEach(o => {
+        if (o.user) {
+          o.user = Object.freeze(o.user)
+        }
         if (!o.comments) {
           o.comments = []
           o.praiseComments = []
@@ -148,14 +152,14 @@ export default {
           o.comments.forEach(o_ => {
             // 判断评论的创建者
             if (peotInfoMap[o_.fromId]) {
-              o_.fromPeot = peotInfoMap[o_.fromId]
+              o_.fromPeot = Object.freeze(peotInfoMap[o_.fromId])
             } else {
               peotIdMap[o_.fromId] = true
             }
 
             if (o_.toId > 0) {
               if (peotInfoMap[o_.toId]) {
-                o_.toPeot = peotInfoMap[o_.toId]
+                o_.toPeot = Object.freeze(peotInfoMap[o_.toId])
               } else {
                 peotIdMap[o_.toId] = true
               }
@@ -175,47 +179,26 @@ export default {
       if (!peotIds.length) {
         return
       }
-
-      this.getUserInfoList(peotIds).then(data => {
-        data.forEach(o => {
-          peotInfoMap[o.id] = o
-        })
+      this.getUsersInfo(peotIds).then(data => {
         list.forEach(o => {
-          this.buildPeotryComments(o, peotInfoMap)
+          this.buildPeotryComments(o)
         })
       })
     },
-    buildPeotryComments (peotry, peotInfoMap) {
+    buildPeotryComments (peotry) {
+      const peotInfoMap = this.userInfoMap
       peotry.praiseComments.forEach(o => {
         if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
+          this.$set(o, 'fromPeot', Object.freeze(peotInfoMap[o.fromId]))
         }
       })
       peotry.realComments.forEach(o => {
         if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
+          this.$set(o, 'fromPeot', Object.freeze(peotInfoMap[o.fromId]))
         }
         if (o.toId > 0 && !o.toPeot) {
-          this.$set(o, 'toPeot', peotInfoMap[o.toId])
+          this.$set(o, 'toPeot', Object.freeze(peotInfoMap[o.toId]))
         }
-      })
-    },
-    getUserInfoList (ids) {
-      const reqs = []
-      const max = 100
-      const len = Math.ceil(ids.length / max)
-      for (let i = 0; i < len; i++) {
-        reqs.push(apiGetData(apiURL.userInfoList, {
-          datas: ids.slice(i * max, i * max + max).toString()
-        })
-        )
-      }
-      return Promise.all(reqs).then(results => {
-        let data = []
-        results.forEach(o => {
-          data = data.concat(o.data)
-        })
-        return data
       })
     },
 
@@ -424,7 +407,12 @@ export default {
       this.praiseVisible = false
       obj.data.itemTag = ''
       delete this.praiseMap[id]
-    }
+    },
+
+    ...mapActions({
+      clearUsersInfo: 'data/clearUsersInfo',
+      getUsersInfo: 'data/getUsersInfo'
+    })
   }
 }
 </script>
