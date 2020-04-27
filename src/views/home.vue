@@ -67,7 +67,7 @@ export default {
 
   data () {
     return {
-      year: new Date().getFullYear(),
+      year: new Date().getFullYear() - 1,
       yearPeots: [],
       yearPoetrySets: [],
       popularPeotrySets: []
@@ -95,7 +95,7 @@ export default {
     getYearInfos () {
       const params = {
         date0: `${this.year}-01-01 00:00:00`,
-        date1: `${this.year}-12-30 59:59:59`
+        date1: `${this.year + 1}-01-01 00:00:00`
       }
       apiGetData(apiURL.peotrySetListYear, params).then(resp => {
         this.yearPoetrySets = resp.data
