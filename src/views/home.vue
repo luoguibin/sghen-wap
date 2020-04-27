@@ -11,43 +11,45 @@
 
     <!-- 内容 -->
     <div class="home-body">
-      <sg-swipper :items="[{slot: 'slot-0'}]" :auto="false">
-        <div slot="slot-0" class="swipper-panel">
-          <h2>《书三行》</h2>
-          <h3>最近就变懒了吗？</h3>
-          <h3>不就是写三行吗？</h3>
-          <h3>这不就写完了吗？</h3>
-          <sg-button @click="$router.push({name: 'peotry-list'})">更多</sg-button>
+      <div>
+        <sg-swipper :items="[{slot: 'slot-0'}]" :auto="false">
+          <div slot="slot-0" class="swipper-panel">
+            <h2>《书三行》</h2>
+            <h3>最近就变懒了吗？</h3>
+            <h3>不就是写三行吗？</h3>
+            <h3>这不就写完了吗？</h3>
+            <sg-button @click="$router.push({name: 'peotry-list'})">更多</sg-button>
+          </div>
+        </sg-swipper>
+
+        <div class="info-panel year-info" v-if="yearPoetrySets.length">
+          <h2>{{year}}年度诗词概况</h2>
+          <p>
+            本年度共创建
+            <span>{{yearPeotryCount}}</span>首诗词，其中以选集
+            <span>【{{yearPoetrySets[0].name}}】</span>
+            {{yearPoetrySets[0].count}}首稳居榜首；
+            <template v-if="yearPeots.length">
+              诗词创建数量最多的是
+              <span>[{{yearPeots[0].username}}]</span> ，共创建
+              <span>{{yearPeots[0].count}}</span>首。
+            </template>
+          </p>
         </div>
-      </sg-swipper>
 
-      <div class="info-panel year-info" v-if="yearPoetrySets.length">
-        <h2>{{year}}年度诗词概况</h2>
-        <p>
-          本年度共创建
-          <span>{{yearPeotryCount}}</span>首诗词，其中以选集
-          <span>【{{yearPoetrySets[0].name}}】</span>
-          {{yearPoetrySets[0].count}}首稳居榜首；
-          <template v-if="yearPeots.length">
-            诗词创建数量最多的是
-            <span>[{{yearPeots[0].username}}]</span> ，共创建
-            <span>{{yearPeots[0].count}}</span>首。
-          </template>
-        </p>
-      </div>
-
-      <div class="info-panel">
-        <h2>选集总排行榜</h2>
-        <div class="popular-sets">
-          <div v-for="item in popularPeotrySets" :key="item.id">{{item.name}}({{item.count}}首)</div>
+        <div class="info-panel">
+          <h2>选集总排行榜</h2>
+          <div class="popular-sets">
+            <div v-for="item in popularPeotrySets" :key="item.id">{{item.name}}({{item.count}}首)</div>
+          </div>
         </div>
-      </div>
 
-      <div class="module-panel">
-        <span>模块占位中...</span>
-      </div>
+        <div class="module-panel">
+          <span>模块占位中...</span>
+        </div>
 
-      <site-instruction></site-instruction>
+        <site-instruction></site-instruction>
+      </div>
     </div>
   </div>
 </template>
@@ -135,7 +137,6 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  overflow: hidden;
   .home-header {
     padding: 1rem 0.5rem;
     text-align: right;
