@@ -26,7 +26,8 @@
         <p>
           本年度共创建
           <span>{{yearPeotryCount}}</span>首诗词，其中以选集
-          <span>【{{yearPoetrySets[0].name}}】</span> {{yearPoetrySets[0].count}}首稳居榜首；
+          <span>【{{yearPoetrySets[0].name}}】</span>
+          {{yearPoetrySets[0].count}}首稳居榜首；
           <template v-if="yearPeots.length">
             诗词创建数量最多的是
             <span>[{{yearPeots[0].username}}]</span> ，共创建
@@ -41,6 +42,12 @@
           <div v-for="item in popularPeotrySets" :key="item.id">{{item.name}}({{item.count}}首)</div>
         </div>
       </div>
+
+      <div class="module-panel">
+        <span>模块占位中...</span>
+      </div>
+
+      <site-instruction></site-instruction>
     </div>
   </div>
 </template>
@@ -52,7 +59,9 @@ import { apiURL, apiGetData } from '@/api'
 export default {
   name: 'Home',
 
-  components: {},
+  components: {
+    SiteInstruction: () => import('@/components/site-instruction')
+  },
 
   data () {
     return {
@@ -173,9 +182,9 @@ export default {
     }
   }
 
-  .popular-sets{
+  .popular-sets {
     margin: -1.2rem -1.2rem 0 0;
-   > div {
+    > div {
       display: inline-block;
       margin: 1.2rem 1.2rem 0 0;
       padding: 3px 8px;
@@ -184,6 +193,35 @@ export default {
       border-radius: 6px;
       background-color: $main-color;
     }
+  }
+
+  .module-panel {
+    height: 18rem;
+    line-height: 18rem;
+    background: #eee;
+    text-align: center;
+    color: #999;
+    span {
+      font-size: 1.6rem;
+      animation: frames-opacity 1200ms alternate infinite;
+    }
+  }
+}
+</style>
+
+<style>
+@keyframes frames-opacity {
+  0% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
   }
 }
 </style>
