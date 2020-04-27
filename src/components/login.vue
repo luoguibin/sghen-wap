@@ -243,7 +243,12 @@ export default {
         const method = loginType === 'create' ? this.createUser : this.login
         method(params).then(() => {
           this.$toast('登录成功')
-          this.$router.push({ name: 'home' })
+          const redirect = this.$route.query.redirect
+          if (redirect) {
+            this.$router.push({ path: redirect })
+          } else {
+            this.$router.push({ name: 'home' })
+          }
         }).finally(() => {
           this.isRequesting = false
         })

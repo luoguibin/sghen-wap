@@ -9,6 +9,11 @@ export default {
     phone: '',
     token: ''
   },
+  getters: {
+    isLogin (state) {
+      return !!state.token
+    }
+  },
   mutations: {
     setUserInfo (state, data = {}) {
       sessionStorage.setItem('sg-userinfo', JSON.stringify(data))
