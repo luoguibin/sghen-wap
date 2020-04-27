@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <div class="login-header">
-      <h2>Sghen-UI测试</h2>
+      <h2>Sghen三行</h2>
     </div>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
       <div class="login-captcha" slot="captchaValue">
