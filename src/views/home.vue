@@ -135,6 +135,7 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
   .home-header {
     padding: 1rem 0.5rem;
     text-align: right;
@@ -179,6 +180,7 @@ export default {
     }
     span {
       color: $main-color;
+      white-space: nowrap;
     }
   }
 
