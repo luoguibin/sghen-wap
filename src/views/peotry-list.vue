@@ -97,6 +97,7 @@ export default {
 
     const pageCacheData = Cache.PeotryPageCache.getData(this.uuid || 'root')
     if (pageCacheData) {
+      console.log('read from cache', this.uuid || 'root')
       this.peotries = pageCacheData.peotries
       this.page = pageCacheData.page
       this.isEnd = pageCacheData.isEnd
@@ -136,7 +137,9 @@ export default {
           }
           this.peotriesLoadCount++
           this.isEnd = this.peotries.length === data.totalCount
+
           this.$refs.sgScroll.success()
+          isRefresh && this.$refs.sgScroll.onScrollToTop()
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
