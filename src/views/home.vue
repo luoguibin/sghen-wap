@@ -138,6 +138,18 @@ export default {
       })
       const data = resp.data
       const imgSrcFunc = Vue.filter('img-src')
+      const getSmallImage = v => {
+        if (v.endsWith('.jpg')) {
+          v = v.replace(/.jpg$/, '_100.jpg')
+        } else if (v.endsWith('.png')) {
+          v = v.replace(/.png$/, '_100.png')
+        } else if (v.endsWith('.jpeg')) {
+          v = v.replace(/.jpeg$/, '_100.jpeg')
+        } else {
+          v += '_100.jpg'
+        }
+        return v
+      }
       this.swipperPoetries = data.map(o => {
         const temp = {
           id: o.id,
@@ -145,7 +157,9 @@ export default {
           lines: o.content.split('\n')
         }
         if (o.image && o.image.count) {
-          temp.image0 = imgSrcFunc(JSON.parse(o.image.images)[0])
+          temp.image0 = getSmallImage(
+            imgSrcFunc(JSON.parse(o.image.images)[0])
+          )
         }
         return temp
       })
@@ -225,7 +239,7 @@ export default {
       width: 100%;
       height: 100%;
       opacity: 0.3;
-      object-fit: scale-down;
+      object-fit: contain;
       pointer-events: none;
     }
   }
