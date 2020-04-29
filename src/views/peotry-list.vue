@@ -1,9 +1,9 @@
 <template>
   <div class="peotry-list" @click.stop="onClickPoetry($event)">
-    <sg-scroll v-if="!isEmpty" ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
+    <sg-scroll  v-show="!isEmpty" ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
       <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries"></peotry>
     </sg-scroll>
-    <div v-else class="empty">暂未有诗词</div>
+    <div v-show="isEmpty" class="empty">暂未有诗词</div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
     <comment-input
@@ -25,8 +25,9 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
+import Cache from '@/common/cache-center'
 import Peotry from '@/components/peotry'
 
 export default {
@@ -70,22 +71,44 @@ export default {
       return !this.peotries.length && this.peotriesLoadCount
     },
     ...mapState({
-      userID: state => state.auth.userID,
-      userInfoMap: state => state.data.userInfoMap
+      userID: state => state.auth.userID
     })
-  },
-
-  watch: {
-    $route (o) {
-      this.uuid = o.query.uuid || ''
-      this.peotriesLoadCount = 0
-      this.handleRefresh()
-    }
   },
 
   created () {
     window.peotryList = this
+    window.GlobalCache = Cache
     this.uuid = this.$route.query.uuid || ''
+  },
+
+  beforeRouteUpdate (to, from, next) {
+    const pageCache = Cache.PeotryPageCache
+    pageCache.setData(this.uuid || 'root', {
+      peotries: this.peotries,
+      page: this.page,
+      isEnd: this.isEnd,
+      scrollTop: this.$refs.sgScroll.getScrollTop()
+    })
+    next()
+
+    this.uuid = to.query.uuid || ''
+    this.peotriesLoadCount = 0
+    this.page = 1
+
+    const pageCacheData = Cache.PeotryPageCache.getData(this.uuid || 'root')
+    if (pageCacheData) {
+      this.peotries = pageCacheData.peotries
+      this.page = pageCacheData.page
+      this.isEnd = pageCacheData.isEnd
+
+      const sgScroll = this.$refs.sgScroll
+      sgScroll.success()
+      this.$nextTick(() => {
+        sgScroll.setScrollTop(pageCacheData.scrollTop)
+      })
+    } else {
+      this.handleLoad(true)
+    }
   },
 
   methods: {
@@ -93,7 +116,6 @@ export default {
       if (!isRefresh) {
         this.page += 1
       }
-
       const params = {
         page: this.page,
         limit: this.limit,
@@ -102,6 +124,7 @@ export default {
       if (this.uuid) {
         params.userId = this.uuid
       }
+
       apiGetData(apiURL.peotryList, params)
         .then(data => {
           const list = data.data
@@ -121,7 +144,8 @@ export default {
     },
     handleRefresh () {
       this.page = 1
-      this.clearUsersInfo()
+      Cache.PeotryPageCache.clear()
+      Cache.UserCache.clear()
       this.handleLoad(true)
     },
 
@@ -129,7 +153,7 @@ export default {
      * @param {Array} list
      */
     checkPeotries (list) {
-      const peotInfoMap = this.userInfoMap
+      const userCache = Cache.UserCache
       const peotIdMap = []
       const timeFunc = function (o0, o1) {
         // 按时间排序评论列表
@@ -151,15 +175,15 @@ export default {
           const realComments = []
           o.comments.forEach(o_ => {
             // 判断评论的创建者
-            if (peotInfoMap[o_.fromId]) {
-              o_.fromPeot = Object.freeze(peotInfoMap[o_.fromId])
+            if (userCache.getData(o_.fromId)) {
+              o_.fromPeot = Object.freeze(userCache.getData(o_.fromId))
             } else {
               peotIdMap[o_.fromId] = true
             }
 
             if (o_.toId > 0) {
-              if (peotInfoMap[o_.toId]) {
-                o_.toPeot = Object.freeze(peotInfoMap[o_.toId])
+              if (userCache.getData(o_.toId)) {
+                o_.toPeot = Object.freeze(userCache.getData(o_.toId))
               } else {
                 peotIdMap[o_.toId] = true
               }
@@ -180,24 +204,45 @@ export default {
         return
       }
       this.getUsersInfo(peotIds).then(data => {
+        const userCache = Cache.UserCache
+        data.forEach(o => {
+          userCache.setData(+o.id, o)
+        })
         list.forEach(o => {
           this.buildPeotryComments(o)
         })
       })
     },
+    getUsersInfo (ids) {
+      const reqs = []
+      const max = 100
+      const len = Math.ceil(ids.length / max)
+      for (let i = 0; i < len; i++) {
+        reqs.push(apiGetData(apiURL.userInfoList, {
+          datas: ids.slice(i * max, i * max + max).toString()
+        }))
+      }
+      return Promise.all(reqs).then(results => {
+        let data = []
+        results.forEach(o => {
+          data = data.concat(o.data)
+        })
+        return data
+      })
+    },
     buildPeotryComments (peotry) {
-      const peotInfoMap = this.userInfoMap
+      const userCache = Cache.UserCache
       peotry.praiseComments.forEach(o => {
         if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', Object.freeze(peotInfoMap[o.fromId]))
+          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
         }
       })
       peotry.realComments.forEach(o => {
         if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', Object.freeze(peotInfoMap[o.fromId]))
+          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
         }
         if (o.toId > 0 && !o.toPeot) {
-          this.$set(o, 'toPeot', Object.freeze(peotInfoMap[o.toId]))
+          this.$set(o, 'toPeot', Object.freeze(userCache.getData(o.toId)))
         }
       })
     },
@@ -237,7 +282,7 @@ export default {
           const currentTime = Date.now()
           if (currentTime - time < 300) {
             this.onPraisePeotry(peotry, peotryInstance, data => {
-              data.fromPeot = this.peotInfoMap[this.userID]
+              data.fromPeot = Cache.UserCache.getData(this.userID)
               data.itemTag = 'opacity'
               peotry.praiseComments.push(data)
 
@@ -362,10 +407,11 @@ export default {
     },
 
     handleCommentOk (o) {
+      const userCache = Cache.UserCache
       const peotry = this.peotries.find(o => o.id === this.commentID)
       if (peotry) {
-        o.fromPeot = this.peotInfoMap[this.userID]
-        o.toPeot = this.peotInfoMap[this.commentToID]
+        o.fromPeot = userCache.getData(this.userID)
+        o.toPeot = userCache.getData(this.commentToID)
         peotry.realComments.push(o)
       } else {
         console.log('comment peotry is not exist', o)
@@ -407,12 +453,7 @@ export default {
       this.praiseVisible = false
       obj.data.itemTag = ''
       delete this.praiseMap[id]
-    },
-
-    ...mapActions({
-      clearUsersInfo: 'data/clearUsersInfo',
-      getUsersInfo: 'data/getUsersInfo'
-    })
+    }
   }
 }
 </script>

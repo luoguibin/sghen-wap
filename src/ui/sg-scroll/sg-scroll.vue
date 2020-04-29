@@ -152,6 +152,12 @@ export default {
       this.$refs.scrollEl.scrollTop = 0
       this.topVisible = false
     },
+    setScrollTop (num) {
+      this.$refs.scrollEl.scrollTop = num
+    },
+    getScrollTop () {
+      return this.$refs.scrollEl.scrollTop
+    },
 
     handleScroll (e) {
       const scrollTop = e.target.scrollTop
