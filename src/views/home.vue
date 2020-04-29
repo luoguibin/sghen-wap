@@ -152,9 +152,9 @@ export default {
       this.swipperItems = data.map(o => ({ slot: 'slot-' + o.id }))
       this.$refs.sgSwipper.start()
 
-      // this.line3Timer = setTimeout(() => {
-      //   this.getWipperPeotries()
-      // }, this.swipperDuration * this.swipperItems.length)
+      this.line3Timer = setTimeout(() => {
+        this.getWipperPeotries()
+      }, this.swipperDuration * this.swipperItems.length)
     },
 
     onGoLogin () {
