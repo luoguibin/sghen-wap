@@ -6,7 +6,7 @@
         <span>|</span>
         <span @click="onConfirm">退出</span>
       </template>
-      <span v-else @click="onGoLogin">登陆</span>
+      <span v-else @click="onGoLogin">登陆~</span>
     </div>
 
     <!-- 内容 -->
@@ -140,7 +140,8 @@ export default {
   .home-header {
     padding: 1rem 0.5rem;
     text-align: right;
-    font-size: 1.6rem;
+    font-size: 1.2rem;
+    color: $main-color;
     border-bottom: 1px solid #eee;
     span {
       padding: 0 2px;
@@ -162,6 +163,7 @@ export default {
       position: absolute;
       right: 10px;
       bottom: 10px;
+      font-size: 1.2rem;
       display: inline-block;
       width: initial;
     }
