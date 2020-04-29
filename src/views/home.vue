@@ -12,13 +12,16 @@
     <!-- 内容 -->
     <div class="home-body">
       <div>
-        <sg-swipper :items="[{slot: 'slot-0'}]" :auto="false">
-          <div slot="slot-0" class="swipper-panel">
-            <h2>《书三行》</h2>
-            <h3>最近就变懒了吗？</h3>
-            <h3>不就是写三行吗？</h3>
-            <h3>这不就写完了吗？</h3>
-            <sg-button @click="$router.push({name: 'peotry-list'})">更多</sg-button>
+        <sg-swipper ref="sgSwipper" :items="swipperItems" :duration="swipperDuration" :auto="1">
+          <div
+            v-for="(item, index) in swipperPoetries"
+            :slot="swipperItems[index].slot"
+            :key="item.id"
+            class="swipper-panel"
+          >
+            <img v-if="item.image0" :src="item.image0" />
+            <h2 v-if="item.setName">《{{item.setName}}》</h2>
+            <p v-for="(l, i) in item.lines" :key="i">{{l}}</p>
           </div>
         </sg-swipper>
 
@@ -44,6 +47,8 @@
           </div>
         </div>
 
+        <sg-button @click="$router.push({name: 'peotry-list'})">更多诗词~</sg-button>
+
         <div class="module-panel">
           <span>模块占位中...</span>
         </div>
@@ -55,6 +60,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
 
@@ -70,7 +76,11 @@ export default {
       year: new Date().getFullYear() - 1,
       yearPeots: [],
       yearPoetrySets: [],
-      popularPeotrySets: []
+      popularPeotrySets: [],
+
+      swipperItems: [],
+      swipperPoetries: [],
+      swipperDuration: 5000
     }
   },
 
@@ -89,6 +99,7 @@ export default {
   created () {
     window.home = this
     this.getYearInfos()
+    this.getWipperPeotries()
   },
 
   methods: {
@@ -106,6 +117,44 @@ export default {
       apiGetData(apiURL.poetrySetPopular).then(resp => {
         this.popularPeotrySets = resp.data
       })
+    },
+    async getWipperPeotries () {
+      const limit = 3
+      if (!this.line3Total) {
+        const resp = await apiGetData(apiURL.peotryCount10001)
+        this.line3Total = +resp.data[0].total
+        this.line3Page = 1
+      } else {
+        this.line3Page++
+        if (this.line3Page > Math.ceil(this.line3Total / limit)) {
+          this.line3Page = 1
+        }
+      }
+
+      const resp = await apiGetData(apiURL.peotryList, {
+        setId: 10001,
+        page: this.line3Page,
+        limit
+      })
+      const data = resp.data
+      const imgSrcFunc = Vue.filter('img-src')
+      this.swipperPoetries = data.map(o => {
+        const temp = {
+          id: o.id,
+          setName: o.set && o.set.name,
+          lines: o.content.split('\n')
+        }
+        if (o.image && o.image.count) {
+          temp.image0 = imgSrcFunc(JSON.parse(o.image.images)[0])
+        }
+        return temp
+      })
+      this.swipperItems = data.map(o => ({ slot: 'slot-' + o.id }))
+      this.$refs.sgSwipper.start()
+
+      // this.line3Timer = setTimeout(() => {
+      //   this.getWipperPeotries()
+      // }, this.swipperDuration * this.swipperItems.length)
     },
 
     onGoLogin () {
@@ -127,6 +176,10 @@ export default {
     ...mapActions({
       logout: 'auth/logout'
     })
+  },
+
+  beforeDestroy () {
+    clearTimeout(this.line3Timer)
   }
 }
 </script>
@@ -159,13 +212,21 @@ export default {
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
-    .sg-button {
+    p {
+      font-size: 1.4rem;
+      line-height: 2.4rem;
+    }
+    img {
       position: absolute;
-      right: 10px;
-      bottom: 10px;
-      font-size: 1.2rem;
-      display: inline-block;
-      width: initial;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.3;
+      object-fit: scale-down;
+      pointer-events: none;
     }
   }
   .info-panel {

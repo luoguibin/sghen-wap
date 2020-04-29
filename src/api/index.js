@@ -53,6 +53,8 @@ export const apiURL = {
   peotrySetListYear: `${preffix}/v1/api/get/peotry-set/list-year`,
   // 根据年度诗词创建数获取诗词作者列表
   peotryUserListYear: `${preffix}/v1/api/get/peotry-user/list-year`,
+  // 书三行选集对应的诗词总数
+  peotryCount10001: `${preffix}/v1/api/get/peotry/count-10001`,
 
   // 评论创建
   commentCreate: `${preffix}/v1/comment/create`,
