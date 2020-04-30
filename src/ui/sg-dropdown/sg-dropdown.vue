@@ -92,9 +92,9 @@ export default {
 
   .sg-dropdown-options {
     position: absolute;
-    left: 0;
-    width: 100%;
-    max-width: 100%;
+    right: 0;
+    max-width: 50vw;
+    min-width: 5rem;
     padding: 1rem 0;
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -112,6 +112,7 @@ export default {
     right: 1rem;
     width: 0;
     height: 0;
+    z-index: $zIndex100;
     box-sizing: border-box;
     border-width: 1rem;
     border-style: solid;
