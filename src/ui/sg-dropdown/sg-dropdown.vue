@@ -1,7 +1,11 @@
 <template>
-  <div :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]">
+  <div
+    :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]"
+  >
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
-      <div class="sg-flex-one sg-text-ellipsis"><slot>{{currentLabel || '点击选择'}}</slot></div>
+      <div class="sg-flex-one sg-text-ellipsis">
+        <slot>{{currentLabel || '点击选择'}}</slot>
+      </div>
       <i v-show="pointerVisible" class="iconfont icon-down"></i>
     </div>
     <div v-show="optionsVisible" class="sg-dropdown-options">
@@ -10,7 +14,7 @@
           v-for="item in options"
           :key="item.value"
           class="sg-dropdown-option sg-text-ellipsis"
-          :class="{'sg-dropdown-option_active': currentValue === item.value}"
+          :class="{'sg-dropdown-option_active': optionActive && currentValue === item.value}"
           @click.stop="onSelectOption(item)"
         >{{item.label}}</div>
       </div>
@@ -27,6 +31,10 @@ export default {
     options: {
       type: Array,
       required: true
+    },
+    optionActive: {
+      type: Boolean,
+      default: false
     },
     pointerVisible: {
       type: Boolean,
@@ -78,6 +86,7 @@ export default {
 .sg-dropdown {
   position: relative;
   padding: 0.5rem;
+  color: $content-color;
   background-color: white;
   .sg-dropdown-label {
     font-size: 1.4rem;
@@ -142,7 +151,7 @@ export default {
 }
 
 .sg-dropdown_bottom {
-  .sg-dropdown-options{
+  .sg-dropdown-options {
     top: 3rem;
   }
   .sg-dropdown-pointer {
@@ -151,10 +160,10 @@ export default {
 }
 
 .sg-dropdown-active {
-   .sg-dropdown-label {
-     i {
-       transform: rotate(180deg);
-     }
-   }
+  .sg-dropdown-label {
+    i {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>
