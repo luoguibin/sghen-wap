@@ -20,6 +20,17 @@
       <div v-show="isEmpty" class="empty">暂未有诗词</div>
     </div>
 
+    <div class="right-menus-wrapper" v-show="rightMenusVisible">
+      <div class="wrapper" @click="rightMenusVisible = false">
+        <div class="right-menus" ref="rightMenus" :style="rightMenusStyle">
+          <sg-button v-show="rightIsSelfPeotry" @click.stop="onClickMenu('edit')">{{ '编辑'}}</sg-button>
+          <sg-button @click.stop="onClickMenu('praise', $event)">{{ rightIsPraise ? '取消点赞' : '点赞'}}</sg-button>
+          <sg-button @click.stop="onClickMenu('comment')">评论</sg-button>
+          <sg-button @click.stop="onClickMenu('close')">关闭</sg-button>
+        </div>
+      </div>
+    </div>
+
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
     <comment-input
@@ -43,10 +54,32 @@
 <script>
 import { mapState } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
+import { TouchAction } from '@/common/touch-action'
 import Cache from '@/common/cache-center'
 import Peotry from '@/components/peotry'
 
 const CACHE_ROOT_ID = 'root'
+
+const getItemIndex = function (el) {
+  let index = -1
+  while (el) {
+    index++
+    el = el.previousElementSibling
+  }
+  return index
+}
+
+const getPeotryIndex = function (el) {
+  let tempEl = el
+  while (tempEl) {
+    if (tempEl.getAttribute('item-type') === 'peotry') {
+      break
+    } else {
+      tempEl = tempEl.parentElement
+    }
+  }
+  return getItemIndex(tempEl)
+}
 
 export default {
   nae: 'PeotryList',
@@ -80,7 +113,15 @@ export default {
       praiseId: 0,
       praiseFromStyle: {},
       praiseToStyle: {},
-      praiseMap: {}
+      praiseMap: {},
+
+      rightMenusVisible: false,
+      rightIsPraise: false,
+      rightIsSelfPeotry: false,
+      rightMenusStyle: {
+        top: 0,
+        right: 0
+      }
     }
   },
 
@@ -111,6 +152,55 @@ export default {
     window.peotryList = this
     window.GlobalCache = Cache
     this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
+  },
+
+  mounted () {
+    const touchAction = new TouchAction(this.$el, 'peotry-content')
+
+    touchAction.addEventListener('touchstart', e => {
+      // console.log('touchAction::touchstart', e)
+
+      const index = getPeotryIndex(e.target)
+      const peotryInstance = this.$refs.peotries[index]
+      const offsetTop =
+        peotryInstance.$el.offsetTop +
+        peotryInstance.$refs.contentEnd.offsetTop -
+        this.$refs.sgScroll.getScrollTop()
+
+      this.rightMenusStyle.top = offsetTop + 'px'
+      this.rightIndex = index
+      this.rightIsPraise = peotryInstance.isPraise
+      this.rightIsSelfPeotry = peotryInstance.isSelfPeotry
+      this.rightMenusVisible = true
+
+      this.$nextTick(() => {
+        const clientWidth = this.$refs.rightMenus.clientWidth
+        this.rightMenusStyle.right = -clientWidth + 'px'
+      })
+    })
+    touchAction.addEventListener('touchmove', (e, valueX) => {
+      // console.log('touchAction::touchstart', e, valueX)
+      let right = parseInt(this.rightMenusStyle.right) - valueX / 2
+      const clientWidth = this.$refs.rightMenus.clientWidth
+      if (right > 0) {
+        right = 0
+      } else if (right < -clientWidth) {
+        right = -clientWidth
+      }
+      this.rightMenusStyle.right = right + 'px'
+    })
+    touchAction.addEventListener('touchend', () => {
+      const right = parseInt(this.rightMenusStyle.right)
+      const clientWidth = this.$refs.rightMenus.clientWidth
+      if (-right < clientWidth / 2) {
+        this.rightMenusStyle.right = '0px'
+      } else {
+        this.rightMenusVisible = false
+      }
+    })
+    this.$once('hook:beforeDestroy', () => {
+      touchAction.release()
+    })
   },
 
   beforeRouteUpdate (to, from, next) {
@@ -293,7 +383,35 @@ export default {
         }
       })
     },
+    onClickMenu (key, e) {
+      const peotry = this.peotries[this.rightIndex]
+      switch (key) {
+        case 'edit':
+          this.$toast('正在码...')
+          break
+        case 'comment':
+          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          break
+        case 'praise':
+          const peotryInstance = this.$refs.peotries[this.rightIndex]
+          this.onPraisePeotry(peotry, peotryInstance, data => {
+            this.rightMenusVisible = false
+            data.fromPeot = Cache.UserCache.getData(this.userID)
+            data.itemTag = 'opacity'
+            peotry.praiseComments.push(data)
 
+            this.$nextTick(() => {
+              this.onPraiseAnime(peotry, peotryInstance, e, data)
+            })
+          })
+          break
+        case 'close':
+          this.rightMenusVisible = false
+          break
+        default:
+          break
+      }
+    },
     onClickPoetry (e) {
       const target = e.target
       const itemType = target.getAttribute('item-type')
@@ -301,25 +419,6 @@ export default {
         return
       }
 
-      const getItemIndex = function (el) {
-        let index = -1
-        while (el) {
-          index++
-          el = el.previousElementSibling
-        }
-        return index
-      }
-      const getPeotryIndex = function (el) {
-        let tempEl = el
-        while (tempEl) {
-          if (tempEl.getAttribute('item-type') === 'peotry') {
-            break
-          } else {
-            tempEl = tempEl.parentElement
-          }
-        }
-        return getItemIndex(tempEl)
-      }
       const index = getPeotryIndex(target)
       const peotry = this.peotries[index]
       const peotryInstance = this.$refs.peotries[index]
@@ -431,6 +530,9 @@ export default {
           fromId: comment.fromId
         })
           .then(data => {
+            this.rightIsPraise = false
+            this.rightMenusVisible = false
+
             const comments = peotry.praiseComments
             const index = comments.findIndex(o => o.id === comment.id)
             comments.splice(index, 1)
@@ -466,6 +568,7 @@ export default {
     },
 
     handleCommentOk (o) {
+      this.rightMenusVisible = false
       const userCache = Cache.UserCache
       const peotry = this.peotries.find(o => o.id === this.commentID)
       if (peotry) {
@@ -530,9 +633,37 @@ export default {
   overflow: hidden;
 
   .main {
+    position: relative;
     flex: 1;
     height: 100%;
     overflow: hidden;
+  }
+
+  .right-menus-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    // background-color: rgba(0, 0, 0, 0.4);
+    // pointer-events: none;
+    .wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      // pointer-events: none;
+    }
+    .right-menus {
+      position: absolute;
+      // width: 5rem;
+      // height: 10rem;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border-top-left-radius: 0.5rem;
+      border-bottom-left-radius: 0.5rem;
+      // pointer-events: all;
+    }
   }
 
   .peotry {
