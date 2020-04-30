@@ -1,17 +1,18 @@
 <template>
   <div class="home">
     <div class="home-header">
-      <template v-if="isLogin">
-        <span>{{userName}}</span>
-        <span>|</span>
-        <span @click="onConfirm">退出</span>
-      </template>
+      <sg-dropdown v-if="isLogin" :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
+        <div class="user">
+          <span>{{userName}}</span>
+          <img :src="userAvatar | img-src" />
+        </div>
+      </sg-dropdown>
       <span v-else @click="onGoLogin">登陆~</span>
     </div>
 
     <!-- 内容 -->
     <div class="home-body">
-      <div>
+      <div class="scroll">
         <sg-swipper ref="sgSwipper" :items="swipperItems" :duration="swipperDuration" :auto="1">
           <div
             v-for="(item, index) in swipperPoetries"
@@ -47,7 +48,9 @@
           </div>
         </div>
 
-        <sg-button @click="$router.push({name: 'peotry-list'})">更多诗词~</sg-button>
+        <div class="info-panel">
+          <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">更多诗词~</sg-button>
+        </div>
 
         <div class="module-panel">
           <span>模块占位中...</span>
@@ -80,7 +83,9 @@ export default {
 
       swipperItems: [],
       swipperPoetries: [],
-      swipperDuration: 5000
+      swipperDuration: 5000,
+
+      dropdownOptions: [{ label: '退出', value: 'logout' }]
     }
   },
 
@@ -92,7 +97,8 @@ export default {
       isLogin: 'auth/isLogin'
     }),
     ...mapState({
-      userName: state => state.auth.userName
+      userName: state => state.auth.userName,
+      userAvatar: state => state.auth.userAvatar
     })
   },
 
@@ -171,20 +177,28 @@ export default {
       }, this.swipperDuration * this.swipperItems.length)
     },
 
+    handleDropdown (key) {
+      switch (key) {
+        case 'logout':
+          this.$confirm({
+            title: '提示',
+            content: '退出后需要重新登录验证',
+            confirm: () => {
+              this.logout()
+              this.$router.push({ name: 'login' })
+            }
+          })
+          break
+
+        default:
+          break
+      }
+    },
+
     onGoLogin () {
       this.$router.push({
         name: 'login',
         query: { redirect: this.$route.fullPath }
-      })
-    },
-    onConfirm () {
-      this.$confirm({
-        title: '提示',
-        content: '退出后需要重新登录验证',
-        confirm: () => {
-          this.logout()
-          this.$router.push({ name: 'login' })
-        }
       })
     },
     ...mapActions({
@@ -204,12 +218,27 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
+  overflow: hidden;
   .home-header {
     padding: 1rem 0.5rem;
     text-align: right;
     font-size: 1.2rem;
     color: $main-color;
     border-bottom: 1px solid #eee;
+    .sg-dropdown {
+      display: inline-block;
+      background-color: transparent;
+    }
+    .user {
+      display: inline-block;
+      span, img {
+        vertical-align: middle;
+      }
+      img {
+        width: 1.6rem;
+        object-fit: scale-down;
+      }
+    }
     span {
       padding: 0 2px;
     }
@@ -218,7 +247,11 @@ export default {
   .home-body {
     flex: 1;
     height: 100%;
-    overflow: hidden auto;
+    overflow: hidden;
+    .scroll {
+      height: 100%;
+      overflow-y: auto;
+    }
   }
   .swipper-panel {
     position: relative;
@@ -245,6 +278,7 @@ export default {
   }
   .info-panel {
     padding: 1rem;
+    overflow: hidden;
     h2 {
       color: $title-color;
     }
