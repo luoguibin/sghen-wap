@@ -2,7 +2,7 @@
   <div :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]">
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
       <div class="sg-flex-one sg-text-ellipsis"><slot>{{currentLabel || '点击选择'}}</slot></div>
-      <i class="iconfont icon-down"></i>
+      <i v-show="pointerVisible" class="iconfont icon-down"></i>
     </div>
     <div v-show="optionsVisible" class="sg-dropdown-options">
       <div class="options-wrapper">
@@ -27,6 +27,10 @@ export default {
     options: {
       type: Array,
       required: true
+    },
+    pointerVisible: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -53,7 +57,7 @@ export default {
       if (this.optionsVisible) {
         const rect = this.$el.getBoundingClientRect()
         const isElTop = rect.top < document.body.clientHeight / 2
-        console.log('isElTop', isElTop)
+        // console.log('isElTop', isElTop)
         this.direction = isElTop ? 'bottom' : 'top'
       }
     },
