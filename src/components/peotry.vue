@@ -1,54 +1,57 @@
 <template>
-  <div :class="{'peotry': true, 'avatar-visible': showAvatar}" item-type="peotry">
-    <!-- 诗人头像 -->
-    <img
-      v-if="showAvatar"
-      class="avatar"
-      item-type="peot-avatar"
-      :src="(peotry.user && peotry.user.avatar) | img-src"
-    />
+  <div class="peotry" item-type="peotry">
+    <slot name="header"></slot>
+    <div :class="{'wrapper': true, 'avatar-visible': showAvatar}">
+      <!-- 诗词选集及标题 -->
+      <div class="set--title">
+        <span v-if="peotry.set" class="set">{{peotry.set.name}}</span>
+        <span v-if="peotry.set && peotry.title" class="dot">*</span>
+        <span class="title" v-if="peotry.title">{{peotry.title}}</span>
 
-    <!-- 诗词选集及标题 -->
-    <div class="set--title">
-      <span v-if="peotry.set" class="set">{{peotry.set.name}}</span>
-      <span v-if="peotry.set && peotry.title" class="dot">*</span>
-      <span class="title" v-if="peotry.title">{{peotry.title}}</span>
-    </div>
+        <!-- 诗人头像 -->
+        <img
+          v-if="showAvatar"
+          class="avatar"
+          item-type="peot-avatar"
+          :src="(peotry.user && peotry.user.avatar) | img-src"
+        />
+      </div>
 
-    <!-- 诗词作者及创建时间 -->
-    <div class="peot--time">
-      <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-      <span v-if="showTime">--{{peotry.time | time-format}}</span>
-    </div>
+      <!-- 诗词作者及创建时间 -->
+      <div class="peot--time">
+        <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
+        <span v-if="showTime">--{{peotry.time | time-format}}</span>
+      </div>
 
-    <!-- 诗词内容 -->
-    <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
-      <div item-type="peotry-content" class="content" v-html="peotry.content"></div>
-      <div class="end" v-if="peotry.end">{{peotry.end}}</div>
-    </div>
+      <!-- 诗词内容 -->
+      <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
+        <div item-type="peotry-content" class="content" v-html="peotry.content"></div>
+        <div class="end" v-if="peotry.end">{{peotry.end}}</div>
+      </div>
 
-    <!-- 诗词扩展按钮 -->
-    <div v-if="hasExpand" class="expand-tip">
-      <p v-show="!isExpand">...</p>
-      <p @click.stop="onClickExpand">{{isExpand ? '收起' : '展开全文'}}</p>
-    </div>
+      <!-- 诗词扩展按钮 -->
+      <div v-if="hasExpand" class="expand-tip">
+        <p v-show="!isExpand">...</p>
+        <p @click.stop="onClickExpand">{{isExpand ? '收起' : '展开全文'}}</p>
+      </div>
 
-    <!-- 诗词图片 -->
-    <div v-if="showImage && thumbnails.length" ref="images" class="images">
-      <div v-for="value in thumbnails" :key="value" class="image-wrapper">
-        <div class="image-wrapper__inner">
-          <img item-type="peotry-image" :src="value" />
+      <!-- 诗词图片 -->
+      <div v-if="showImage && thumbnails.length" ref="images" class="images">
+        <div v-for="value in thumbnails" :key="value" class="image-wrapper">
+          <div class="image-wrapper__inner">
+            <img item-type="peotry-image" :src="value" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- 诗词评论 -->
-    <comments
-      v-if="showComment"
-      ref="comments"
-      :praises="peotry.praiseComments"
-      :comments="peotry.realComments"
-    ></comments>
+      <!-- 诗词评论 -->
+      <comments
+        v-if="showComment"
+        ref="comments"
+        :praises="peotry.praiseComments"
+        :comments="peotry.realComments"
+      ></comments>
+    </div>
   </div>
 </template>
 
@@ -211,15 +214,18 @@ export default {
 <style scoped lang="scss">
 .peotry {
   position: relative;
-  padding-right: 1rem;
-  box-sizing: border-box;
+
+  .wrapper {
+    padding-right: 1rem;
+    box-sizing: border-box;
+  }
 
   .avatar {
     width: 2.6rem;
     height: 2.6rem;
     object-fit: contain;
     position: absolute;
-    left: 3px;
+    left: -3.3rem;
     top: 0;
     cursor: pointer;
     object-fit: contain;
@@ -231,6 +237,7 @@ export default {
   }
 
   .set--title {
+    position: relative;
     padding-bottom: 1.2rem;
 
     .set {
@@ -302,7 +309,7 @@ export default {
 }
 
 .avatar-visible {
-  padding-left: 38px;
+  padding-left: 3.8rem;
 }
 
 .image-wrapper {

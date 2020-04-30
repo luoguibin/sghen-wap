@@ -1,14 +1,23 @@
 <template>
   <div class="home">
-    <div class="home-header">
-      <sg-dropdown v-if="isLogin" :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
-        <div class="user">
-          <span>{{userName}}</span>
-          <img :src="userAvatar | img-src" />
-        </div>
-      </sg-dropdown>
-      <span v-else @click="onGoLogin">登陆~</span>
-    </div>
+    <sg-header :backVisible="false">
+      <div slot="right">
+        <sg-dropdown
+          v-if="isLogin"
+          :options="dropdownOptions"
+          @change="handleDropdown"
+          :pointerVisible="false"
+        >
+          <div class="user">
+            <span>{{userName}}</span>
+            <img :src="userAvatar | img-src" />
+          </div>
+        </sg-dropdown>
+        <span v-else @click="onGoLogin">登陆~</span>
+      </div>
+    </sg-header>
+
+    <!-- <div class="home-header"></div> -->
 
     <!-- 内容 -->
     <div class="home-body">
@@ -219,19 +228,17 @@ export default {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  .home-header {
-    padding: 1rem 0.5rem;
-    text-align: right;
-    font-size: 1.2rem;
+  .sg-header {
     color: $main-color;
-    border-bottom: 1px solid #eee;
     .sg-dropdown {
       display: inline-block;
+      padding: 0;
       background-color: transparent;
     }
     .user {
       display: inline-block;
-      span, img {
+      span,
+      img {
         vertical-align: middle;
       }
       img {

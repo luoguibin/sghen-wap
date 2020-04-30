@@ -1,11 +1,27 @@
 <template>
   <div class="peotry-list" @click.stop="onClickPoetry($event)">
-    <sg-scroll  v-show="!isEmpty" ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
-      <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries"></peotry>
-    </sg-scroll>
-    <div v-show="isEmpty" class="empty">暂未有诗词</div>
+    <sg-header>
+      <span style="font-size: 1.6rem;">{{title}}</span>
+      <span v-show="isSelf" slot="right" class="iconfont icon-increase" @click="onGoNewPeotry"></span>
+    </sg-header>
+
+    <div class="main">
+      <sg-scroll
+        v-show="!isEmpty"
+        ref="sgScroll"
+        :isEnd="isEnd"
+        @load="handleLoad"
+        @refresh="handleRefresh"
+      >
+        <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries">
+          <div v-if="item.timeLine" slot="header" class="time-line">{{item.timeLine}}</div>
+        </peotry>
+      </sg-scroll>
+      <div v-show="isEmpty" class="empty">暂未有诗词</div>
+    </div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+
     <comment-input
       :visible.sync="commentVisible"
       :id="commentID"
@@ -29,6 +45,8 @@ import { mapState } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import Cache from '@/common/cache-center'
 import Peotry from '@/components/peotry'
+
+const CACHE_ROOT_ID = 'root'
 
 export default {
   nae: 'PeotryList',
@@ -67,6 +85,20 @@ export default {
   },
 
   computed: {
+    title () {
+      const text = '诗词列表'
+      let username = this.$route.query.username
+      if (this.uuid !== CACHE_ROOT_ID) {
+        if (this.isSelf) {
+          username = '我'
+        }
+        return `${username || 'TA'}的${text}`
+      }
+      return text
+    },
+    isSelf () {
+      return +this.userID === +this.uuid
+    },
     isEmpty () {
       return !this.peotries.length && this.peotriesLoadCount
     },
@@ -78,37 +110,38 @@ export default {
   created () {
     window.peotryList = this
     window.GlobalCache = Cache
-    this.uuid = this.$route.query.uuid || ''
+    this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
   },
 
   beforeRouteUpdate (to, from, next) {
+    const sgScroll = this.$refs.sgScroll
     const pageCache = Cache.PeotryPageCache
-    pageCache.setData(this.uuid || 'root', {
+    pageCache.setData(this.uuid, {
       peotries: this.peotries,
       page: this.page,
       isEnd: this.isEnd,
-      scrollTop: this.$refs.sgScroll.getScrollTop()
+      scrollTop: sgScroll.getScrollTop()
     })
     next()
 
-    this.uuid = to.query.uuid || ''
+    this.uuid = to.query.uuid || CACHE_ROOT_ID
     this.peotriesLoadCount = 0
     this.page = 1
 
-    const pageCacheData = Cache.PeotryPageCache.getData(this.uuid || 'root')
+    const pageCacheData = pageCache.getData(this.uuid)
     if (pageCacheData) {
-      console.log('read from cache', this.uuid || 'root')
       this.peotries = pageCacheData.peotries
       this.page = pageCacheData.page
       this.isEnd = pageCacheData.isEnd
+      this.peotriesLoadCount++
 
-      const sgScroll = this.$refs.sgScroll
       sgScroll.success()
       this.$nextTick(() => {
         sgScroll.setScrollTop(pageCacheData.scrollTop)
       })
     } else {
-      this.handleLoad(true)
+      this.peotries = []
+      sgScroll.refresh()
     }
   },
 
@@ -122,7 +155,7 @@ export default {
         limit: this.limit,
         needComment: true
       }
-      if (this.uuid) {
+      if (this.uuid !== CACHE_ROOT_ID) {
         params.userId = this.uuid
       }
 
@@ -147,7 +180,7 @@ export default {
     },
     handleRefresh () {
       this.page = 1
-      Cache.PeotryPageCache.clear()
+      Cache.PeotryPageCache.delete(this.uuid)
       Cache.UserCache.clear()
       this.handleLoad(true)
     },
@@ -164,8 +197,17 @@ export default {
         const time1 = new Date(o1.createTime).getTime()
         return time0 < time1 ? -1 : 1
       }
-
+      let currentYearMonth = 999911
       list.forEach(o => {
+        const createDate = new Date(o.time)
+        const tempYearMonth =
+          createDate.getFullYear() * 100 + createDate.getMonth()
+        if (tempYearMonth < currentYearMonth) {
+          o.timeLine = `${createDate.getFullYear()}年 ${createDate.getMonth() +
+            1}月`
+        }
+        currentYearMonth = tempYearMonth
+
         if (o.user) {
           o.user = Object.freeze(o.user)
         }
@@ -221,9 +263,11 @@ export default {
       const max = 100
       const len = Math.ceil(ids.length / max)
       for (let i = 0; i < len; i++) {
-        reqs.push(apiGetData(apiURL.userInfoList, {
-          datas: ids.slice(i * max, i * max + max).toString()
-        }))
+        reqs.push(
+          apiGetData(apiURL.userInfoList, {
+            datas: ids.slice(i * max, i * max + max).toString()
+          })
+        )
       }
       return Promise.all(reqs).then(results => {
         let data = []
@@ -305,21 +349,33 @@ export default {
           this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
           break
         case 'peot-avatar':
-          this.$router.push({ name: 'peotry-list', query: { uuid: peotry.user.id } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: peotry.user.id, username: peotry.user.username }
+          })
           break
         case 'comment-avatar':
           const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
-          this.$router.push({ name: 'peotry-list', query: { uuid: poet.id } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: poet.id, username: poet.username }
+          })
           break
         case 'comment-from':
           const fromIndex = getItemIndex(target.parentElement.parentElement)
           const fromComment = peotry.realComments[fromIndex]
-          this.$router.push({ name: 'peotry-list', query: { uuid: fromComment.fromId } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: fromComment.fromId }
+          })
           break
         case 'comment-to':
           const toIndex = getItemIndex(target.parentElement.parentElement)
           const toComment = peotry.realComments[toIndex]
-          this.$router.push({ name: 'peotry-list', query: { uuid: toComment.toId } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: toComment.toId }
+          })
           break
         case 'comment-content':
           const commentIndex = getItemIndex(target.parentElement)
@@ -456,6 +512,10 @@ export default {
       this.praiseVisible = false
       obj.data.itemTag = ''
       delete this.praiseMap[id]
+    },
+
+    onGoNewPeotry () {
+      this.$toast('正在码...')
     }
   }
 }
@@ -463,15 +523,32 @@ export default {
 
 <style lang="scss" scoped>
 .peotry-list {
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
   overflow: hidden;
+
+  .main {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
 
   .peotry {
     margin-bottom: 3rem;
     &:first-child {
       margin-top: 2rem;
     }
+  }
+
+  .time-line {
+    padding: 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: right;
   }
 
   .empty {
