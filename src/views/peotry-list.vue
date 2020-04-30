@@ -411,7 +411,7 @@ export default {
     openCommentInput (typeId, fromId, tip) {
       this.commentVisible = true
       this.commentID = typeId
-      this.commentToID = fromId
+      this.commentToID = +fromId
       this.commentTip = tip
     },
     onPraisePeotry (peotry, instance, call) {
@@ -469,8 +469,8 @@ export default {
       const userCache = Cache.UserCache
       const peotry = this.peotries.find(o => o.id === this.commentID)
       if (peotry) {
-        o.fromPeot = userCache.getData(this.userID)
-        o.toPeot = userCache.getData(this.commentToID)
+        o.fromPeot = userCache.getData(+this.userID)
+        o.toPeot = userCache.getData(+this.commentToID)
         peotry.realComments.push(o)
       } else {
         console.log('comment peotry is not exist', o)
