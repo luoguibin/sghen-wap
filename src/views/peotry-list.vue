@@ -508,6 +508,10 @@ export default {
       )
     },
     openCommentInput (typeId, fromId, tip) {
+      if (!this.userID) {
+        this.$toast('请登陆后再操作')
+        return
+      }
       this.commentVisible = true
       this.commentID = typeId
       this.commentToID = +fromId

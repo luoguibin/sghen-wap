@@ -204,7 +204,7 @@ export default {
             content: '退出后需要重新登录验证',
             confirm: () => {
               this.logout()
-              this.$router.push({ name: 'login' })
+              // this.$router.push({ name: 'login' })
             }
           })
           break
@@ -317,6 +317,7 @@ export default {
 
   .popular-sets {
     margin: -1.2rem -1.2rem 0 0;
+    overflow: hidden;
     > div {
       display: inline-block;
       margin: 1.2rem 1.2rem 0 0;
