@@ -121,6 +121,9 @@ export default {
     margin-bottom: 0.5rem;
     line-height: 1.4;
     font-size: 1.4rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   .sg-dropdown-option_active {
     color: $main-color;
