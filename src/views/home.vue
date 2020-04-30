@@ -94,7 +94,10 @@ export default {
       swipperPoetries: [],
       swipperDuration: 5000,
 
-      dropdownOptions: [{ label: '退出', value: 'logout' }]
+      dropdownOptions: [
+        { label: '我的诗词', value: 'my-list' },
+        { label: '退出', value: 'logout' }
+      ]
     }
   },
 
@@ -106,6 +109,7 @@ export default {
       isLogin: 'auth/isLogin'
     }),
     ...mapState({
+      userID: state => state.auth.userID,
       userName: state => state.auth.userName,
       userAvatar: state => state.auth.userAvatar
     })
@@ -188,6 +192,12 @@ export default {
 
     handleDropdown (key) {
       switch (key) {
+        case 'my-list':
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: this.userID, username: this.userName }
+          })
+          break
         case 'logout':
           this.$confirm({
             title: '提示',
@@ -228,8 +238,8 @@ export default {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+
   .sg-header {
-    color: $main-color;
     .sg-dropdown {
       display: inline-block;
       padding: 0;
@@ -237,6 +247,7 @@ export default {
     }
     .user {
       display: inline-block;
+      color: $main-color;
       span,
       img {
         vertical-align: middle;
@@ -298,7 +309,8 @@ export default {
       color: $content-color;
     }
     span {
-      color: $main-color;
+      color: $main-focus-color;
+      font-weight: bold;
       white-space: nowrap;
     }
   }
