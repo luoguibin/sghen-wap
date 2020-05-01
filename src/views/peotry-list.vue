@@ -1,11 +1,38 @@
 <template>
   <div class="peotry-list" @click.stop="onClickPoetry($event)">
-    <sg-scroll v-if="!isEmpty" ref="sgScroll" :isEnd="isEnd" @load="handleLoad" @refresh="handleRefresh">
-      <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries"></peotry>
-    </sg-scroll>
-    <div v-else class="empty">暂未有诗词</div>
+    <sg-header>
+      <span style="font-size: 1.6rem;">{{title}}</span>
+      <span v-show="isSelf" slot="right" class="iconfont icon-increase" @click="onGoNewPeotry"></span>
+    </sg-header>
+
+    <div class="main">
+      <sg-scroll
+        v-show="!isEmpty"
+        ref="sgScroll"
+        :isEnd="isEnd"
+        @load="handleLoad"
+        @refresh="handleRefresh"
+      >
+        <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries">
+          <div v-if="item.timeLine" slot="header" class="time-line">{{item.timeLine}}</div>
+        </peotry>
+      </sg-scroll>
+      <div v-show="isEmpty" class="empty">暂未有诗词</div>
+    </div>
+
+    <div class="right-menus-wrapper" v-show="rightMenusVisible">
+      <div class="wrapper" @click="rightMenusVisible = false">
+        <div class="right-menus" ref="rightMenus" :style="rightMenusStyle">
+          <sg-button v-show="rightIsSelfPeotry" @click.stop="onClickMenu('edit')">{{ '编辑'}}</sg-button>
+          <sg-button @click.stop="onClickMenu('praise', $event)">{{ rightIsPraise ? '取消点赞' : '点赞'}}</sg-button>
+          <sg-button @click.stop="onClickMenu('comment')">评论</sg-button>
+          <sg-button @click.stop="onClickMenu('close')">关闭</sg-button>
+        </div>
+      </div>
+    </div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+
     <comment-input
       :visible.sync="commentVisible"
       :id="commentID"
@@ -27,7 +54,32 @@
 <script>
 import { mapState } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
+import { TouchAction } from '@/common/touch-action'
+import Cache from '@/common/cache-center'
 import Peotry from '@/components/peotry'
+
+const CACHE_ROOT_ID = 'root'
+
+const getItemIndex = function (el) {
+  let index = -1
+  while (el) {
+    index++
+    el = el.previousElementSibling
+  }
+  return index
+}
+
+const getPeotryIndex = function (el) {
+  let tempEl = el
+  while (tempEl) {
+    if (tempEl.getAttribute('item-type') === 'peotry') {
+      break
+    } else {
+      tempEl = tempEl.parentElement
+    }
+  }
+  return getItemIndex(tempEl)
+}
 
 export default {
   nae: 'PeotryList',
@@ -61,11 +113,33 @@ export default {
       praiseId: 0,
       praiseFromStyle: {},
       praiseToStyle: {},
-      praiseMap: {}
+      praiseMap: {},
+
+      rightMenusVisible: false,
+      rightIsPraise: false,
+      rightIsSelfPeotry: false,
+      rightMenusStyle: {
+        top: 0,
+        right: 0
+      }
     }
   },
 
   computed: {
+    title () {
+      const text = '诗词列表'
+      let username = this.$route.query.username
+      if (this.uuid !== CACHE_ROOT_ID) {
+        if (this.isSelf) {
+          username = '我'
+        }
+        return `${username || 'TA'}的${text}`
+      }
+      return text
+    },
+    isSelf () {
+      return +this.userID === +this.uuid
+    },
     isEmpty () {
       return !this.peotries.length && this.peotriesLoadCount
     },
@@ -74,18 +148,91 @@ export default {
     })
   },
 
-  watch: {
-    $route (o) {
-      this.uuid = o.query.uuid || ''
-      this.peotriesLoadCount = 0
-      this.handleRefresh()
-    }
-  },
-
   created () {
     window.peotryList = this
-    this.uuid = this.$route.query.uuid || ''
-    this.peotInfoMap = {}
+    window.GlobalCache = Cache
+    this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
+  },
+
+  mounted () {
+    const touchAction = new TouchAction(this.$el, 'peotry-content')
+
+    touchAction.addEventListener('touchstart', e => {
+      // console.log('touchAction::touchstart', e)
+
+      const index = getPeotryIndex(e.target)
+      const peotryInstance = this.$refs.peotries[index]
+      const offsetTop =
+        peotryInstance.$el.offsetTop +
+        peotryInstance.$refs.contentEnd.offsetTop -
+        this.$refs.sgScroll.getScrollTop()
+
+      this.rightMenusStyle.top = offsetTop + 'px'
+      this.rightIndex = index
+      this.rightIsPraise = peotryInstance.isPraise
+      this.rightIsSelfPeotry = peotryInstance.isSelfPeotry
+      this.rightMenusVisible = true
+
+      this.$nextTick(() => {
+        const clientWidth = this.$refs.rightMenus.clientWidth
+        this.rightMenusStyle.right = -clientWidth + 'px'
+      })
+    })
+    touchAction.addEventListener('touchmove', (e, valueX) => {
+      // console.log('touchAction::touchstart', e, valueX)
+      let right = parseInt(this.rightMenusStyle.right) - valueX / 2
+      const clientWidth = this.$refs.rightMenus.clientWidth
+      if (right > 0) {
+        right = 0
+      } else if (right < -clientWidth) {
+        right = -clientWidth
+      }
+      this.rightMenusStyle.right = right + 'px'
+    })
+    touchAction.addEventListener('touchend', () => {
+      const right = parseInt(this.rightMenusStyle.right)
+      const clientWidth = this.$refs.rightMenus.clientWidth
+      if (-right < clientWidth / 2) {
+        this.rightMenusStyle.right = '0px'
+      } else {
+        this.rightMenusVisible = false
+      }
+    })
+    this.$once('hook:beforeDestroy', () => {
+      touchAction.release()
+    })
+  },
+
+  beforeRouteUpdate (to, from, next) {
+    const sgScroll = this.$refs.sgScroll
+    const pageCache = Cache.PeotryPageCache
+    pageCache.setData(this.uuid, {
+      peotries: this.peotries,
+      page: this.page,
+      isEnd: this.isEnd,
+      scrollTop: sgScroll.getScrollTop()
+    })
+    next()
+
+    this.uuid = to.query.uuid || CACHE_ROOT_ID
+    this.peotriesLoadCount = 0
+    this.page = 1
+
+    const pageCacheData = pageCache.getData(this.uuid)
+    if (pageCacheData) {
+      this.peotries = pageCacheData.peotries
+      this.page = pageCacheData.page
+      this.isEnd = pageCacheData.isEnd
+      this.peotriesLoadCount++
+
+      sgScroll.success()
+      this.$nextTick(() => {
+        sgScroll.setScrollTop(pageCacheData.scrollTop)
+      })
+    } else {
+      this.peotries = []
+      sgScroll.refresh()
+    }
   },
 
   methods: {
@@ -93,15 +240,15 @@ export default {
       if (!isRefresh) {
         this.page += 1
       }
-
       const params = {
         page: this.page,
         limit: this.limit,
         needComment: true
       }
-      if (this.uuid) {
+      if (this.uuid !== CACHE_ROOT_ID) {
         params.userId = this.uuid
       }
+
       apiGetData(apiURL.peotryList, params)
         .then(data => {
           const list = data.data
@@ -113,7 +260,9 @@ export default {
           }
           this.peotriesLoadCount++
           this.isEnd = this.peotries.length === data.totalCount
+
           this.$refs.sgScroll.success()
+          isRefresh && this.$refs.sgScroll.onScrollToTop()
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
@@ -121,6 +270,8 @@ export default {
     },
     handleRefresh () {
       this.page = 1
+      Cache.PeotryPageCache.delete(this.uuid)
+      Cache.UserCache.clear()
       this.handleLoad(true)
     },
 
@@ -128,7 +279,7 @@ export default {
      * @param {Array} list
      */
     checkPeotries (list) {
-      const peotInfoMap = this.peotInfoMap
+      const userCache = Cache.UserCache
       const peotIdMap = []
       const timeFunc = function (o0, o1) {
         // 按时间排序评论列表
@@ -136,8 +287,20 @@ export default {
         const time1 = new Date(o1.createTime).getTime()
         return time0 < time1 ? -1 : 1
       }
-
+      let currentYearMonth = 999911
       list.forEach(o => {
+        const createDate = new Date(o.time)
+        const tempYearMonth =
+          createDate.getFullYear() * 100 + createDate.getMonth()
+        if (tempYearMonth < currentYearMonth) {
+          o.timeLine = `${createDate.getFullYear()}年 ${createDate.getMonth() +
+            1}月`
+        }
+        currentYearMonth = tempYearMonth
+
+        if (o.user) {
+          o.user = Object.freeze(o.user)
+        }
         if (!o.comments) {
           o.comments = []
           o.praiseComments = []
@@ -147,15 +310,15 @@ export default {
           const realComments = []
           o.comments.forEach(o_ => {
             // 判断评论的创建者
-            if (peotInfoMap[o_.fromId]) {
-              o_.fromPeot = peotInfoMap[o_.fromId]
+            if (userCache.getData(o_.fromId)) {
+              o_.fromPeot = Object.freeze(userCache.getData(o_.fromId))
             } else {
               peotIdMap[o_.fromId] = true
             }
 
             if (o_.toId > 0) {
-              if (peotInfoMap[o_.toId]) {
-                o_.toPeot = peotInfoMap[o_.toId]
+              if (userCache.getData(o_.toId)) {
+                o_.toPeot = Object.freeze(userCache.getData(o_.toId))
               } else {
                 peotIdMap[o_.toId] = true
               }
@@ -175,39 +338,25 @@ export default {
       if (!peotIds.length) {
         return
       }
-
-      this.getUserInfoList(peotIds).then(data => {
+      this.getUsersInfo(peotIds).then(data => {
+        const userCache = Cache.UserCache
         data.forEach(o => {
-          peotInfoMap[o.id] = o
+          userCache.setData(+o.id, o)
         })
         list.forEach(o => {
-          this.buildPeotryComments(o, peotInfoMap)
+          this.buildPeotryComments(o)
         })
       })
     },
-    buildPeotryComments (peotry, peotInfoMap) {
-      peotry.praiseComments.forEach(o => {
-        if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
-        }
-      })
-      peotry.realComments.forEach(o => {
-        if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', peotInfoMap[o.fromId])
-        }
-        if (o.toId > 0 && !o.toPeot) {
-          this.$set(o, 'toPeot', peotInfoMap[o.toId])
-        }
-      })
-    },
-    getUserInfoList (ids) {
+    getUsersInfo (ids) {
       const reqs = []
       const max = 100
       const len = Math.ceil(ids.length / max)
       for (let i = 0; i < len; i++) {
-        reqs.push(apiGetData(apiURL.userInfoList, {
-          datas: ids.slice(i * max, i * max + max).toString()
-        })
+        reqs.push(
+          apiGetData(apiURL.userInfoList, {
+            datas: ids.slice(i * max, i * max + max).toString()
+          })
         )
       }
       return Promise.all(reqs).then(results => {
@@ -218,7 +367,51 @@ export default {
         return data
       })
     },
+    buildPeotryComments (peotry) {
+      const userCache = Cache.UserCache
+      peotry.praiseComments.forEach(o => {
+        if (!o.fromPeot) {
+          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
+        }
+      })
+      peotry.realComments.forEach(o => {
+        if (!o.fromPeot) {
+          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
+        }
+        if (o.toId > 0 && !o.toPeot) {
+          this.$set(o, 'toPeot', Object.freeze(userCache.getData(o.toId)))
+        }
+      })
+    },
+    onClickMenu (key, e) {
+      const peotry = this.peotries[this.rightIndex]
+      switch (key) {
+        case 'edit':
+          this.$toast('正在码...')
+          break
+        case 'comment':
+          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          break
+        case 'praise':
+          const peotryInstance = this.$refs.peotries[this.rightIndex]
+          this.onPraisePeotry(peotry, peotryInstance, data => {
+            this.rightMenusVisible = false
+            data.fromPeot = Cache.UserCache.getData(this.userID)
+            data.itemTag = 'opacity'
+            peotry.praiseComments.push(data)
 
+            this.$nextTick(() => {
+              this.onPraiseAnime(peotry, peotryInstance, e, data)
+            })
+          })
+          break
+        case 'close':
+          this.rightMenusVisible = false
+          break
+        default:
+          break
+      }
+    },
     onClickPoetry (e) {
       const target = e.target
       const itemType = target.getAttribute('item-type')
@@ -226,25 +419,6 @@ export default {
         return
       }
 
-      const getItemIndex = function (el) {
-        let index = -1
-        while (el) {
-          index++
-          el = el.previousElementSibling
-        }
-        return index
-      }
-      const getPeotryIndex = function (el) {
-        let tempEl = el
-        while (tempEl) {
-          if (tempEl.getAttribute('item-type') === 'peotry') {
-            break
-          } else {
-            tempEl = tempEl.parentElement
-          }
-        }
-        return getItemIndex(tempEl)
-      }
       const index = getPeotryIndex(target)
       const peotry = this.peotries[index]
       const peotryInstance = this.$refs.peotries[index]
@@ -254,7 +428,7 @@ export default {
           const currentTime = Date.now()
           if (currentTime - time < 300) {
             this.onPraisePeotry(peotry, peotryInstance, data => {
-              data.fromPeot = this.peotInfoMap[this.userID]
+              data.fromPeot = Cache.UserCache.getData(this.userID)
               data.itemTag = 'opacity'
               peotry.praiseComments.push(data)
 
@@ -274,21 +448,33 @@ export default {
           this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
           break
         case 'peot-avatar':
-          this.$router.push({ name: 'peotry-list', query: { uuid: peotry.user.id } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: peotry.user.id, username: peotry.user.username }
+          })
           break
         case 'comment-avatar':
           const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
-          this.$router.push({ name: 'peotry-list', query: { uuid: poet.id } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: poet.id, username: poet.username }
+          })
           break
         case 'comment-from':
           const fromIndex = getItemIndex(target.parentElement.parentElement)
           const fromComment = peotry.realComments[fromIndex]
-          this.$router.push({ name: 'peotry-list', query: { uuid: fromComment.fromId } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: fromComment.fromId }
+          })
           break
         case 'comment-to':
           const toIndex = getItemIndex(target.parentElement.parentElement)
           const toComment = peotry.realComments[toIndex]
-          this.$router.push({ name: 'peotry-list', query: { uuid: toComment.toId } })
+          this.$router.push({
+            name: 'peotry-list',
+            query: { uuid: toComment.toId }
+          })
           break
         case 'comment-content':
           const commentIndex = getItemIndex(target.parentElement)
@@ -322,9 +508,13 @@ export default {
       )
     },
     openCommentInput (typeId, fromId, tip) {
+      if (!this.userID) {
+        this.$toast('请登陆后再操作')
+        return
+      }
       this.commentVisible = true
       this.commentID = typeId
-      this.commentToID = fromId
+      this.commentToID = +fromId
       this.commentTip = tip
     },
     onPraisePeotry (peotry, instance, call) {
@@ -344,6 +534,9 @@ export default {
           fromId: comment.fromId
         })
           .then(data => {
+            this.rightIsPraise = false
+            this.rightMenusVisible = false
+
             const comments = peotry.praiseComments
             const index = comments.findIndex(o => o.id === comment.id)
             comments.splice(index, 1)
@@ -379,10 +572,12 @@ export default {
     },
 
     handleCommentOk (o) {
+      this.rightMenusVisible = false
+      const userCache = Cache.UserCache
       const peotry = this.peotries.find(o => o.id === this.commentID)
       if (peotry) {
-        o.fromPeot = this.peotInfoMap[this.userID]
-        o.toPeot = this.peotInfoMap[this.commentToID]
+        o.fromPeot = userCache.getData(+this.userID)
+        o.toPeot = userCache.getData(+this.commentToID)
         peotry.realComments.push(o)
       } else {
         console.log('comment peotry is not exist', o)
@@ -424,6 +619,10 @@ export default {
       this.praiseVisible = false
       obj.data.itemTag = ''
       delete this.praiseMap[id]
+    },
+
+    onGoNewPeotry () {
+      this.$toast('正在码...')
     }
   }
 }
@@ -431,15 +630,60 @@ export default {
 
 <style lang="scss" scoped>
 .peotry-list {
+  display: flex;
+  flex-direction: column;
   position: relative;
   height: 100%;
   overflow: hidden;
+
+  .main {
+    position: relative;
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .right-menus-wrapper {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    // background-color: rgba(0, 0, 0, 0.4);
+    // pointer-events: none;
+    .wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      // pointer-events: none;
+    }
+    .right-menus {
+      position: absolute;
+      // width: 5rem;
+      // height: 10rem;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      border-top-left-radius: 0.5rem;
+      border-bottom-left-radius: 0.5rem;
+      // pointer-events: all;
+    }
+  }
 
   .peotry {
     margin-bottom: 3rem;
     &:first-child {
       margin-top: 2rem;
     }
+  }
+
+  .time-line {
+    padding: 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: right;
   }
 
   .empty {

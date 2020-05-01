@@ -7,7 +7,7 @@
           <template v-else-if="isPullHanding">{{isLoading ? '加载中...' : '松开后刷新'}}</template>
           <template v-else>下拉刷新</template>
         </div>
-        <div :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" ref="scrollEl">
+        <div ref="scrollEl" :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" @scroll="handleScroll">
           <div>
             <slot></slot>
           </div>
@@ -152,6 +152,18 @@ export default {
       this.$refs.scrollEl.scrollTop = 0
       this.topVisible = false
     },
+    setScrollTop (num) {
+      this.$refs.scrollEl.scrollTop = num
+    },
+    getScrollTop () {
+      return this.$refs.scrollEl.scrollTop
+    },
+
+    handleScroll (e) {
+      const scrollTop = e.target.scrollTop
+      this.topVisible = scrollTop > this.$el.clientHeight * 2
+    },
+
     /**
      * @param{Event} e
      */
@@ -177,10 +189,7 @@ export default {
 
       const scrollEl = this.$refs.scrollEl
       const scrollTop = scrollEl.scrollTop
-      const clientHeight = scrollEl.clientHeight
       const sliceHeight = this.sliceHeight
-
-      this.topVisible = scrollTop > clientHeight * 2
 
       // console.log(`translateY=${this.translateY}, scrollTop=${scrollTop},`)
       // console.log(`scrollEl.clientHeight=${scrollEl.clientHeight}, scrollEl.scrollHeight=${scrollEl.scrollHeight}`)

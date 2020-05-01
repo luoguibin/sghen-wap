@@ -1,8 +1,12 @@
 <template>
-  <div :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]">
+  <div
+    :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]"
+  >
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
-      <div class="sg-flex-one sg-text-ellipsis"><slot>{{currentLabel || '点击选择'}}</slot></div>
-      <i class="iconfont icon-down"></i>
+      <div class="sg-flex-one sg-text-ellipsis">
+        <slot>{{currentLabel || '点击选择'}}</slot>
+      </div>
+      <i v-show="pointerVisible" class="iconfont icon-down"></i>
     </div>
     <div v-show="optionsVisible" class="sg-dropdown-options">
       <div class="options-wrapper">
@@ -10,7 +14,7 @@
           v-for="item in options"
           :key="item.value"
           class="sg-dropdown-option sg-text-ellipsis"
-          :class="{'sg-dropdown-option_active': currentValue === item.value}"
+          :class="{'sg-dropdown-option_active': optionActive && currentValue === item.value}"
           @click.stop="onSelectOption(item)"
         >{{item.label}}</div>
       </div>
@@ -27,6 +31,14 @@ export default {
     options: {
       type: Array,
       required: true
+    },
+    optionActive: {
+      type: Boolean,
+      default: false
+    },
+    pointerVisible: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -53,7 +65,7 @@ export default {
       if (this.optionsVisible) {
         const rect = this.$el.getBoundingClientRect()
         const isElTop = rect.top < document.body.clientHeight / 2
-        console.log('isElTop', isElTop)
+        // console.log('isElTop', isElTop)
         this.direction = isElTop ? 'bottom' : 'top'
       }
     },
@@ -74,6 +86,7 @@ export default {
 .sg-dropdown {
   position: relative;
   padding: 0.5rem;
+  color: $content-color;
   background-color: white;
   .sg-dropdown-label {
     font-size: 1.4rem;
@@ -88,9 +101,9 @@ export default {
 
   .sg-dropdown-options {
     position: absolute;
-    left: 0;
-    width: 100%;
-    max-width: 100%;
+    right: 0;
+    max-width: 50vw;
+    min-width: 5rem;
     padding: 1rem 0;
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -108,6 +121,7 @@ export default {
     right: 1rem;
     width: 0;
     height: 0;
+    z-index: $zIndex100;
     box-sizing: border-box;
     border-width: 1rem;
     border-style: solid;
@@ -117,6 +131,9 @@ export default {
     margin-bottom: 0.5rem;
     line-height: 1.4;
     font-size: 1.4rem;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
   .sg-dropdown-option_active {
     color: $main-color;
@@ -134,7 +151,7 @@ export default {
 }
 
 .sg-dropdown_bottom {
-  .sg-dropdown-options{
+  .sg-dropdown-options {
     top: 3rem;
   }
   .sg-dropdown-pointer {
@@ -143,10 +160,10 @@ export default {
 }
 
 .sg-dropdown-active {
-   .sg-dropdown-label {
-     i {
-       transform: rotate(180deg);
-     }
-   }
+  .sg-dropdown-label {
+    i {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>

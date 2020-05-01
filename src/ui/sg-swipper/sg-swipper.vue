@@ -19,8 +19,12 @@ export default {
       type: Array,
       required: true
     },
+    duration: {
+      type: Number,
+      default: 5000
+    },
     auto: {
-      type: Boolean,
+      type: [Boolean, Number],
       default: true
     },
     index: {
@@ -33,13 +37,14 @@ export default {
     return {
       translateX: 0,
       currentIndex: 0,
+      loopCount: 0,
       isTouching: false
     }
   },
 
   mounted () {
     window.sgSwipper = this
-    this.setCurrentIndex(this.index)
+    this.start()
   },
 
   computed: {
@@ -51,6 +56,10 @@ export default {
   },
 
   methods: {
+    start () {
+      this.loopCount = 0
+      this.setCurrentIndex(this.index)
+    },
     setCurrentIndex (index) {
       this.$nextTick(() => {
         const itemWidth = this.$refs.wrapper.clientWidth
@@ -65,14 +74,19 @@ export default {
       if (!this.auto) {
         return
       }
+
       this._clearLoop()
       this.loopTimer = setTimeout(() => {
         let index = this.currentIndex + 1
         if (index >= this.items.length) {
           index = 0
+          this.loopCount++
+          if (typeof this.auto === 'number' && this.loopCount >= this.auto) {
+            return
+          }
         }
         this.setCurrentIndex(index)
-      }, 5000)
+      }, this.duration)
     },
     _clearLoop () {
       if (this.loopTimer) {
