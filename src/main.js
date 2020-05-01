@@ -9,9 +9,10 @@ import './style/index.scss'
 
 Vue.config.productionTip = false
 
-const temp = sessionStorage.getItem('sg-userinfo')
+const temp = sessionStorage.getItem('sghen_user_info')
 if (temp) {
-  store.commit('auth/setUserInfo', JSON.parse(temp))
+  const userinfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
+  store.commit('auth/setUserInfo', userinfo)
 }
 
 // document.body.addEventListener('touchmove', function (e) {
