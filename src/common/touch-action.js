@@ -1,5 +1,6 @@
 export class TouchAction {
   previousTouch = null
+  moveCount = 0
 
   calls = []
 
@@ -37,52 +38,64 @@ export class TouchAction {
    * @param {TouchEvent} e
    */
   touchstart (e) {
-    if (this.itemType) {
-      const itemType = e.target.getAttribute('item-type')
-      this.isValid = itemType === this.itemType
-    } else {
-      this.isValid = true
+    this.isMatchType = e.target.getAttribute('item-type') === this.itemType
+    if (!this.isMatchType || !this.itemType) {
+      this.isMatchType = false
+      return
     }
+
     this.previousTouch = e.touches[0]
-    this.isHorizontal = false
-    if (this.isValid) {
-      this.calls.filter(o => o.key === 'touchstart').forEach(o => {
-        o.call(e)
-      })
-    }
+    this.moveCount = 0
+    this.isValid = false
+    // this.calls.filter(o => o.key === 'touchstart').forEach(o => {
+    //   o.call(e)
+    // })
   }
 
   /**
    * @param {TouchEvent} e
    */
   touchmove (e) {
+    if (!this.isMatchType) {
+      return
+    }
+
+    const touch = e.touches[0]
+    const valueX = touch.clientX - this.previousTouch.clientX
+
+    if (this.moveCount === 0) {
+      const ratio = Math.abs((touch.clientY - this.previousTouch.clientY) / valueX)
+      if (ratio < 0.35) {
+        this.isValid = true
+        e.stopPropagation()
+        this.calls.filter(o => o.key === 'touchstart').forEach(o => {
+          o.call(e)
+        })
+      } else {
+        this.isValid = false
+      }
+    }
+
+    this.moveCount++
     if (!this.isValid) {
       return
     }
-    const touch = e.touches[0]
-    const valueX = touch.clientX - this.previousTouch.clientX
-    if (this.isHorizontal) {
-      e.stopPropagation()
-    } else {
-      const ratio = (touch.clientY - this.previousTouch.clientY) / valueX
-      if (ratio > 0.7 || ratio < -0.7) {
-        this.isHorizontal = true
-        e.stopPropagation()
-      }
-    }
+    e.stopPropagation()
+
     this.previousTouch = touch
+
     this.calls.filter(o => o.key === 'touchmove').forEach(o => {
       o.call(e, valueX)
     })
   }
 
   touchend (e) {
-    if (this.isValid) {
-      this.calls.filter(o => o.key === 'touchend').forEach(o => {
-        o.call()
-      })
+    if (!this.isValid) {
+      return
     }
-    this.isValid = false
+    this.calls.filter(o => o.key === 'touchend').forEach(o => {
+      o.call(e)
+    })
   }
 
   release () {

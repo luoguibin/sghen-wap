@@ -178,9 +178,9 @@ export default {
         this.rightMenusStyle.right = -clientWidth + 'px'
       })
     })
-    touchAction.addEventListener('touchmove', (e, valueX) => {
-      // console.log('touchAction::touchstart', e, valueX)
-      let right = parseInt(this.rightMenusStyle.right) - valueX / 2
+    touchAction.addEventListener('touchmove', (e, v) => {
+      // console.log('touchAction::touchstart', e, v)
+      let right = parseInt(this.rightMenusStyle.right) - v / 2
       const clientWidth = this.$refs.rightMenus.clientWidth
       if (right > 0) {
         right = 0
