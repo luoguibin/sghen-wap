@@ -219,6 +219,7 @@ export default {
     this.uuid = to.query.uuid || CACHE_ROOT_ID
     this.peotriesLoadCount = 0
     this.page = 1
+    this.scrollItemMap = {}
 
     const pageCacheData = pageCache.getData(this.uuid)
     if (pageCacheData) {
