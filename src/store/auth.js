@@ -16,7 +16,8 @@ export default {
   },
   mutations: {
     setUserInfo (state, data = {}) {
-      sessionStorage.setItem('sg-userinfo', JSON.stringify(data))
+      const temp = window.btoa(window.encodeURIComponent(JSON.stringify(data)))
+      sessionStorage.setItem('sghen_user_info', temp)
       state.userID = data.id
       state.userAvatar = data.avatar
       state.userName = data.username || data.name
