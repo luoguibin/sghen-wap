@@ -153,6 +153,7 @@ export default {
     window.peotryList = this
     window.GlobalCache = Cache
     this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
+    this.scrollItemMap = {}
   },
 
   mounted () {
@@ -268,7 +269,9 @@ export default {
           if (isRefresh) {
             this.$nextTick(() => {
               const peotries = this.$refs.peotries
+              const map = this.scrollItemMap
               for (let i = 0, max = Math.min(3, peotries.length); i < max; i++) {
+                map[peotries[i].peotry.id] = true
                 peotries[i].setScrollIntoView()
               }
             })
@@ -285,9 +288,6 @@ export default {
       this.handleLoad(true)
     },
     handleScroll (scrollTop, clientHeight) {
-      if (!this.scrollItemMap) {
-        this.scrollItemMap = {}
-      }
       const map = this.scrollItemMap
       this.$refs.peotries.forEach((o, index) => {
         const offsetTop = o.$el.offsetTop

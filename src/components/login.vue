@@ -1,8 +1,8 @@
 <template>
   <div class="login">
-    <div class="login-header">
-      <h2>Sghen三行</h2>
-    </div>
+    <sg-header>
+      <span style="font-size: 1.6rem;">Sghen三行</span>
+    </sg-header>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
       <div class="login-captcha" slot="captchaValue">
         <input v-model="formData.captchaValue" v-focus-within />
@@ -268,10 +268,8 @@ export default {
 
 <style lang="scss" scoped>
 .login {
-  .login-header {
+  .sg-header {
     margin-bottom: 2rem;
-    text-align: center;
-    overflow: hidden;
   }
   .login-captcha {
     display: flex;
