@@ -162,6 +162,7 @@ export default {
     handleScroll (e) {
       const scrollTop = e.target.scrollTop
       this.topVisible = scrollTop > this.$el.clientHeight * 2
+      this.$emit('scroll', scrollTop, e.target.clientHeight)
     },
 
     /**

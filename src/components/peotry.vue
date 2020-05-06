@@ -36,8 +36,8 @@
       </div>
 
       <!-- 诗词图片 -->
-      <div v-if="showImage && thumbnails.length" ref="images" class="images">
-        <div v-for="value in thumbnails" :key="value" class="image-wrapper">
+      <div v-if="showImage && currentThumbnails.length" ref="images" class="images">
+        <div v-for="(value, index) in currentThumbnails" :key="index" class="image-wrapper">
           <div class="image-wrapper__inner">
             <img item-type="peotry-image" :src="value" />
           </div>
@@ -58,6 +58,7 @@
 <script>
 import Vue from 'vue'
 import { mapState } from 'vuex'
+import { defaultImgSrc } from '@/common/const'
 import Comments from './comments'
 
 export default {
@@ -107,6 +108,9 @@ export default {
   },
   data () {
     return {
+      defaultImgSrc,
+      isIntoView: false,
+
       newComment: {
         type: 1,
         typeId: 0,
@@ -163,6 +167,11 @@ export default {
         return v
       })
     },
+    currentThumbnails () {
+      return this.thumbnails.map(v => {
+        return this.isIntoView ? v : this.defaultImgSrc
+      })
+    },
 
     /**
      * @returns {Comment} 返回我的点赞对象
@@ -198,6 +207,11 @@ export default {
     this.checkCanExpand()
   },
   methods: {
+    setScrollIntoView () {
+      this.isIntoView = true
+      const comments = this.$refs.comments
+      comments && comments.setScrollIntoView()
+    },
     checkCanExpand () {
       const el = this.$refs.contentEnd
       if (el) {

@@ -1,18 +1,18 @@
 <template>
-  <div class="comments" v-show="praises.length || comments.length">
+  <div class="comments" v-show="currentPraises.length || comments.length">
     <!-- 已点赞的用户头像 -->
-    <div ref="avatars" class="avatars" v-show="praises.length">
+    <div ref="avatars" class="avatars" v-show="currentPraises.length">
       <img
-        v-for="comment in praises"
+        v-for="comment in currentPraises"
         :key="comment.id"
-        :src="comment.fromPeot && comment.fromPeot.avatar | img-src"
+        :src="comment.avatar"
         :item-tag="comment.itemTag"
         item-type="comment-avatar"
         alt
       />
     </div>
 
-    <div v-show="praises.length && comments.length" style="border-bottom: 1px solid white;"></div>
+    <div v-show="currentPraises.length && comments.length" style="border-bottom: 1px solid white;"></div>
 
     <!-- 评论列表 -->
     <div class="contents" v-show="comments.length">
@@ -37,6 +37,9 @@
 </template>
 
 <script>
+import Vue from 'vue'
+import { defaultImgSrc } from '@/common/const'
+
 export default {
   name: 'Comments',
 
@@ -52,6 +55,30 @@ export default {
       default () {
         return []
       }
+    }
+  },
+
+  data () {
+    return {
+      defaultImgSrc,
+      isIntoView: false
+    }
+  },
+
+  computed: {
+    currentPraises () {
+      const srcFilter = Vue.filter('img-src')
+      return this.praises.map(o => {
+        const temp = { ...o }
+        temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar) : this.defaultImgSrc
+        return temp
+      })
+    }
+  },
+
+  methods: {
+    setScrollIntoView () {
+      this.isIntoView = true
     }
   }
 }

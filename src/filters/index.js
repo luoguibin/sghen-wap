@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { defaultImgSrc } from '@/common/const'
 
 export const timeFormat = function (date, fmt = 'yyyy-MM-dd hh:mm:ss') {
   // 2018-04-15T10:10:10+08:00
@@ -33,7 +34,7 @@ export const timeFormat = function (date, fmt = 'yyyy-MM-dd hh:mm:ss') {
 
 export const imgSrcFormat = function (v) {
   if (!v) {
-    return require('@/assets/favicon.png')
+    return defaultImgSrc
   }
   let path
   if (v.indexOf('.') === 0) {

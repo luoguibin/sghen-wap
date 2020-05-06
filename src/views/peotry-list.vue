@@ -12,6 +12,7 @@
         :isEnd="isEnd"
         @load="handleLoad"
         @refresh="handleRefresh"
+        @scroll="handleScroll"
       >
         <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries">
           <div v-if="item.timeLine" slot="header" class="time-line">{{item.timeLine}}</div>
@@ -263,6 +264,15 @@ export default {
 
           this.$refs.sgScroll.success()
           isRefresh && this.$refs.sgScroll.onScrollToTop()
+
+          if (isRefresh) {
+            this.$nextTick(() => {
+              const peotries = this.$refs.peotries
+              for (let i = 0, max = Math.min(3, peotries.length); i < max; i++) {
+                peotries[i].setScrollIntoView()
+              }
+            })
+          }
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
@@ -273,6 +283,22 @@ export default {
       Cache.PeotryPageCache.delete(this.uuid)
       Cache.UserCache.clear()
       this.handleLoad(true)
+    },
+    handleScroll (scrollTop, clientHeight) {
+      if (!this.scrollItemMap) {
+        this.scrollItemMap = {}
+      }
+      const map = this.scrollItemMap
+      this.$refs.peotries.forEach((o, index) => {
+        const offsetTop = o.$el.offsetTop
+        if (Math.abs(offsetTop - scrollTop) <= clientHeight) {
+          const id = this.peotries[index].id
+          if (!map[id]) {
+            map[id] = true
+            o.setScrollIntoView()
+          }
+        }
+      })
     },
 
     /**

@@ -2,7 +2,7 @@ import axios from 'axios'
 import Qs from 'qs'
 import store from '@/store'
 
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 100000
 
 axios.interceptors.request.use(
   config => {
