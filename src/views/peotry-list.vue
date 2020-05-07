@@ -22,6 +22,8 @@
     </div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+
+    <peotry-edit v-if="editVisible" @close="editVisible = false"></peotry-edit>
   </div>
 </template>
 
@@ -37,8 +39,9 @@ export default {
   nae: 'PeotryList',
 
   components: {
-    peotry: () => import('@/components/peotry'),
-    'image-viewer': () => import('@/components/image-viewer')
+    'peotry': () => import('@/components/peotry'),
+    'image-viewer': () => import('@/components/image-viewer'),
+    'peotry-edit': () => import('@/components/peotry-edit')
   },
 
   data () {
@@ -52,7 +55,9 @@ export default {
 
       viewerVisible: false,
       images: [],
-      imageIndex: 0
+      imageIndex: 0,
+
+      editVisible: false
     }
   },
 
@@ -225,7 +230,7 @@ export default {
       }
     },
     onGoNewPeotry () {
-      this.$toast('正在码...')
+      this.editVisible = true
     }
   }
 }

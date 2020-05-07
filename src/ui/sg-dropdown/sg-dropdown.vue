@@ -90,7 +90,7 @@ export default {
   background-color: white;
   .sg-dropdown-label {
     font-size: 1.4rem;
-    line-height: 1;
+    // line-height: 1;
     i {
       display: inline-block;
       margin-left: 1rem;

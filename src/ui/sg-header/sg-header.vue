@@ -36,6 +36,10 @@ export default {
       type: String,
       default: 'visible'
     },
+    autoBack: {
+      type: Boolean,
+      default: false
+    },
     backVisible: {
       type: Boolean,
       default: true
@@ -48,6 +52,10 @@ export default {
 
   methods: {
     onBack () {
+      if (!this.autoBack) {
+        this.$emit('back')
+        return
+      }
       this.$router.go(-1)
     }
   }

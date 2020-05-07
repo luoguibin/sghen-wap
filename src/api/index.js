@@ -44,6 +44,8 @@ export const apiURL = {
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
   peotryHot: `${preffix}/v1/peotry/query-popular`,
+  // 诗词作者选集列表
+  peotSets: `${preffix}/v1/peotry-set/query`,
 
   // 诗词词频列表
   peotryHotWord: `${preffix}/v1/api/get/peotry/hot-word`,
