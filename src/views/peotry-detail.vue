@@ -501,7 +501,7 @@ export default {
   }
   .main-wrapper {
     height: 100%;
-    overflow: hidden auto;
+    overflow-y: auto;
   }
 }
 </style>

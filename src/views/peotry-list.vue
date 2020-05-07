@@ -246,33 +246,6 @@ export default {
     overflow: hidden;
   }
 
-  .right-menus-wrapper {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100;
-    // background-color: rgba(0, 0, 0, 0.4);
-    // pointer-events: none;
-    .wrapper {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      // pointer-events: none;
-    }
-    .right-menus {
-      position: absolute;
-      // width: 5rem;
-      // height: 10rem;
-      background-color: white;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-      border-top-left-radius: 0.5rem;
-      border-bottom-left-radius: 0.5rem;
-      // pointer-events: all;
-    }
-  }
-
   .peotry {
     margin-bottom: 3rem;
     &:first-child {
