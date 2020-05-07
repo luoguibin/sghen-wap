@@ -20,7 +20,7 @@
       <!-- 诗词作者及创建时间 -->
       <div class="peot--time">
         <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-        <span v-if="showTime">--{{peotry.time | time-format}}</span>
+        <span>--{{peotry.time | time-format}}</span>
       </div>
 
       <!-- 诗词内容 -->
@@ -32,11 +32,11 @@
       <!-- 诗词扩展按钮 -->
       <div v-if="hasExpand" class="expand-tip">
         <p v-show="!isExpand">...</p>
-        <p @click.stop="onClickExpand">{{isExpand ? '收起' : '展开全文'}}</p>
+        <p @click.stop="onClickExpand">{{isExpand ? '收起' : '显示全文'}}</p>
       </div>
 
       <!-- 诗词图片 -->
-      <div v-if="showImage && currentThumbnails.length" ref="images" class="images">
+      <div v-if="currentThumbnails.length" ref="images" class="images">
         <div v-for="(value, index) in currentThumbnails" :key="index" class="image-wrapper">
           <div class="image-wrapper__inner">
             <img item-type="peotry-image" :src="value" />
@@ -46,10 +46,10 @@
 
       <!-- 诗词评论 -->
       <comments
-        v-if="showComment"
         ref="comments"
         :praises="peotry.praiseComments"
         :comments="peotry.realComments"
+        :isDetail="isDetail"
       ></comments>
     </div>
   </div>
@@ -75,33 +75,17 @@ export default {
     },
 
     /**
-     * 是否有
+     * 是否为诗词详情，包括完整显示诗词、图片、评论、点赞
+     */
+    isDetail: {
+      type: Boolean,
+      default: false
+    },
+
+    /**
+     * 是否显示作者头像
      */
     showAvatar: {
-      type: Boolean,
-      default: true
-    },
-
-    /**
-     * 是否显示创建时间
-     */
-    showTime: {
-      type: Boolean,
-      default: true
-    },
-
-    /**
-     * 是否显示评论
-     */
-    showComment: {
-      type: Boolean,
-      default: true
-    },
-
-    /**
-     * 是否显示图片
-     */
-    showImage: {
       type: Boolean,
       default: true
     }
@@ -123,7 +107,6 @@ export default {
       clickTime: 0,
       hasExpand: false,
       isExpand: false,
-      mainScrollBox: null,
 
       showUser: false,
       showUserInfo: {}
@@ -131,13 +114,6 @@ export default {
   },
   filters: {},
   computed: {
-    /**
-     * @returns {Boolean} 返回是否为当前用户创建的诗词
-     */
-    isSelfPeotry () {
-      return this.peotry.user && this.userID === this.peotry.user.id
-    },
-
     /**
      * @returns {Array} 返回诗词的直接可用图片列表
      */
@@ -173,37 +149,16 @@ export default {
       })
     },
 
-    /**
-     * @returns {Comment} 返回我的点赞对象
-     */
-    myPraiseComment () {
-      const userID = this.userID
-      if (!userID) return
-      return this.peotry.praiseComments.find(
-        comment => comment.toId === -1 && comment.fromId === userID
-      )
-    },
-
-    /**
-     * @returns {Boolean} 返回当前登录用户是否点赞当前诗词
-     */
-    isPraise () {
-      return this.myPraiseComment && this.myPraiseComment.content === 'praise'
-    },
-
     ...mapState({
       userID: state => state.auth.userID,
       userName: state => state.auth.userName,
       userAvatar: state => state.auth.userAvatar
     })
   },
-  created () {
-    const mainScrollEl = document.getElementById('main-scroll')
-    if (mainScrollEl && mainScrollEl.children) {
-      this.mainScrollBox = mainScrollEl.children[0]
-    }
-  },
   mounted () {
+    if (this.isDetail) {
+      this.isIntoView = true
+    }
     this.checkCanExpand()
   },
   methods: {
@@ -216,6 +171,9 @@ export default {
       const el = this.$refs.contentEnd
       if (el) {
         this.hasExpand = el.scrollHeight > el.clientHeight
+      }
+      if (this.isDetail) {
+        this.isExpand = true
       }
     },
     onClickExpand () {

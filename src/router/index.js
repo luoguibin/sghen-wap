@@ -20,6 +20,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'peotry-list' */'@/views/peotry-list')
   },
   {
+    path: '/peotry-detail/:id',
+    name: 'peotry-detail',
+    component: () => import(/* webpackChunkName: 'peotry-detail' */'@/views/peotry-detail')
+  },
+  {
     path: '/*',
     redirect: '/home'
   }

@@ -55,6 +55,10 @@ export default {
       default () {
         return []
       }
+    },
+    isDetail: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -73,6 +77,12 @@ export default {
         temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar) : this.defaultImgSrc
         return temp
       })
+    }
+  },
+
+  created () {
+    if (this.isDetail) {
+      this.setScrollIntoView()
     }
   },
 
@@ -104,6 +114,9 @@ $background: rgba(0, 0, 0, 0.05);
 
   .avatars {
     padding: 5px 8px;
+    margin-right: -5px;
+    box-sizing: border-box;
+    overflow: hidden;
     user-select: none;
 
     img {
