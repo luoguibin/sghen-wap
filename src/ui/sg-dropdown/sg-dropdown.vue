@@ -15,7 +15,7 @@
           :key="item.value"
           class="sg-dropdown-option sg-text-ellipsis"
           :class="{'sg-dropdown-option_active': optionActive && currentValue === item.value}"
-          @click.stop="onSelectOption(item)"
+          @click.stop="onSelectOption(item, $event)"
         >{{item.label}}</div>
       </div>
     </div>
@@ -69,11 +69,11 @@ export default {
         this.direction = isElTop ? 'bottom' : 'top'
       }
     },
-    onSelectOption (option) {
+    onSelectOption (option, e) {
       this.currentValue = option.value
       this.currentLabel = option.label
       this.optionsVisible = false
-      this.$emit('change', option.value)
+      this.$emit('change', option.value, e)
     }
   }
 }
