@@ -1,13 +1,9 @@
 <template>
   <div class="peotry-detail">
-     <sg-header>
+    <sg-header ref="header">
       <span style="font-size: 1.6rem;">诗词详情</span>
       <div slot="right">
-        <sg-dropdown
-          :options="dropdownOptions"
-          @change="handleDropdown"
-          :pointerVisible="false"
-        >
+        <sg-dropdown :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
           <span class="iconfont icon-checkmore"></span>
         </sg-dropdown>
       </div>
@@ -20,6 +16,13 @@
         </peotry>
       </div>
     </div>
+
+    <peotry-edit
+      v-if="editVisible"
+      :peotry="editPeotry"
+      @close="editVisible = false"
+      @success="handleSave"
+    ></peotry-edit>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
@@ -51,7 +54,8 @@ export default {
   name: 'PeotryDetail',
 
   components: {
-    'peotry': () => import('@/components/peotry'),
+    peotry: () => import('@/components/peotry'),
+    'peotry-edit': () => import('@/components/peotry-edit'),
     'image-viewer': () => import('@/components/image-viewer'),
     'comment-input': () => import('@/components/comment-input'),
     'praise-anime': () => import('@/components/praise-anime')
@@ -61,6 +65,8 @@ export default {
     return {
       peotryID: 0,
       peotry: null,
+      editPeotry: null,
+      editVisible: false,
 
       dropdownOptions: [],
 
@@ -144,13 +150,12 @@ export default {
     getPeotry () {
       const id = this.$route.params.id
       this.peotryID = id
-      apiGetData(apiURL.peotryList, { id, needComment: true })
-        .then(data => {
-          const o = data.data
-          this.checkPeotry(o)
-          this.peotry = o
-          this.resetDropdownOptions()
-        })
+      apiGetData(apiURL.peotryList, { id, needComment: true }).then(data => {
+        const o = data.data
+        this.checkPeotry(o)
+        this.peotry = o
+        this.resetDropdownOptions()
+      })
     },
 
     checkPeotry (peotry) {
@@ -324,6 +329,7 @@ export default {
         ]
         if (this.isSelfPeotry) {
           options.push({ label: '编辑', value: 'edit' })
+          options.push({ label: '删除', value: 'delete' })
         }
         this.dropdownOptions = options
       })
@@ -333,13 +339,37 @@ export default {
       const peotry = this.peotry
       switch (key) {
         case 'edit':
-          this.$toast('正在码...')
+          this.editPeotry = {
+            id: peotry.id,
+            set: peotry.set,
+            title: peotry.title,
+            content: peotry.content,
+            end: peotry.end
+          }
+          this.editVisible = true
           break
         case 'comment':
           this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
           break
         case 'praise':
           this.onCheckPraisePeotry(e)
+          break
+        case 'delete':
+          this.$confirm({
+            title: '删除提示',
+            content: '诗词删除后将无法找回，请确认!',
+            confirm: () => {
+              apiPostData(apiURL.peotryDelete, {
+                userId: this.userID,
+                id: this.peotry.id
+              }).then(
+                resp => {
+                  this.$toast('删除成功')
+                  this.$refs.header.onBack()
+                }
+              )
+            }
+          })
           break
         default:
           break
@@ -432,6 +462,10 @@ export default {
       )
     },
 
+    handleSave () {
+      this.editVisible = false
+      this.getPeotry()
+    },
     handleCommentOk (o) {
       o.fromPeot = Cache.UserCache.getData(+this.userID)
       o.toPeot = Cache.UserCache.getData(+this.commentToID)

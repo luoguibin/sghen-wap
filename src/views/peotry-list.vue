@@ -23,7 +23,7 @@
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
-    <peotry-edit v-if="editVisible" @close="editVisible = false"></peotry-edit>
+    <peotry-edit v-if="editVisible" @close="editVisible = false" @success="handleCreated"></peotry-edit>
   </div>
 </template>
 
@@ -231,6 +231,10 @@ export default {
     },
     onGoNewPeotry () {
       this.editVisible = true
+    },
+    handleCreated () {
+      this.editVisible = false
+      this.$refs.sgScroll.refresh()
     }
   }
 }

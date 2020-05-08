@@ -44,8 +44,19 @@ export const apiURL = {
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
   peotryHot: `${preffix}/v1/peotry/query-popular`,
-  // 诗词作者选集列表
+  // 诗词创建
+  peotryCreate: `${preffix}/v1/peotry/create`,
+  // 诗词更新
+  peotryUpdate: `${preffix}/v1/peotry/update`,
+  // 诗词删除
+  peotryDelete: `${preffix}/v1/peotry/delete`,
+
+  // 选集列表
   peotSets: `${preffix}/v1/peotry-set/query`,
+  // 选集创建
+  peotSetCreate: `${preffix}/v1/peotry-set/create`,
+  // 选集删除
+  peotSetDelete: `${preffix}/v1/peotry-set/delete`,
 
   // 诗词词频列表
   peotryHotWord: `${preffix}/v1/api/get/peotry/hot-word`,
