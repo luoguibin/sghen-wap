@@ -210,7 +210,8 @@ export default {
         this.isPullHanding = tempY > sliceHeight * 0.75
         this.topScale = Math.max(1, tempY / sliceHeight)
         this.pullStatus = PULL_DOWN
-      } else if (scrollTop + scrollEl.clientHeight === scrollEl.scrollHeight) {
+      } else if (scrollTop + scrollEl.clientHeight >= scrollEl.scrollHeight) {
+        // 不同浏览器的dom计算不精确
         // 可进入上拉，translateY应该为负数
         tempY += yValue
         tempY = Math.max(tempY, -sliceHeight * 3)
