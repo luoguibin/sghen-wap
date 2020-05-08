@@ -38,7 +38,7 @@ export default {
     },
     autoBack: {
       type: Boolean,
-      default: false
+      default: true
     },
     backVisible: {
       type: Boolean,
