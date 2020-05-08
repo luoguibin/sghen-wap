@@ -3,7 +3,11 @@
     <div class="sg-confirm-mask" v-show="visible">
       <div class="sg-confirm">
         <div class="sg-confirm-title">{{title}}</div>
-        <div class="sg-confirm-content">{{content}}</div>
+        <div class="sg-confirm-content">
+          <input v-if="type === 'input'" v-model="content" :placeholder="placeholder" />
+          <textarea v-else-if="type === 'textarea'" :placeholder="placeholder" v-model="content"></textarea>
+          <template v-else>{{content}}</template>
+        </div>
         <div class="sg-confirm-options">
           <div>
             <button class="cancel" @click="hide()">取消</button>
@@ -26,7 +30,8 @@ export default {
     return {
       visible: false,
       title: '',
-      content: ''
+      content: '',
+      type: ''
     }
   },
 
@@ -34,6 +39,9 @@ export default {
     show (options = {}) {
       this.title = options.title
       this.content = options.content
+      this.type = options.type
+      this.placeholder = options.placeholder
+      this.validator = options.validator
       this.confirmCall = options.confirm
       this.visible = true
     },
@@ -42,6 +50,9 @@ export default {
       this.confirmCall = null
     },
     confirm () {
+      if (this.validator && this.validator(this.content)) {
+        return
+      }
       this.confirmCall && this.confirmCall()
       this.hide()
     }
@@ -69,6 +80,22 @@ export default {
   border-radius: 1rem;
   background-color: white;
   transform: translate(-50%, -50%);
+
+  input,
+  textarea {
+    display: block;
+    width: 100%;
+    padding: 0.3rem 0.5rem;
+    color: $main-color;
+    font-size: 1.2rem;
+    line-height: 1.5rem;
+    border: none;
+    outline: none;
+    box-sizing: border-box;
+    background-color: transparent;
+    border-bottom: 2px solid $border-color;
+  }
+
   .sg-confirm-title {
     padding: 1rem;
     text-align: center;

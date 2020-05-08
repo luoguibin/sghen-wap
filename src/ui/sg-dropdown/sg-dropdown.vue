@@ -4,7 +4,9 @@
   >
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
       <div class="sg-flex-one sg-text-ellipsis">
-        <slot>{{currentLabel || '点击选择'}}</slot>
+        <slot>
+          <span :class="{'sg-dropdown-tip': !currentLabel}">{{currentLabel || '点击选择'}}</span>
+        </slot>
       </div>
       <i v-show="pointerVisible" class="iconfont icon-down"></i>
     </div>
@@ -88,6 +90,12 @@ export default {
   padding: 0.5rem;
   color: $content-color;
   background-color: white;
+  .sg-flex {
+    align-items: center;
+  }
+  .sg-dropdown-tip {
+    color: #aaa;
+  }
   .sg-dropdown-label {
     font-size: 1.4rem;
     // line-height: 1;
