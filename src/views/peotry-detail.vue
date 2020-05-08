@@ -535,6 +535,8 @@ export default {
   }
   .main-wrapper {
     height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
     overflow-y: auto;
   }
 }

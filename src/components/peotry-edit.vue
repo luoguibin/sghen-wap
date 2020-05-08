@@ -19,10 +19,15 @@
                 <span class="iconfont icon-increase" @click="onNewSet"></span>
               </div>
 
+              <div v-if="!formData.id" slot="imageNames" class="petory-item">
+                <image-uploader ref="uploader" @success="handleUpload" @fail="handleUploadFail"></image-uploader>
+              </div>
+
               <sg-button
                 type="primary"
                 style="margin-top: 2rem;"
                 :disabled="isSaveing"
+                :isLoading="isSaveing"
                 @click="onConfirm"
               >{{peotry ? '更新':'创建'}}</sg-button>
             </sg-form>
@@ -39,6 +44,10 @@ import { apiURL, apiGetData, apiPostData } from '@/api'
 
 export default {
   name: 'PeotryEdit',
+
+  components: {
+    'image-uploader': () => import('@/components/image-uploader')
+  },
 
   props: {
     peotry: {
@@ -102,6 +111,13 @@ export default {
           required: false,
           type: 'textarea',
           _error: ''
+        },
+        {
+          key: 'imageNames',
+          label: '图集',
+          slot: true,
+          hasValue: true,
+          hidden: false
         }
       ],
 
@@ -119,7 +135,6 @@ export default {
 
   created () {
     window.peotryEdit = this
-    this.$toast('正在码...')
     this.initFormData()
     this.getPeotSets()
   },
@@ -135,6 +150,8 @@ export default {
         data.title = peotry.title
         data.content = peotry.content
         data.end = peotry.end
+
+        this.formRules[this.formRules.length - 1].hidden = true
       }
     },
     getPeotSets (isLast) {
@@ -188,7 +205,18 @@ export default {
         }
       })
     },
+    handleUpload (images = []) {
+      if (images.length) {
+        this.formData.imageNames = JSON.stringify(images)
+      } else {
+        this.formData.imageNames = ''
+      }
 
+      this.savePeotry()
+    },
+    handleUploadFail () {
+      this.isSaveing = false
+    },
     onConfirm () {
       this.$refs.form.validate(error => {
         if (error) {
@@ -198,31 +226,36 @@ export default {
           return
         }
         this.isSaveing = true
-        const data = this.formData
-        const params = {
-          userId: this.userID,
-          setId: data.setId,
-          title: data.title,
-          content: data.content,
-          end: data.end
-        }
-        if (data.imageNames) {
-          params.imageNames = data.imageNames
-        }
-
-        const id = data.id
-        if (id) {
-          params.id = id
-        }
-        apiPostData(id ? apiURL.peotryUpdate : apiURL.peotryCreate, params)
-          .then(resp => {
-            this.$toast(id ? '更新成功' : '创建成功')
-            this.$emit('success')
-          })
-          .finally(() => {
-            this.isSaveing = false
-          })
+        // 调用上传，产生回调事件
+        this.$refs.uploader.start()
       })
+    },
+
+    savePeotry () {
+      const data = this.formData
+      const params = {
+        userId: this.userID,
+        setId: data.setId,
+        title: data.title,
+        content: data.content,
+        end: data.end
+      }
+      if (data.imageNames) {
+        params.imageNames = data.imageNames
+      }
+
+      const id = data.id
+      if (id) {
+        params.id = id
+      }
+      apiPostData(id ? apiURL.peotryUpdate : apiURL.peotryCreate, params)
+        .then(resp => {
+          this.$toast(id ? '更新成功' : '创建成功')
+          this.$emit('success')
+        })
+        .finally(() => {
+          this.isSaveing = false
+        })
     }
   }
 }
@@ -261,7 +294,8 @@ export default {
   }
   .main-wrapper {
     height: 100%;
-    padding: 1rem;
+    padding: 1rem 0;
+    box-sizing: border-box;
     overflow-y: auto;
   }
 

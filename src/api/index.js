@@ -24,6 +24,24 @@ export const apiPostData = (url, data) =>
     data
   })
 
+/**
+ * @description 通用上传请求
+ * @param {String} url
+ * @param {Object} params
+ */
+export const apiPostUpload = (url, data, params, call) =>
+  request({
+    url,
+    method: 'post',
+    params,
+    data,
+    timeout: 60 * 1000,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: e => {
+      call(e)
+    }
+  })
+
 const preffix = '/sapi'
 /**
  * @description 接口地址列表
@@ -36,6 +54,8 @@ export const apiURL = {
   captcha: `${preffix}/v1/sms/captcha`,
   // 验证码
   smsCode: `${preffix}/v1/sms/send`,
+  // 上传
+  upload: `${preffix}/v1/upload`,
 
   // 获取作者基本信息
   userInfoList: `${preffix}/v1/api/get/user/list`,
