@@ -56,6 +56,10 @@ export default {
         this.$emit('back')
         return
       }
+      if (history.length <= 1) {
+        this.$router.push({ name: 'home' })
+        return
+      }
       this.$router.go(-1)
     }
   }
