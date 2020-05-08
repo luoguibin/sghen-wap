@@ -12,8 +12,19 @@
         <slot :name="item.key"></slot>
       </template>
       <template v-else>
-        <textarea v-if="item.type === 'textarea'" v-model="formData[item.key]" v-focus-within></textarea>
-        <input v-else v-model="formData[item.key]" :type="item.inputType" v-focus-within />
+        <textarea
+          v-if="item.type === 'textarea'"
+          v-model="formData[item.key]"
+          :style="item.style"
+          v-focus-within
+        ></textarea>
+        <input
+          v-else
+          v-model="formData[item.key]"
+          :type="item.inputType"
+          :style="item.style"
+          v-focus-within
+        />
       </template>
       <label :class="{'sg-label-required': item.required}">
         {{item.label}}

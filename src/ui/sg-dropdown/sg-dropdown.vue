@@ -73,9 +73,12 @@ export default {
         this.direction = isElTop ? 'bottom' : 'top'
       }
     },
+    setSelectOption ({ value, label }) {
+      this.currentValue = value
+      this.currentLabel = label
+    },
     onSelectOption (option, e) {
-      this.currentValue = option.value
-      this.currentLabel = option.label
+      this.setSelectOption(option)
       this.optionsVisible = false
       this.$emit('change', option.value, e)
     }

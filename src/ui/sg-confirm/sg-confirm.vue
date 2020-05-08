@@ -53,7 +53,7 @@ export default {
       if (this.validator && this.validator(this.content)) {
         return
       }
-      this.confirmCall && this.confirmCall()
+      this.confirmCall && this.confirmCall(this.type ? this.content : '')
       this.hide()
     }
   }
