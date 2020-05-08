@@ -5,7 +5,7 @@
     <div
       v-for="item in formRules"
       :key="item.key"
-      :class="{'sg-form-item': !item.noneClass}"
+      :class="{'sg-form-item': !item.noneClass, 'sg-form-value': item.hasValue}"
       v-show="!item.hidden"
     >
       <template v-if="item.slot">
@@ -171,6 +171,7 @@ export default {
     }
   }
   .sg-form-item.sg-input-value,
+  .sg-form-item.sg-form-value,
   .sg-form-item.sg-focus-within {
     label {
       transform: translateY(-150%);
