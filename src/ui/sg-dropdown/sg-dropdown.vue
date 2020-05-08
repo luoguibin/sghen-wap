@@ -5,7 +5,9 @@
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
       <div class="sg-flex-one sg-text-ellipsis">
         <slot>
-          <span :class="{'sg-dropdown-tip': !currentLabel}">{{currentLabel || '点击选择'}}</span>
+          <span
+            :class="{'sg-dropdown-tip': !currentLabel, 'sg-dropdown-text': optionActive && !!currentLabel}"
+          >{{currentLabel || '点击选择'}}</span>
         </slot>
       </div>
       <i v-show="pointerVisible" class="iconfont icon-down"></i>
@@ -95,6 +97,9 @@ export default {
   }
   .sg-dropdown-tip {
     color: #aaa;
+  }
+  .sg-dropdown-text {
+    color: $main-color;
   }
   .sg-dropdown-label {
     font-size: 1.4rem;
