@@ -1,6 +1,6 @@
 <template>
   <div class="peotry-detail">
-    <sg-header @back="$router.go(-1)">
+    <sg-header @back="onBack">
       <span style="font-size: 1.6rem;">诗词详情</span>
       <div slot="right">
         <sg-dropdown :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
@@ -147,6 +147,9 @@ export default {
   },
 
   methods: {
+    onBack () {
+      this.$router.go(-1)
+    },
     getPeotry () {
       const id = this.$route.params.id
       this.peotryID = id
@@ -365,7 +368,7 @@ export default {
               }).then(
                 resp => {
                   this.$toast('删除成功')
-                  this.$router.go(-1)
+                  this.onBack()
                 }
               )
             }

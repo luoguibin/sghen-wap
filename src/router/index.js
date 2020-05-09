@@ -34,4 +34,15 @@ const router = new VueRouter({
   routes
 })
 
+// 优化路由返回上一级不存在的情况
+router._go = router.go
+router.go = function (num) {
+  // console.log(`go, num=${num}, fromFullpath=${this._fromFullpath}`)
+  if (num === -1 && history.length <= 1) {
+    this.push('/')
+  } else {
+    this._go(num)
+  }
+}
+
 export default router
