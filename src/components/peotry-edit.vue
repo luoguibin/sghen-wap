@@ -2,7 +2,7 @@
   <div class="dialog-mask">
     <div class="dialog-wrapper">
       <div class="peotry-edit">
-        <sg-header @back="$emit('close')" :autoBack="false">
+        <sg-header @back="$emit('close')">
           <span style="font-size: 1.6rem;">诗词{{peotry ? '更新':'创建'}}</span>
         </sg-header>
 

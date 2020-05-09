@@ -1,6 +1,6 @@
 <template>
   <div class="peotry-list">
-    <sg-header>
+    <sg-header @back="$router.go(-1)">
       <span style="font-size: 1.6rem;">{{title}}</span>
       <span v-show="isSelf" slot="right" class="iconfont icon-increase" @click="onGoNewPeotry"></span>
     </sg-header>

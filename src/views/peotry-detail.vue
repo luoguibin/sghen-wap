@@ -1,6 +1,6 @@
 <template>
   <div class="peotry-detail">
-    <sg-header ref="header">
+    <sg-header @back="$router.go(-1)">
       <span style="font-size: 1.6rem;">诗词详情</span>
       <div slot="right">
         <sg-dropdown :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
@@ -365,7 +365,7 @@ export default {
               }).then(
                 resp => {
                   this.$toast('删除成功')
-                  this.$refs.header.onBack()
+                  this.$router.go(-1)
                 }
               )
             }

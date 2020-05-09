@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <sg-header>
+    <sg-header @back="$router.go(-1)">
       <span style="font-size: 1.6rem;">Sghen三行</span>
     </sg-header>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
