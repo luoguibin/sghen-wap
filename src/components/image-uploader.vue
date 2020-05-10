@@ -28,7 +28,7 @@
 
 <script>
 import { apiURL, apiPostUpload } from '@/api'
-import { resizeImage, base64ToBlob, blobToFile } from '@/common/image'
+import { resizeImage, base64ToFile } from '@/common/image'
 
 export default {
   name: 'ImageUploader',
@@ -124,8 +124,8 @@ export default {
       }
       const form = new FormData()
       this.imageDatas.forEach(o => {
-        const file = blobToFile(base64ToBlob(o.data), o.file.name)
-        form.append('file', file)
+        // o.data是base64数据，canvas产生默认为png格式
+        form.append('file', base64ToFile(o.data, o.file.name))
       })
 
       this.progress = '0%'
