@@ -36,3 +36,24 @@ export const resizeImage = function (src, maxSize = 800 * 600) {
     image.src = src
   })
 }
+
+export const base64ToBlob = function (base64Data) {
+  const arr = base64Data.split(',')
+  const fileType = arr[0].match(/:(.*?);/)[1]
+  const bstr = atob(arr[1])
+  let l = bstr.length
+  const u8Arr = new Uint8Array(l)
+
+  while (l--) {
+    u8Arr[l] = bstr.charCodeAt(l)
+  }
+  return new Blob([u8Arr], {
+    type: fileType
+  })
+}
+
+export const blobToFile = function (newBlob, fileName) {
+  newBlob.lastModifiedDate = new Date()
+  newBlob.name = fileName
+  return newBlob
+}
