@@ -9,8 +9,8 @@ export const resizeImage = function (src, type, maxSize = 800 * 600) {
     image.onload = function () {
       const max = image.width * image.height
       const ratio = Math.sqrt(maxSize / max)
-      const newWidth = ratio > 1 ? Math.floor(image.width * ratio) : image.width
-      const newHeight = ratio > 1 ? Math.floor(image.height * ratio) : image.height
+      const newWidth = ratio < 1 ? Math.floor(image.width * ratio) : image.width
+      const newHeight = ratio < 1 ? Math.floor(image.height * ratio) : image.height
       //   console.log(maxSize, max, image.width, image.height, newWidth, newHeight)
 
       const canvas = window._sgGlobal.testCavans || document.createElement('canvas')
