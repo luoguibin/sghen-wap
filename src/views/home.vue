@@ -62,7 +62,7 @@
         </div>
 
         <div class="module-panel">
-          <span>模块占位中...</span>
+          <rotate-box></rotate-box>
         </div>
 
         <site-instruction></site-instruction>
@@ -80,6 +80,7 @@ export default {
   name: 'Home',
 
   components: {
+    RotateBox: () => import('@/components/rotate-box'),
     SiteInstruction: () => import('@/components/site-instruction')
   },
 
@@ -330,15 +331,17 @@ export default {
   }
 
   .module-panel {
-    height: 18rem;
-    line-height: 18rem;
+    // height: 18rem;
+    // line-height: 18rem;
+    padding: 0 1rem;
+    box-sizing: border-box;
     background: #eee;
-    text-align: center;
-    color: #999;
-    span {
-      font-size: 1.6rem;
-      animation: frames-opacity 1200ms alternate infinite;
-    }
+    // text-align: center;
+    // color: #999;
+    // span {
+    //   font-size: 1.6rem;
+    //   animation: frames-opacity 1200ms alternate infinite;
+    // }
   }
 }
 </style>
