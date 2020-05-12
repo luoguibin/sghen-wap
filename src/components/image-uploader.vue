@@ -28,7 +28,7 @@
 
 <script>
 import { apiURL, apiPostUpload } from '@/api'
-import { resizeImage } from '@/common/image'
+import { resizeImage, base64ToFile } from '@/common/image'
 
 export default {
   name: 'ImageUploader',
@@ -106,7 +106,12 @@ export default {
      * 上传图片
      */
     start () {
-      console.log('start uploadImages')
+      // console.log('start uploadImages')
+      if (this.isUploading) {
+        return
+      }
+      this.isUploading = true
+
       if (!this.imageDatas.length) {
         this.$emit('success', [])
         return
@@ -119,18 +124,16 @@ export default {
       }
       const form = new FormData()
       this.imageDatas.forEach(o => {
-        form.append('file', o.file)
+        // o.data是base64数据，canvas产生默认为png格式
+        form.append('file', base64ToFile(o.data, o.file.name))
       })
 
-      if (this.isUploading) {
-        return
-      }
-      this.isUploading = true
       this.progress = '0%'
       apiPostUpload(apiURL.upload, form, { pathType: 'peotry' }, e => {
         this.progress = Math.floor(e.loaded / e.total * 100) + '%'
       })
         .then(resp => {
+          this.isUploading = false
           this.progress = '100%'
           this.$emit('success', resp.data)
           this.$nextTick(() => {
