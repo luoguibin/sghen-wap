@@ -17,8 +17,6 @@
       </div>
     </sg-header>
 
-    <!-- <div class="home-header"></div> -->
-
     <!-- 内容 -->
     <div class="home-body">
       <div class="scroll">
@@ -27,9 +25,9 @@
             v-for="(item, index) in swipperPoetries"
             :slot="swipperItems[index].slot"
             :key="item.id"
-            class="swipper-panel"
+            class="item-panel"
           >
-            <img v-if="item.image0" :src="item.image0" />
+            <img class="item-bg" v-if="item.image0" :src="item.image0" />
             <h2 v-if="item.setName">《{{item.setName}}》</h2>
             <p v-for="(l, i) in item.lines" :key="i">{{l}}</p>
           </div>
@@ -62,7 +60,24 @@
         </div>
 
         <div class="module-panel">
-          <rotate-box></rotate-box>
+          <rotate-box v-if="lastestImages.length" :items="rotateItems">
+            <div
+              v-for="(item, index) in lastestImages"
+              :slot="rotateItems[index].slot"
+              :key="item.id"
+              class="item-panel album-item"
+            >
+              <!-- 相册中不超过2张图片，默认显示第一张图片 -->
+              <img v-if="item.images.length < 3" class="album-image1" :src="item.images[0]" />
+
+              <!-- 相册中超过2张图片，默认显示最新的前3张图片 -->
+              <div v-else class="album-images3">
+                <img :src="item.images[0]" />
+                <img :src="item.images[1]" />
+                <img :src="item.images[2]" />
+              </div>
+            </div>
+          </rotate-box>
         </div>
 
         <site-instruction></site-instruction>
@@ -75,6 +90,19 @@
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
+
+const getSmallImage = v => {
+  if (v.endsWith('.jpg')) {
+    v = v.replace(/.jpg$/, '_100.jpg')
+  } else if (v.endsWith('.png')) {
+    v = v.replace(/.png$/, '_100.png')
+  } else if (v.endsWith('.jpeg')) {
+    v = v.replace(/.jpeg$/, '_100.jpeg')
+  } else {
+    v += '_100.jpg'
+  }
+  return v
+}
 
 export default {
   name: 'Home',
@@ -94,6 +122,9 @@ export default {
       swipperItems: [],
       swipperPoetries: [],
       swipperDuration: 5000,
+
+      lastestImages: [],
+      rotateItems: [],
 
       dropdownOptions: [
         { label: '我的诗词', value: 'my-list' },
@@ -120,6 +151,7 @@ export default {
     window.home = this
     this.getYearInfos()
     this.getWipperPeotries()
+    this.getRotateImages()
   },
 
   methods: {
@@ -158,18 +190,6 @@ export default {
       })
       const data = resp.data
       const imgSrcFunc = Vue.filter('img-src')
-      const getSmallImage = v => {
-        if (v.endsWith('.jpg')) {
-          v = v.replace(/.jpg$/, '_100.jpg')
-        } else if (v.endsWith('.png')) {
-          v = v.replace(/.png$/, '_100.png')
-        } else if (v.endsWith('.jpeg')) {
-          v = v.replace(/.jpeg$/, '_100.jpeg')
-        } else {
-          v += '_100.jpg'
-        }
-        return v
-      }
       this.swipperPoetries = data.map(o => {
         const temp = {
           id: o.id,
@@ -183,12 +203,31 @@ export default {
         }
         return temp
       })
-      this.swipperItems = data.map(o => ({ slot: 'slot-' + o.id }))
+      this.swipperItems = data.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
       this.$refs.sgSwipper.start()
 
       this.line3Timer = setTimeout(() => {
         this.getWipperPeotries()
       }, this.swipperDuration * this.swipperItems.length)
+    },
+    getRotateImages () {
+      apiGetData(apiURL.peotryImages, { limit: 4 }).then(({ data }) => {
+        const imgSrcFunc = Vue.filter('img-src')
+        this.lastestImages = data
+          .filter(o => o.count)
+          .map(o => {
+            const temp = {
+              id: o.id,
+              count: o.count
+            }
+            const images = JSON.parse(o.images).map(v => {
+              return getSmallImage(imgSrcFunc(v))
+            })
+            temp.images = [...images, ...images]
+            return temp
+          })
+        this.rotateItems = data.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
+      })
     },
 
     handleDropdown (key) {
@@ -272,7 +311,7 @@ export default {
       overflow-y: auto;
     }
   }
-  .swipper-panel {
+  .item-panel {
     position: relative;
     height: 100%;
     box-sizing: border-box;
@@ -282,7 +321,7 @@ export default {
       font-size: 1.4rem;
       line-height: 2.4rem;
     }
-    img {
+    .item-bg {
       position: absolute;
       top: 0;
       right: 0;
@@ -331,17 +370,41 @@ export default {
   }
 
   .module-panel {
-    // height: 18rem;
-    // line-height: 18rem;
     padding: 0 1rem;
     box-sizing: border-box;
-    background: #eee;
-    // text-align: center;
-    // color: #999;
-    // span {
-    //   font-size: 1.6rem;
-    //   animation: frames-opacity 1200ms alternate infinite;
-    // }
+  }
+
+  .album-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    img {
+      display: inline-block;
+      box-sizing: border-box;
+      height: 100%;
+      object-fit: cover;
+    }
+    .album-image1 {
+      width: 100%;
+    }
+    .album-images3 {
+      height: 100%;
+      img {
+        float: left;
+        &:nth-child(1) {
+          width: 70%;
+          padding-right: 4px;
+        }
+        &:nth-child(2) {
+          width: 30%;
+          height: 50%;
+          padding-bottom: 2px;
+        }
+        &:nth-child(3) {
+          width: 30%;
+          height: 50%;
+          padding-top: 2px;
+        }
+      }
+    }
   }
 }
 </style>

@@ -70,6 +70,8 @@ export const apiURL = {
   peotryUpdate: `${preffix}/v1/peotry/update`,
   // 诗词删除
   peotryDelete: `${preffix}/v1/peotry/delete`,
+  // 诗词图片
+  peotryImages: `${preffix}/v1/api/get/peotry/images`,
 
   // 选集列表
   peotSets: `${preffix}/v1/peotry-set/query`,

@@ -1,12 +1,12 @@
 <template>
   <div class="rotate-box">
     <div ref="wrapper" class="wrapper" :style="wrapperStyle" :class="{'anime' : canAnime}">
-      <div
-        v-for="item in items"
-        :key="item.id"
-        class="rotate-item"
-        :style="item.style"
-      >{{item.name}}</div>
+      <div v-for="item in itemStyles" :key="item.id" class="rotate-item" :style="item.style">
+        <template v-if="item.slot">
+          <slot :name="item.slot"></slot>
+        </template>
+        <template v-else>{{item.content}}</template>
+      </div>
     </div>
   </div>
 </template>
@@ -15,50 +15,22 @@
 export default {
   name: 'RotateBox',
 
+  props: {
+    items: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    duration: {
+      type: Number,
+      default: 5000
+    }
+  },
+
   data () {
     return {
-      items: [
-        {
-          id: 0,
-          name: '第一个展示模块',
-          rotateY: 0,
-          translateZ: 0,
-          style: {
-            backgroundColor: 'rgba(70, 130, 180, 0.95)',
-            transform: 'rotateY(0deg)'
-          }
-        },
-        {
-          id: 1,
-          name: '第二个展示模块',
-          rotateY: 0,
-          translateZ: 0,
-          style: {
-            backgroundColor: 'rgba(180, 129, 70, 0.95)',
-            transform: 'rotateY(0deg)'
-          }
-        },
-        {
-          id: 2,
-          name: '第三个展示模块',
-          rotateY: 0,
-          translateZ: 0,
-          style: {
-            backgroundColor: 'rgba(180, 70, 112, 0.95)',
-            transform: 'rotateY(0deg)'
-          }
-        },
-        {
-          id: 3,
-          name: '第四个展示模块',
-          rotateY: 0,
-          translateZ: 0,
-          style: {
-            backgroundColor: 'rgba(70, 180, 130, 0.95)',
-            transform: 'rotateY(0deg)'
-          }
-        }
-      ],
+      itemStyles: [],
       rotateY: 0,
       canAnime: true,
       wrapperStyle: {
@@ -69,34 +41,57 @@ export default {
 
   mounted () {
     window.rotateBox = this
-    const haflWidth = this.$el.clientWidth / 2
-    const v = 360 / this.items.length
-
-    const rad = (Math.PI - (Math.PI * 2) / this.items.length) / 2
-    // 当只有一个卡片时，z计算出来为大负数
-    const z = Math.max(Math.tan(rad) * haflWidth, 100)
-    this.translateZ = z
-    this.items.forEach((o, i) => {
-      o.rotateY = v * i
-      o.translateZ = z
-    })
-    this.setRotateY(0)
-    this.setWrapperRotateY(0)
-    this.start()
+    this.init()
   },
 
   methods: {
+    init () {
+      const len = this.items.length
+      if (len < 2) {
+        return
+      }
+
+      this.itemStyles = this.items.map(o => {
+        return {
+          id: o.id,
+          slot: o.slot,
+          content: o.content,
+          rotateY: 0,
+          translateZ: 0,
+          style: {
+            ...o.style,
+            transform: 'rotateY(0deg)'
+          }
+        }
+      })
+
+      const haflWidth = this.$el.clientWidth / 2
+      const deg = 360 / len
+      const rad = (Math.PI - (Math.PI * 2) / len) / 2
+      const z = Math.tan(rad) * haflWidth
+      this.translateZ = z
+      this.itemStyles.forEach((o, i) => {
+        o.rotateY = deg * i
+        o.translateZ = z
+      })
+      this.setItemsRotateY(0)
+      this.setRotateY(0)
+
+      this.stop()
+      this.start()
+    },
+
     start (v = 0) {
       this.rotateY = v
       this.timer = setInterval(() => {
         let v = this.rotateY
-        v -= 360 / this.items.length
+        v -= 360 / this.itemStyles.length
         if (v <= -360) {
           // 1000ms后等动画完成后进行无缝重置角度
           setTimeout(() => {
             this.canAnime = false
             this.$nextTick(() => {
-              this.setWrapperRotateY(0)
+              this.setRotateY(0)
               this.$nextTick(() => {
                 // ??不加这行代码动画直接生效
                 void this.$refs.wrapper.clientWidth
@@ -105,21 +100,32 @@ export default {
             }, 0)
           }, 1000)
         }
-        this.setWrapperRotateY(v)
-      }, 3000)
+        this.setRotateY(v)
+      }, this.duration)
     },
-    setRotateY (v) {
-      this.items.forEach((o, i) => {
+    stop () {
+      if (this.timer) {
+        clearInterval(this.timer)
+      }
+      this.timer = null
+    },
+
+    setItemsRotateY (v) {
+      this.itemStyles.forEach((o, i) => {
         o.style.transform = `rotateY(${v + o.rotateY}deg) translateZ(${
           o.translateZ
         }px)`
       })
     },
-    setWrapperRotateY (v) {
+    setRotateY (v) {
       this.rotateY = v
       this.wrapperStyle.transform = `translateZ(${-this
         .translateZ}px) rotateY(${v}deg)`
     }
+  },
+
+  beforeDestroy () {
+    this.stop()
   }
 }
 </script>
@@ -147,10 +153,6 @@ export default {
     left: 0;
     width: 100%;
     height: 100%;
-    font-size: 1.5rem;
-    color: white;
-    text-align: center;
-    line-height: 6rem;
   }
 }
 </style>
