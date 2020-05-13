@@ -1,4 +1,5 @@
 import { apiURL, apiPostData } from '@/api'
+import Cache from '@/common/cache-center'
 
 export default {
   namespaced: true,
@@ -23,6 +24,14 @@ export default {
       state.userName = data.username || data.name
       state.phone = data.phone || data.id
       state.token = data.token
+
+      if (data.token) {
+        Cache.UserCache.setData(data.id, {
+          id: data.id,
+          avatar: data.avatar,
+          username: state.userName
+        })
+      }
     }
   },
   actions: {
