@@ -36,10 +36,6 @@ export default {
       type: String,
       default: 'visible'
     },
-    autoBack: {
-      type: Boolean,
-      default: true
-    },
     backVisible: {
       type: Boolean,
       default: true

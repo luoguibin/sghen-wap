@@ -62,6 +62,12 @@ export default {
   color: $main-color;
 }
 
+.sg-button-text {
+  display: inline-block;
+  width: initial;
+  padding: 0;
+}
+
 .sg-button-primary {
   color: white;
   background-color: $main-color;
