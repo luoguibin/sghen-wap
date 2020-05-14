@@ -27,7 +27,7 @@
           <i>:</i>
         </span>
         <div>
-          <img :src="personalAvatar" />
+          <img :src="personalAvatar | img-src" />
           <sg-button v-if="isEditing" type="text" @click="onOpenChangeAvatar">更换</sg-button>
         </div>
       </div>
