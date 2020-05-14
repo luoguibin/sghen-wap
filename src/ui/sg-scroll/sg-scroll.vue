@@ -216,10 +216,6 @@ export default {
         tempY += yValue
         tempY = Math.max(tempY, -sliceHeight * 3)
         tempY = Math.min(tempY, 0)
-        if (!this.isEnd || tempY !== -sliceHeight * 3) {
-          e.preventDefault()
-          e.stopPropagation()
-        }
 
         this.isPullHanding = tempY < -sliceHeight * 0.75
         this.bottomScale = Math.max(1, -tempY / sliceHeight)
