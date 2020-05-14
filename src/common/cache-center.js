@@ -28,10 +28,12 @@ class CacheCenter {
   }
 }
 
-export default {
+const cache = {
   UserCache: new CacheCenter('user'),
   PeotryPageCache: new CacheCenter('petory-page'),
   PeotrySetCache: new CacheCenter('petory-set')
 }
+window.GlobalCache = cache
+export default cache
 
 // export const UserCache = new CacheCenter('user')

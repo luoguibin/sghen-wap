@@ -128,6 +128,7 @@ export default {
 
       dropdownOptions: [
         { label: '我的诗词', value: 'my-list' },
+        { label: '个人中心', value: 'personal' },
         { label: '退出', value: 'logout' }
       ]
     }
@@ -248,7 +249,12 @@ export default {
             }
           })
           break
-
+        case 'personal':
+          this.$router.push({
+            name: 'personal',
+            query: { uuid: this.userID }
+          })
+          break
         default:
           break
       }

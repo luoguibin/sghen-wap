@@ -25,6 +25,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'peotry-detail' */'@/views/peotry-detail')
   },
   {
+    path: '/personal',
+    name: 'personal',
+    component: () => import(/* webpackChunkName: 'personal' */'@/views/personal')
+  },
+  {
     path: '/*',
     redirect: '/home'
   }

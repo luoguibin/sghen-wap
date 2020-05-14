@@ -86,7 +86,6 @@ export default {
 
   created () {
     window.peotryList = this
-    window.GlobalCache = Cache
     this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
     this.scrollItemMap = {}
   },

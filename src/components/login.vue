@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import { sgIsPhone } from '@/utils/sgRegExp'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 
@@ -152,8 +152,8 @@ export default {
     countdownText () {
       return this.countdown + 'S后获取'
     },
-    ...mapState({
-      isLogin: state => state.auth.phone
+    ...mapGetters({
+      isLogin: 'auth/isLogin'
     })
   },
 

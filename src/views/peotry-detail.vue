@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import { getItemIndex } from '@/utils/sgDom'
 import Cache from '@/common/cache-center'
@@ -120,12 +120,14 @@ export default {
 
     ...mapState({
       userID: state => state.auth.userID
+    }),
+    ...mapGetters({
+      selfPublicInfo: 'auth/selfPublicInfo'
     })
   },
 
   created () {
     window.peotryDetail = this
-    window.GlobalCache = Cache
     this.getPeotry()
   },
 
@@ -300,7 +302,7 @@ export default {
           toId: -1
         })
           .then(({ data }) => {
-            data.fromPeot = Cache.UserCache.getData(this.userID)
+            data.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
             data.itemTag = 'opacity'
             this.peotry.praiseComments.push(data)
             this.resetDropdownOptions()
@@ -470,7 +472,7 @@ export default {
       this.getPeotry()
     },
     handleCommentOk (o) {
-      o.fromPeot = Cache.UserCache.getData(+this.userID)
+      o.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
       o.toPeot = Cache.UserCache.getData(+this.commentToID)
       this.peotry.realComments.push(o)
     },

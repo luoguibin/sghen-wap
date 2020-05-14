@@ -1,5 +1,4 @@
 import { apiURL, apiPostData } from '@/api'
-import Cache from '@/common/cache-center'
 
 export default {
   namespaced: true,
@@ -11,6 +10,13 @@ export default {
     token: ''
   },
   getters: {
+    selfPublicInfo (state) {
+      return {
+        id: state.userID,
+        username: state.userName,
+        avatar: state.userAvatar
+      }
+    },
     isLogin (state) {
       return !!state.token
     }
@@ -22,16 +28,8 @@ export default {
       state.userID = data.id
       state.userAvatar = data.avatar
       state.userName = data.username || data.name
-      state.phone = data.phone || data.id
+      state.phone = data.phone
       state.token = data.token
-
-      if (data.token) {
-        Cache.UserCache.setData(data.id, {
-          id: data.id,
-          avatar: data.avatar,
-          username: state.userName
-        })
-      }
     }
   },
   actions: {
