@@ -1,11 +1,27 @@
 <template>
   <div class="sg-swipper">
-    <div ref="wrapper" :class="{ 'sg-swipper-wrapper': true, 'sg-swipper-wrapper_anime': !isTouching }"
-      :style="wrapperStyle" @touchstart="onMouseDown" @touchend="onMouseUp">
-      <div v-for="(item, index) in items" :key="index" ref="swipperItems"
-        :class="{ 'sg-swipper-item': true, 'sg-swipper-item_active': index === currentIndex }">
+    <div
+      ref="wrapper"
+      :class="{ 'sg-swipper-wrapper': true, 'sg-swipper-wrapper_anime': !isTouching }"
+      :style="wrapperStyle"
+      @touchstart="onMouseDown"
+      @touchend="onMouseUp"
+    >
+      <div
+        v-for="(item, index) in items"
+        :key="item.slot"
+        ref="swipperItems"
+        :class="{ 'sg-swipper-item': true, 'sg-swipper-item_active': index === currentIndex }"
+      >
         <slot :name="item.slot"></slot>
       </div>
+    </div>
+    <div class="sg-swipper-pointers">
+      <div
+        v-for="(item, index) in items"
+        :key="item.slot"
+        :class="{'pointer': true, 'pointer-active': index === currentIndex}"
+      ></div>
     </div>
   </div>
 </template>
@@ -108,7 +124,10 @@ export default {
     },
     onMouseMove (e) {
       const item = this.$refs.swipperItems[this.currentIndex]
-      if (item.scrollLeft > 0 && item.scrollLeft + item.clientWidth < item.scrollWidth) {
+      if (
+        item.scrollLeft > 0 &&
+        item.scrollLeft + item.clientWidth < item.scrollWidth
+      ) {
         return
       }
       const clientX = e.touches[0].clientX
@@ -130,7 +149,9 @@ export default {
       }
 
       const itemWidth = this.$refs.wrapper.clientWidth
-      const index = Math.floor(Math.abs(this.translateX - itemWidth / 2) / itemWidth)
+      const index = Math.floor(
+        Math.abs(this.translateX - itemWidth / 2) / itemWidth
+      )
       this.setCurrentIndex(index)
 
       this.isTouching = false
@@ -145,7 +166,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../style/colors.scss";
+
 .sg-swipper {
+  position: relative;
   height: 15rem;
   overflow: hidden;
 
@@ -166,6 +190,25 @@ export default {
     overflow: auto;
   }
   .sg-swipper-item_active {
+  }
+  .sg-swipper-pointers {
+    position: absolute;
+    left: 50%;
+    bottom: 1rem;
+    transform: translate(-50%, 0);
+    .pointer {
+      display: inline-block;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background-color: $main-disabled-color;
+    }
+    .pointer + .pointer {
+      margin-left: 1rem;
+    }
+    .pointer-active {
+      background-color: $main-active-color;
+    }
   }
 }
 </style>

@@ -92,7 +92,7 @@ export default {
 
 .sg-dropdown {
   position: relative;
-  padding: 0.5rem;
+  padding: $padding-small;
   color: $content-color;
   background-color: white;
   .sg-flex {
@@ -125,7 +125,7 @@ export default {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: white;
     border-radius: 0.3rem;
-    z-index: $zIndex100;
+    z-index: $z-index-100;
     .options-wrapper {
       padding: 0 1rem;
       max-height: 16rem;
@@ -137,7 +137,7 @@ export default {
     right: 1rem;
     width: 0;
     height: 0;
-    z-index: $zIndex100;
+    z-index: $z-index-100;
     box-sizing: border-box;
     border-width: 1rem;
     border-style: solid;

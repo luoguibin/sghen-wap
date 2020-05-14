@@ -9,10 +9,10 @@
           <template v-else>{{content}}</template>
         </div>
         <div class="sg-confirm-options">
-          <div>
+          <div v-show="cancelVisible">
             <button class="cancel" @click="hide()">取消</button>
           </div>
-          <span></span>
+          <span v-show="cancelVisible"></span>
           <div>
             <button class="confirm" @click="confirm">确定</button>
           </div>
@@ -29,6 +29,7 @@ export default {
   data () {
     return {
       visible: false,
+      cancelVisible: true,
       title: '',
       content: '',
       type: ''
@@ -43,6 +44,7 @@ export default {
       this.placeholder = options.placeholder
       this.validator = options.validator
       this.confirmCall = options.confirm
+      this.cancelVisible = options.cancelVisible !== false
       this.visible = true
     },
     hide () {
@@ -62,6 +64,8 @@ export default {
 
 <style lang="scss" scoped>
 @import "../style/colors.scss";
+@import "../style/size.scss";
+
 .sg-confirm-mask {
   position: fixed;
   top: 0;
@@ -87,8 +91,8 @@ export default {
     width: 100%;
     padding: 0.3rem 0.5rem;
     color: $main-color;
-    font-size: 1.2rem;
-    line-height: 1.5rem;
+    font-size: $size-text;
+    line-height: $height-text;
     border: none;
     outline: none;
     box-sizing: border-box;
@@ -100,15 +104,15 @@ export default {
     padding: 1rem;
     text-align: center;
     color: $title-color;
-    font-size: 1.8rem;
+    font-size: $size-title;
     font-weight: bold;
   }
   .sg-confirm-content {
     padding: 2px 1rem 2rem;
     text-align: center;
     color: $content-color;
-    font-size: 1.6rem;
-    line-height: 1.8rem;
+    font-size: $size-option;
+    line-height: $height-option;
   }
   .sg-confirm-options {
     display: flex;

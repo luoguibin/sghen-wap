@@ -202,6 +202,8 @@ export default {
     },
 
     onActionStart (e, key) {
+      e.stopPropagation()
+      e.preventDefault()
       if (!this.moveHandle) {
         this.moveHandle = e => {
           this.onActionMove(e)
@@ -216,7 +218,12 @@ export default {
       this.$el.addEventListener('touchmove', this.moveHandle)
       this.$el.addEventListener('touchend', this.endHandle)
     },
+    /**
+     * @param {Event} e
+     */
     onActionMove (e) {
+      e.stopPropagation()
+      e.preventDefault()
       this.isTouching = true
       const key = this.currentKey
       const clientY = e.touches[0].clientY
@@ -267,7 +274,7 @@ export default {
           this.marginTopMap.date = originY + itemHeight * val + 'px'
         }
       }
-      console.log('onActionEnd', this.getTimeValues())
+      // console.log('onActionEnd', this.getTimeValues())
     },
 
     /**
@@ -318,10 +325,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '../style/size.scss';
+
 .sg-time {
-  font-size: 1.4rem;
+  font-size: $size-option;
   overflow: hidden;
-  margin-top: 1rem;
   box-sizing: border-box;
   border: 1px solid gray;
   .sg-flex {
@@ -338,7 +346,7 @@ export default {
     overflow: hidden;
   }
   .sg-time-item {
-    line-height: 2rem;
+    line-height: $height-text;
     padding: 0 0.3rem;
   }
 

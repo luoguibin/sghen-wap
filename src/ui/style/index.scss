@@ -7,10 +7,6 @@
 .sg-flex {
     display: flex;
     flex-direction: row;
-    overflow: hidden;
-    .sg-flex-one {
-        overflow: hidden;
-    }
 }
 .sg-flex-column {
     flex-direction: column;

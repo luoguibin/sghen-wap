@@ -30,6 +30,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'personal' */'@/views/personal')
   },
   {
+    path: '/sg-components',
+    name: 'sgComponents',
+    component: () => import(/* webpackChunkName: 'sg-components' */'@/views/sg-components')
+  },
+  {
     path: '/*',
     redirect: '/home'
   }

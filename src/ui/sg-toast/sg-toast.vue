@@ -33,13 +33,14 @@ export default {
 .sg-toast {
   position: fixed;
   left: 50%;
-  padding: 0.5rem 1rem;
+  padding: $padding-small $padding-big;
   color: white;
-  font-size: 1.2rem;
+  font-size: $size-text;
+  line-height: $height-text;
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 0.6rem;
   transform: translateX(-50%);
-  z-index: $zIndex999;
+  z-index: $z-index-999
 }
 .sg-toast-top {
   top: 2rem;

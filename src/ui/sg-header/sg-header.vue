@@ -1,10 +1,8 @@
 <template>
-  <div class="sg-header sg-flex">
-    <div v-if="leftStatus" class="left">
-      <div v-show="leftStatus === 'visible'">
-        <span v-show="backVisible" class="back iconfont icon-down" @click="onBack"></span>
-        <slot name="left"></slot>
-      </div>
+  <header class="sg-header sg-flex">
+    <div v-if="leftStatus" v-show="leftStatus === 'visible'" class="left">
+      <span v-show="backVisible" class="back iconfont icon-down" @click="onBack"></span>
+      <slot name="left"></slot>
     </div>
     <div v-if="centerStatus" class="center">
       <div v-show="centerStatus === 'visible'">
@@ -16,7 +14,7 @@
         <slot name="right"></slot>
       </div>
     </div>
-  </div>
+  </header>
 </template>
 
 <script>
@@ -55,27 +53,34 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../style/size.scss";
+
 .sg-header {
-  padding: 1rem;
+  padding: 0 $padding-normal;
+  height: $height-title;
+  line-height: $height-title;
+  align-items: center;
   .back {
     display: inline-block;
+    font-size: $size-option;
     transform: rotate(90deg);
   }
 
   .left {
     flex: 1;
     text-align: left;
+    font-size: $size-option;
   }
   .center {
     flex: 3;
     text-align: center;
+    font-size: $size-title;
+    font-weight: bold;
   }
   .right {
     flex: 1;
     text-align: right;
+    font-size: $size-option;
   }
-}
-.sg-flex {
-  overflow: initial;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
   <button :class="`sg-button sg-button-` + type" :disabled="disabled || isLoading" @click="onClick">
-    <i v-show="isLoading"></i>
+    <i v-if="isLoading"></i>
     <slot></slot>
   </button>
 </template>
@@ -37,14 +37,13 @@ export default {
 
 <style lang="scss" scoped>
 @import '../style/colors.scss';
+@import '../style/size.scss';
 
 .sg-button {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 1rem;
+  padding: 0 $padding-normal;
+  font-size: $size-text;
   border-radius: 0.3rem;
-  text-align: center;
-  font-size: 1.6rem;
+  line-height: $height-option;
 
   i {
     display: inline-block;
@@ -59,16 +58,19 @@ export default {
 }
 
 .sg-button-default {
-  color: $main-color;
+  display: block;
+  width: 100%;
 }
 
 .sg-button-text {
   display: inline-block;
-  width: initial;
   padding: 0;
+  color: $main-color;
 }
 
 .sg-button-primary {
+  display: block;
+  width: 100%;
   color: white;
   background-color: $main-color;
   &:active {
@@ -81,6 +83,10 @@ export default {
     border: 2px solid white;
     border-left-color: transparent;
   }
+}
+
+.sg-button-subsidiary {
+
 }
 
 @keyframes sg-rotate {

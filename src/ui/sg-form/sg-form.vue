@@ -126,22 +126,25 @@ export default {
 
 <style lang="scss" scoped>
 @import "../style/colors.scss";
+@import "../style/size.scss";
+
+$form-item-font-size: $size-text;
+$form-item-line-height: $height-text;
+$form-item-input-padding: 0.5rem;
 
 .sg-form {
-  padding: 1rem;
-
   .sg-form-item {
     position: relative;
-    padding-top: 0.5rem;
+    margin-top: $form-item-line-height;
     border-bottom: 2px solid $border-color;
     input,
     textarea {
       display: block;
       width: 100%;
-      padding: 0.3rem 0.5rem;
+      padding: $form-item-input-padding;
       color: $main-color;
-      font-size: 2rem;
-      line-height: 2rem;
+      font-size: $form-item-font-size;
+      line-height: $form-item-line-height;
       border: none;
       outline: none;
       box-sizing: border-box;
@@ -149,8 +152,10 @@ export default {
     }
     label {
       position: absolute;
-      top: 1rem;
+      top: $form-item-input-padding;
       left: 0.5rem;
+      font-size: $form-item-font-size;
+      line-height: $form-item-line-height;
       pointer-events: none;
       transition: transform 0.3s;
       span {
@@ -171,9 +176,6 @@ export default {
       transition: transform 0.3s;
     }
   }
-  .sg-form-item + .sg-form-item {
-    margin-top: 2rem;
-  }
 
   .sg-form-item.sg-focus-within {
     &::after {
@@ -185,14 +187,13 @@ export default {
   .sg-form-item.sg-form-value,
   .sg-form-item.sg-focus-within {
     label {
-      transform: translateY(-150%);
+      transform: translateY(-100%);
     }
   }
 
   .sg-label-required::before {
-    content: "*";
-    color: $error-color;
-    padding-right: 2px;
+    content: "•";
+    color: $color-required;
   }
 }
 </style>
