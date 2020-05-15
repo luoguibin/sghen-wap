@@ -196,16 +196,24 @@ export default {
       // console.log(`scrollEl.clientHeight=${scrollEl.clientHeight}, scrollEl.scrollHeight=${scrollEl.scrollHeight}`)
       // console.log('')
 
+      // if (this.preLogMsg !== this.logMsg) {
+      //   console.log('onMouseMove', this.logMsg)
+      // }
+      // this.preLogMsg = this.logMsg
+
       let tempY = this.translateY
       if (scrollTop === 0) {
         // 可进入下拉，translateY应该为正数
-        if (yValue > 0) {
-          e.preventDefault()
-          e.stopPropagation()
-        }
         tempY += yValue
         tempY = Math.max(tempY, 0)
-        tempY = Math.min(tempY, sliceHeight * 3)
+        tempY = Math.min(tempY, sliceHeight * 2)
+
+        if (tempY > 0) {
+          this.isStopPropagation = true
+          this.logMsg = `下拉过程中：sg-scroll-slice可见`
+        } else {
+          this.logMsg = `下拉过程中：sg-scroll-slice不可见`
+        }
 
         this.isPullHanding = tempY > sliceHeight * 0.75
         this.topScale = Math.max(1, tempY / sliceHeight)
@@ -214,21 +222,35 @@ export default {
         // 不同浏览器的dom计算不精确
         // 可进入上拉，translateY应该为负数
         tempY += yValue
-        tempY = Math.max(tempY, -sliceHeight * 3)
+        tempY = Math.max(tempY, -sliceHeight * 2)
         tempY = Math.min(tempY, 0)
+
+        if (tempY < 0) {
+          this.isStopPropagation = true
+          this.logMsg = `上拉过程中：sg-scroll-slice可见`
+        } else {
+          this.logMsg = `上拉过程中：sg-scroll-slice可见`
+        }
 
         this.isPullHanding = tempY < -sliceHeight * 0.75
         this.bottomScale = Math.max(1, -tempY / sliceHeight)
         this.pullStatus = PULL_UP
       } else {
+        this.logMsg = `普通拖动`
         // 默认区域上下滑动
         tempY = 0
       }
       this.translateY = tempY
+
+      if (this.isStopPropagation) {
+        e.preventDefault()
+        e.stopPropagation()
+      }
     },
     onMouseUp (e) {
       // e.preventDefault()
       // e.stopPropagation()
+      this.isStopPropagation = false
       if (!this.moveHandle) {
         return
       }
