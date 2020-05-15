@@ -1,6 +1,6 @@
 <template>
   <transition name="confirm">
-    <div class="sg-confirm-mask" v-show="visible">
+    <div class="sg-mask" v-show="visible">
       <div class="sg-confirm">
         <div class="sg-confirm-title">{{title}}</div>
         <div class="sg-confirm-content">
@@ -63,19 +63,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/colors.scss";
-@import "../style/size.scss";
+@import "../style/const.scss";
 
-.sg-confirm-mask {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
 .sg-confirm {
   position: absolute;
   top: 50%;
@@ -89,36 +78,35 @@ export default {
   textarea {
     display: block;
     width: 100%;
-    padding: 0.3rem 0.5rem;
-    color: $main-color;
+    padding: $padding-small;
     font-size: $size-text;
     line-height: $height-text;
     border: none;
     outline: none;
     box-sizing: border-box;
     background-color: transparent;
-    border-bottom: 2px solid $border-color;
+    border-bottom: 2px solid $color-border;
   }
 
   .sg-confirm-title {
-    padding: 1rem;
     text-align: center;
-    color: $title-color;
+    color: $color-title;
     font-size: $size-title;
     font-weight: bold;
+    line-height: $height-title + 1rem;
   }
   .sg-confirm-content {
     padding: 2px 1rem 2rem;
     text-align: center;
-    color: $content-color;
-    font-size: $size-option;
-    line-height: $height-option;
+    color: $color-text;
+    font-size: $size-text;
+    line-height: $height-text;
   }
   .sg-confirm-options {
     display: flex;
     align-items: center;
-    line-height: 4rem;
-    border-top: 1px solid $border-color;
+    line-height: 3.3rem;
+    border-top: 1px solid $color-border;
     div {
       flex: 1;
       text-align: center;
@@ -127,18 +115,20 @@ export default {
       display: inline-block;
       width: 1px;
       height: 3rem;
-      background-color: $border-color;
+      background-color: $color-border;
     }
     button {
-      font-size: 1.6rem;
-      border: none;
+      font-size: $size-text;
       background-color: transparent;
     }
     .cancel {
-      color: $title-color;
+      color: $color-tip;
     }
     .confirm {
-      color: $main-color;
+      color: $color-theme;
+      &:active {
+        color: $color-theme-active;
+      }
     }
   }
 }

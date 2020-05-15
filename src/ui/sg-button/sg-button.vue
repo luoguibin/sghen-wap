@@ -36,14 +36,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../style/colors.scss';
-@import '../style/size.scss';
+@import '../style/const.scss';
 
 .sg-button {
   padding: 0 $padding-normal;
   font-size: $size-text;
+  line-height: $height-text * 1.5;
   border-radius: 0.3rem;
-  line-height: $height-option;
 
   i {
     display: inline-block;
@@ -51,7 +50,7 @@ export default {
     height: 1rem;
     margin-right: 0.5rem;
     border-radius: 50%;
-    border: 2px solid $main-color;
+    border: 2px solid $color-theme;
     border-left-color: transparent;
     animation: sg-rotate 1s infinite linear;
   }
@@ -60,24 +59,39 @@ export default {
 .sg-button-default {
   display: block;
   width: 100%;
+  color: $color-text;
+  background-color: $color-bg;
+  &:active {
+    background-color: mix($color-bg, $color-theme, 90%);
+    color: $color-theme-active;
+  }
+  &:disabled {
+    background-color: $color-theme-disabled;
+  }
 }
 
 .sg-button-text {
   display: inline-block;
   padding: 0;
-  color: $main-color;
+  color: $color-theme;
+  &:active {
+    color: $color-theme-active;
+  }
+  &:disabled {
+    color: $color-theme-disabled;
+  }
 }
 
 .sg-button-primary {
   display: block;
   width: 100%;
   color: white;
-  background-color: $main-color;
+  background-color: $color-theme;
   &:active {
-    background-color: $main-active-color;
+    background-color: $color-theme-active;
   }
   &:disabled {
-    background-color: $main-disabled-color;
+    background-color: $color-theme-disabled;
   }
   i {
     border: 2px solid white;

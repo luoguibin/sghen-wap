@@ -125,8 +125,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/colors.scss";
-@import "../style/size.scss";
+@import "../style/const.scss";
 
 $form-item-font-size: $size-text;
 $form-item-line-height: $height-text;
@@ -136,13 +135,13 @@ $form-item-input-padding: 0.5rem;
   .sg-form-item {
     position: relative;
     margin-top: $form-item-line-height;
-    border-bottom: 2px solid $border-color;
+    border-bottom: 2px solid $color-border;
     input,
     textarea {
       display: block;
       width: 100%;
       padding: $form-item-input-padding;
-      color: $main-color;
+      color: $color-text;
       font-size: $form-item-font-size;
       line-height: $form-item-line-height;
       border: none;
@@ -158,9 +157,10 @@ $form-item-input-padding: 0.5rem;
       line-height: $form-item-line-height;
       pointer-events: none;
       transition: transform 0.3s;
+      color: $color-tip;
       span {
         padding-left: 1rem;
-        color: $error-color;
+        color: $color-error;
       }
     }
     &::after {
@@ -171,7 +171,7 @@ $form-item-input-padding: 0.5rem;
       bottom: -2px;
       width: 100%;
       height: 2px;
-      background-color: $border-color;
+      background-color: $color-border;
       transform: scaleX(0);
       transition: transform 0.3s;
     }
@@ -179,7 +179,7 @@ $form-item-input-padding: 0.5rem;
 
   .sg-form-item.sg-focus-within {
     &::after {
-      background-color: $main-color;
+      background-color: $color-theme;
       transform: scaleX(1);
     }
   }

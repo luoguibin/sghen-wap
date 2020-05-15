@@ -325,7 +325,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '../style/size.scss';
+@import '../style/const.scss';
 
 .sg-time {
   font-size: $size-option;
@@ -346,8 +346,10 @@ export default {
     overflow: hidden;
   }
   .sg-time-item {
-    line-height: $height-text;
     padding: 0 0.3rem;
+    color: $color-text;
+    font-size: $size-text;
+    line-height: $height-text;
   }
 
   .sg-flex {

@@ -53,11 +53,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/size.scss";
+@import "../style/const.scss";
 
 .sg-header {
   padding: 0 $padding-normal;
   height: $height-title;
+  color: $color-text;
   line-height: $height-title;
   align-items: center;
   .back {
@@ -73,6 +74,7 @@ export default {
   }
   .center {
     flex: 3;
+    color: $color-title;
     text-align: center;
     font-size: $size-title;
     font-weight: bold;

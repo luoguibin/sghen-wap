@@ -28,7 +28,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/size.scss";
+@import "../style/const.scss";
 
 .sg-toast {
   position: fixed;
@@ -37,10 +37,10 @@ export default {
   color: white;
   font-size: $size-text;
   line-height: $height-text;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: $color-mask;
   border-radius: 0.6rem;
   transform: translateX(-50%);
-  z-index: $z-index-999
+  z-index: $z-index-high;
 }
 .sg-toast-top {
   top: 2rem;

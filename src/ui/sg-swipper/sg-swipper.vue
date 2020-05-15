@@ -166,7 +166,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/colors.scss";
+@import "../style/const.scss";
 
 .sg-swipper {
   position: relative;
@@ -194,20 +194,20 @@ export default {
   .sg-swipper-pointers {
     position: absolute;
     left: 50%;
-    bottom: 1rem;
+    bottom: 0.2rem;
     transform: translate(-50%, 0);
     .pointer {
       display: inline-block;
       width: 0.5rem;
       height: 0.5rem;
       border-radius: 50%;
-      background-color: $main-disabled-color;
+      background-color: $color-theme-disabled;
     }
     .pointer + .pointer {
       margin-left: 1rem;
     }
     .pointer-active {
-      background-color: $main-active-color;
+      background-color: $color-theme-active;
     }
   }
 }

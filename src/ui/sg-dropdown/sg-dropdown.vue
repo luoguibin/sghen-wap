@@ -3,7 +3,7 @@
     :class="['sg-dropdown', optionsVisible ? 'sg-dropdown-active' : '', 'sg-dropdown_' + direction]"
   >
     <div class="sg-dropdown-label sg-flex" @click.stop="onToggle">
-      <div class="sg-flex-one sg-text-ellipsis">
+      <div class="sg-flex-one sg-ellipsis">
         <slot>
           <span
             :class="{'sg-dropdown-tip': !currentLabel, 'sg-dropdown-text': optionActive && !!currentLabel}"
@@ -17,7 +17,7 @@
         <div
           v-for="item in options"
           :key="item.value"
-          class="sg-dropdown-option sg-text-ellipsis"
+          class="sg-dropdown-option sg-ellipsis"
           :class="{'sg-dropdown-option_active': optionActive && currentValue === item.value}"
           @click.stop="onSelectOption(item, $event)"
         >{{item.label}}</div>
@@ -87,13 +87,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "../style/colors.scss";
-@import "../style/size.scss";
+@import "../style/const.scss";
 
 .sg-dropdown {
   position: relative;
   padding: $padding-small;
-  color: $content-color;
   background-color: white;
   .sg-flex {
     align-items: center;
@@ -102,7 +100,7 @@ export default {
     color: #aaa;
   }
   .sg-dropdown-text {
-    color: $main-color;
+    color: $color-theme;
   }
   .sg-dropdown-label {
     font-size: 1.4rem;
@@ -120,12 +118,12 @@ export default {
     right: 0;
     max-width: 50vw;
     min-width: 5rem;
-    padding: 1rem 0;
+    padding: $padding-normal 0;
     box-sizing: border-box;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     background-color: white;
     border-radius: 0.3rem;
-    z-index: $z-index-100;
+    z-index: $z-index-normal;
     .options-wrapper {
       padding: 0 1rem;
       max-height: 16rem;
@@ -137,7 +135,7 @@ export default {
     right: 1rem;
     width: 0;
     height: 0;
-    z-index: $z-index-100;
+    z-index: $z-index-normal;
     box-sizing: border-box;
     border-width: 1rem;
     border-style: solid;
@@ -145,14 +143,15 @@ export default {
   }
   .sg-dropdown-option {
     margin-bottom: 0.5rem;
-    line-height: 1.4;
-    font-size: 1.4rem;
+    line-height: $height-text;
+    font-size: $size-text;
+    color: $color-text;
     &:last-child {
       margin-bottom: 0;
     }
   }
   .sg-dropdown-option_active {
-    color: $main-color;
+    color: $color-theme;
   }
 }
 
