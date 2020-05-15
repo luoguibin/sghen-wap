@@ -63,7 +63,6 @@ export default {
   align-items: center;
   .back {
     display: inline-block;
-    font-size: $size-option;
     transform: rotate(90deg);
   }
 

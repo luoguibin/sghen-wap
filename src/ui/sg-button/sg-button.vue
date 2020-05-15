@@ -74,6 +74,7 @@ export default {
   display: inline-block;
   padding: 0;
   color: $color-theme;
+  line-height: $height-text;
   &:active {
     color: $color-theme-active;
   }

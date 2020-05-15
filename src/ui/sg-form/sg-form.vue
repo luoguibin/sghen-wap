@@ -132,6 +132,7 @@ $form-item-line-height: $height-text;
 $form-item-input-padding: 0.5rem;
 
 .sg-form {
+  padding: 0 $padding-normal;
   .sg-form-item {
     position: relative;
     margin-top: $form-item-line-height;
@@ -159,7 +160,7 @@ $form-item-input-padding: 0.5rem;
       transition: transform 0.3s;
       color: $color-tip;
       span {
-        padding-left: 1rem;
+        padding-left: 0.5rem;
         color: $color-error;
       }
     }
