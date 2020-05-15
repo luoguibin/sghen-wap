@@ -1,5 +1,5 @@
 <template>
-  <div class="comment-input-mask" v-show="visible" @click="onClose">
+  <div class="sg-mask comment-input-mask" v-show="visible" @click="onClose">
     <div class="comment-input" @click.stop="onNothing">
       <textarea ref="textarea" v-model="content" :placeholder="placeholder"></textarea>
       <sg-button
@@ -97,14 +97,6 @@ export default {
 <style lang="scss" scoped>
 .comment-input-mask {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 100;
-  background-color: rgba(0, 0, 0, 0.6);
 }
 .comment-input {
   position: fixed;

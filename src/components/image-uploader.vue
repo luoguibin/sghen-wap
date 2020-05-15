@@ -156,7 +156,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/ui/style/colors";
+@import "@/ui/style/const.scss";
 
 .image-uploader {
   position: relative;
@@ -199,7 +199,7 @@ export default {
     .progress-bar {
       width: 0;
       height: 8px;
-      background-color: $main-color;
+      background-color: $color-theme;
       border-radius: 3px;
       transition: width 300ms;
     }

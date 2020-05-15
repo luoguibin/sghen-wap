@@ -13,7 +13,7 @@
             <img :src="userAvatar | img-src" />
           </div>
         </sg-dropdown>
-        <span v-else @click="onGoLogin">登陆~</span>
+        <sg-button v-else type="text" @click="onGoLogin">登陆~</sg-button>
       </div>
     </sg-header>
 
@@ -38,12 +38,12 @@
           <p>
             本年度共创建
             <span>{{yearPeotryCount}}</span>首诗词，其中以选集
-            <span>【{{yearPoetrySets[0].name}}】</span>
+            <span>《{{yearPoetrySets[0].name}}》</span>
             {{yearPoetrySets[0].count}}首稳居榜首；
             <template v-if="yearPeots.length">
               诗词创建数量最多的是
-              <span>[{{yearPeots[0].username}}]</span> ，共创建
-              <span>{{yearPeots[0].count}}</span>首。
+              <span>[{{yearPeots[0].username}}]</span>
+              ，共创建{{yearPeots[0].count}}首。
             </template>
           </p>
         </div>
@@ -278,7 +278,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import "@/ui/style/colors";
+@import "@/ui/style/const.scss";
+
 .home {
   display: flex;
   flex-direction: column;
@@ -293,7 +294,7 @@ export default {
     }
     .user {
       display: inline-block;
-      color: $main-color;
+      color: $color-theme;
       span,
       img {
         vertical-align: middle;
@@ -344,18 +345,19 @@ export default {
     padding: 1rem;
     overflow: hidden;
     h2 {
-      color: $title-color;
+      color: $color-title;
     }
   }
 
   .year-info {
     p {
-      text-indent: 2em;
-      font-size: 1.2rem;
-      color: $content-color;
+      // text-indent: 2em;
+      font-size: $size-text;
+      line-height: $height-text;
+      color: $color-text;
     }
     span {
-      color: $main-focus-color;
+      color: $color-theme;
       font-weight: bold;
       white-space: nowrap;
     }
@@ -367,11 +369,12 @@ export default {
     > div {
       display: inline-block;
       margin: 1.2rem 1.2rem 0 0;
-      padding: 3px 8px;
-      color: #fff;
-      font-size: 1.2rem;
-      border-radius: 6px;
-      background-color: $main-color;
+      padding: 0 1rem;
+      color: $color-theme;
+      font-size: $size-text;
+      line-height: $height-text * 1.2;
+      border-radius: 1rem;
+      background-color: mix($color-theme, white, 25%);
     }
   }
 

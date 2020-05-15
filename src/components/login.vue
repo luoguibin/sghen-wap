@@ -1,8 +1,6 @@
 <template>
   <div class="login">
-    <sg-header @back="$router.go(-1)">
-      <span style="font-size: 1.6rem;">Sghen三行</span>
-    </sg-header>
+    <sg-header @back="$router.go(-1)">Sghen三行</sg-header>
     <sg-form ref="form" :formData="formData" :formRules="formRules">
       <div class="login-captcha" slot="captchaValue">
         <input v-model="formData.captchaValue" v-focus-within />
@@ -12,19 +10,35 @@
         <input v-model="formData.code" v-focus-within />
         <span class="code-divider"></span>
         <span v-show="countdown > 0" class="code-countdown">{{countdownText}}</span>
-        <sg-button v-show="countdown <= 0" :isLoading="smsLoading" @click="onGetSmsCode">获&nbsp;取</sg-button>
+        <sg-button
+          v-show="countdown <= 0"
+          type="text"
+          :isLoading="smsLoading"
+          @click="onGetSmsCode"
+        >获&nbsp;取</sg-button>
       </div>
       <div class="login-type" slot="loginType">
         <div class="left">
-          <sg-button v-show="formData.loginType !== 'create'" @click="onChangeLoginType('code')">{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
+          <sg-button
+            v-show="formData.loginType !== 'create'"
+            type="text"
+            @click="onChangeLoginType('code')"
+          >{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
         </div>
         <div class="right">
-          <sg-button v-show="formData.loginType !== 'code'" @click="onChangeLoginType('create')">{{formData.loginType === 'pw' ? '账号注册' : '已有账号？'}}</sg-button>
+          <sg-button
+            v-show="formData.loginType !== 'code'"
+            type="text"
+            @click="onChangeLoginType('create')"
+          >{{formData.loginType === 'pw' ? '账号注册' : '已有账号？'}}</sg-button>
         </div>
       </div>
-      <sg-button class="login-button" type="primary" :isLoading="isRequesting" @click="onSubmit">
-        {{formData.loginType === 'create' ? '注&nbsp;&nbsp;册' : '登&nbsp;&nbsp;录'}}
-      </sg-button>
+      <sg-button
+        class="login-button"
+        type="primary"
+        :isLoading="isRequesting"
+        @click="onSubmit"
+      >{{formData.loginType === 'create' ? '注&nbsp;&nbsp;册' : '登&nbsp;&nbsp;录'}}</sg-button>
     </sg-form>
   </div>
 </template>
@@ -206,18 +220,20 @@ export default {
           captchaId: this.captcha.id,
           captchaValue: this.formData.captchaValue
         }
-        apiPostData(apiURL.smsCode, params).then(() => {
-          this.countdown = 60
-          clearInterval(this.countdownHandle)
-          this.countdownHandle = setInterval(() => {
-            this.countdown--
-            if (this.countdown === 0) {
-              clearInterval(this.countdownHandle)
-            }
-          }, 1000)
-        }).finally(() => {
-          this.smsLoading = false
-        })
+        apiPostData(apiURL.smsCode, params)
+          .then(() => {
+            this.countdown = 60
+            clearInterval(this.countdownHandle)
+            this.countdownHandle = setInterval(() => {
+              this.countdown--
+              if (this.countdown === 0) {
+                clearInterval(this.countdownHandle)
+              }
+            }, 1000)
+          })
+          .finally(() => {
+            this.smsLoading = false
+          })
       })
     },
 
@@ -241,17 +257,19 @@ export default {
         }
 
         const method = loginType === 'create' ? this.createUser : this.login
-        method(params).then(() => {
-          this.$toast('登录成功')
-          const redirect = this.$route.query.redirect
-          if (redirect) {
-            this.$router.push({ path: redirect })
-          } else {
-            this.$router.push({ name: 'home' })
-          }
-        }).finally(() => {
-          this.isRequesting = false
-        })
+        method(params)
+          .then(() => {
+            this.$toast('登录成功')
+            const redirect = this.$route.query.redirect
+            if (redirect) {
+              this.$router.push({ path: redirect })
+            } else {
+              this.$router.push({ name: 'home' })
+            }
+          })
+          .finally(() => {
+            this.isRequesting = false
+          })
       })
     },
 
@@ -267,6 +285,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .login {
   .sg-header {
     margin-bottom: 2rem;
@@ -297,12 +317,6 @@ export default {
       width: 6rem;
       color: rgb(167, 167, 167);
     }
-    .sg-button {
-      width: 6rem;
-      font-size: 1.3rem;
-      padding-right: 0;
-      padding-left: 0;
-    }
   }
   .login-type {
     display: flex;
@@ -315,12 +329,6 @@ export default {
     .left {
       flex: 1;
       text-align: left;
-    }
-    .sg-button {
-      display: inline-block;
-      width: inherit;
-      padding: 0.5rem 0;
-      font-size: 1.2rem;
     }
   }
   .login-button {
