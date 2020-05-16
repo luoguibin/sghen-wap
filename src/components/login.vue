@@ -290,9 +290,6 @@ export default {
 @import "@/ui/style/const.scss";
 
 .login {
-  .sg-header {
-    margin-bottom: 2rem;
-  }
   .login-captcha {
     display: flex;
     flex-direction: row;
