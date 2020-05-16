@@ -57,9 +57,9 @@ export default {
 
 .sg-header {
   padding: 0 $padding-normal;
-  height: $height-title;
+  height: $height-title * 1.5;
   color: $color-text;
-  line-height: $height-title;
+  line-height: $height-title * 1.5;
   align-items: center;
   .back {
     display: inline-block;
