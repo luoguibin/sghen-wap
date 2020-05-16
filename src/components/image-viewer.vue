@@ -160,6 +160,7 @@ export default {
 <style lang="scss">
 .image-viewer {
   .sg-header .left {
+    color: white;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
