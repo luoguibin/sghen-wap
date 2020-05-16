@@ -1,45 +1,47 @@
 <template>
-  <div class="login">
+  <div class="login sg-flex-column">
     <sg-header @back="$router.go(-1)">Sghen三行</sg-header>
-    <sg-form ref="form" :formData="formData" :formRules="formRules">
-      <div class="login-captcha" slot="captchaValue">
-        <input v-model="formData.captchaValue" v-focus-within />
-        <img v-if="captcha.id" :src="captcha.base64" @click="onGetCaptcha" />
-      </div>
-      <div class="login-code" slot="code">
-        <input v-model="formData.code" v-focus-within />
-        <span class="code-divider"></span>
-        <span v-show="countdown > 0" class="code-countdown">{{countdownText}}</span>
+    <div class="sg-flex-one" style="overflow-y: auto;">
+      <sg-form ref="form" :formData="formData" :formRules="formRules">
+        <div class="login-captcha" slot="captchaValue">
+          <input v-model="formData.captchaValue" v-focus-within />
+          <img v-if="captcha.id" :src="captcha.base64" @click="onGetCaptcha" />
+        </div>
+        <div class="login-code" slot="code">
+          <input v-model="formData.code" v-focus-within />
+          <span class="code-divider"></span>
+          <span v-show="countdown > 0" class="code-countdown">{{countdownText}}</span>
+          <sg-button
+            v-show="countdown <= 0"
+            type="text"
+            :isLoading="smsLoading"
+            @click="onGetSmsCode"
+          >获&nbsp;取</sg-button>
+        </div>
+        <div class="login-type" slot="loginType">
+          <div class="left">
+            <sg-button
+              v-show="formData.loginType !== 'create'"
+              type="text"
+              @click="onChangeLoginType('code')"
+            >{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
+          </div>
+          <div class="right">
+            <sg-button
+              v-show="formData.loginType !== 'code'"
+              type="text"
+              @click="onChangeLoginType('create')"
+            >{{formData.loginType === 'pw' ? '账号注册' : '已有账号？'}}</sg-button>
+          </div>
+        </div>
         <sg-button
-          v-show="countdown <= 0"
-          type="text"
-          :isLoading="smsLoading"
-          @click="onGetSmsCode"
-        >获&nbsp;取</sg-button>
-      </div>
-      <div class="login-type" slot="loginType">
-        <div class="left">
-          <sg-button
-            v-show="formData.loginType !== 'create'"
-            type="text"
-            @click="onChangeLoginType('code')"
-          >{{formData.loginType === 'pw' ? '短信登陆' : '密码登陆'}}</sg-button>
-        </div>
-        <div class="right">
-          <sg-button
-            v-show="formData.loginType !== 'code'"
-            type="text"
-            @click="onChangeLoginType('create')"
-          >{{formData.loginType === 'pw' ? '账号注册' : '已有账号？'}}</sg-button>
-        </div>
-      </div>
-      <sg-button
-        class="login-button"
-        type="primary"
-        :isLoading="isRequesting"
-        @click="onSubmit"
-      >{{formData.loginType === 'create' ? '注&nbsp;&nbsp;册' : '登&nbsp;&nbsp;录'}}</sg-button>
-    </sg-form>
+          class="login-button"
+          type="primary"
+          :isLoading="isRequesting"
+          @click="onSubmit"
+        >{{formData.loginType === 'create' ? '注&nbsp;&nbsp;册' : '登&nbsp;&nbsp;录'}}</sg-button>
+      </sg-form>
+    </div>
   </div>
 </template>
 
@@ -285,7 +287,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
 .login {
   .sg-header {
