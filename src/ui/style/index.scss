@@ -28,6 +28,7 @@ div, p, span, a {
     flex-direction: row;
 }
 .sg-flex-column {
+    display: flex;
     flex-direction: column;
     height: 100%;
     .sg-flex-one {
