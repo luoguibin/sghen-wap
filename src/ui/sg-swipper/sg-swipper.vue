@@ -132,11 +132,11 @@ export default {
       }
       const clientX = e.touches[0].clientX
       this.translateX += clientX - this.previouseX
-      if (this.translateX > 200) {
-        this.translateX = 200
+      if (this.translateX > 100) {
+        this.translateX = 100
       } else {
         const wrapperEl = this.$refs.wrapper
-        const maxWidth = this.items.length * wrapperEl.clientWidth - 200
+        const maxWidth = this.items.length * wrapperEl.clientWidth - 100
         if (this.translateX < -maxWidth) {
           this.translateX = -maxWidth
         }
@@ -149,9 +149,11 @@ export default {
       }
 
       const itemWidth = this.$refs.wrapper.clientWidth
-      const index = Math.floor(
+      // todo: 优化
+      let index = Math.floor(
         Math.abs(this.translateX - itemWidth / 2) / itemWidth
       )
+      index = index === this.items.length ? index - 1 : index
       this.setCurrentIndex(index)
 
       this.isTouching = false
