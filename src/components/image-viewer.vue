@@ -1,16 +1,24 @@
 <template>
   <div class="sg-mask image-viewer-mask" v-show="visible">
     <div class="image-viewer">
-      <div class="image-viewer-header">
-        <div class="back" @click="$emit('update:visible', false)">
-          <i class="iconfont icon-down"></i>
-        </div>
-        <span></span>
-        <div class="image-name">{{currentName}}</div>
-      </div>
+      <sg-header @back="$emit('update:visible', false)" :centerStatus="''" :rightStatus="''">
+        <span slot="left">{{currentName}}</span>
+      </sg-header>
       <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
-        <sg-swipper v-if="visible" ref="swipper" :index="index" :items="swipperItems" :auto="false" @change="hanleChange">
-          <div v-for="(item, index) in imageOptions" :key="index" :slot="'img-' + index" class="image-wrapper">
+        <sg-swipper
+          v-if="visible"
+          ref="swipper"
+          :index="index"
+          :items="swipperItems"
+          :auto="false"
+          @change="hanleChange"
+        >
+          <div
+            v-for="(item, index) in imageOptions"
+            :key="index"
+            :slot="'img-' + index"
+            class="image-wrapper"
+          >
             <img v-if="item.visible" :src="item.src" />
           </div>
         </sg-swipper>
@@ -107,33 +115,12 @@ export default {
   position: relative;
   height: 100%;
   box-sizing: border-box;
-  .image-viewer-header {
+  .sg-header {
     position: absolute;
     z-index: 10;
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    padding: 1rem;
-    box-sizing: border-box;
-    font-size: 1.8rem;
-    color: white;
-    div {
-      display: inline-block;
-    }
-    .back {
-      transform: rotate(90deg);
-      .iconfont {
-        font-size: inherit;
-      }
-    }
-    .image-name {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
     span {
-      padding: 0 0.5rem;
+      margin-left: 0.5rem;
     }
   }
   .image-viewer-footer {
@@ -172,6 +159,11 @@ export default {
 
 <style lang="scss">
 .image-viewer {
+  .sg-header .left {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   .sg-swipper {
     height: 100%;
     .sg-swipper-item {

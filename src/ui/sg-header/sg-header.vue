@@ -61,6 +61,7 @@ export default {
   color: $color-text;
   line-height: $height-title * 1.5;
   align-items: center;
+  box-sizing: border-box;
   .back {
     display: inline-block;
     transform: rotate(90deg);
