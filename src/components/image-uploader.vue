@@ -110,7 +110,6 @@ export default {
       if (this.isUploading) {
         return
       }
-      this.isUploading = true
 
       if (!this.imageDatas.length) {
         this.$emit('success', [])
@@ -129,6 +128,7 @@ export default {
       })
 
       this.progress = '0%'
+      this.isUploading = true
       apiPostUpload(apiURL.upload, form, { pathType: 'peotry' }, e => {
         this.progress = Math.floor(e.loaded / e.total * 100) + '%'
       })
