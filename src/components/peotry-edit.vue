@@ -297,7 +297,7 @@ export default {
   }
 
   .set-item {
-    padding: 0.5rem 0 0.5rem 1rem;
+    padding: 0.5rem 0;
     span {
       display: block;
       padding: 0.5rem 1rem;
