@@ -3,7 +3,7 @@
  * @param {*} src
  * @param {*} maxSize
  */
-export const resizeImage = function (src, type, maxSize = 800 * 600) {
+export const resizeImage = function (src, maxSize = 800 * 600) {
   return new Promise(function (resolve, reject) {
     const image = new Image()
     image.onload = function () {
@@ -23,7 +23,7 @@ export const resizeImage = function (src, type, maxSize = 800 * 600) {
       const ctx = canvas.getContext('2d')
       ctx.clearRect(0, 0, newWidth, newHeight)
       ctx.drawImage(image, 0, 0, image.width, image.height, 0, 0, newWidth, newHeight)
-      resolve(canvas.toDataURL('image/' + type, 1.0))
+      resolve(canvas.toDataURL())
     }
     image.onerror = function () {
       reject(src)

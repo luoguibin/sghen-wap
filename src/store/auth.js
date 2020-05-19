@@ -64,6 +64,17 @@ export default {
         }
       })
     },
+    update (context, { name, avatar }) {
+      return apiPostData(apiURL.userUpdate, { name, avatar }).then(resp => {
+        const temp = sessionStorage.getItem('sghen_user_info')
+        if (temp) {
+          const userinfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
+          userinfo.username = name
+          userinfo.avatar = avatar
+          context.commit('setUserInfo', userinfo)
+        }
+      })
+    },
     logout (context) {
       context.commit('setUserInfo')
     }

@@ -38,7 +38,7 @@ export const apiPostUpload = (url, data, params, call) =>
     timeout: 60 * 1000,
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: e => {
-      call(e)
+      call && call(e)
     }
   })
 
@@ -50,6 +50,7 @@ export const apiURL = {
   // 用户登陆
   login: `${preffix}/v1/user/login`,
   userCreate: `${preffix}/v1/user/create`,
+  userUpdate: `${preffix}/v1/user/update`,
   // 校验码
   captcha: `${preffix}/v1/sms/captcha`,
   // 验证码

@@ -27,7 +27,8 @@
           <i>:</i>
         </span>
         <div>
-          <img :src="personalAvatar | img-src" />
+          <img v-if="isAvatarBase64" :src="personalAvatar" />
+          <img v-else :src="personalAvatar | img-src" />
           <sg-button v-if="isEditing" type="text" @click="onOpenChangeAvatar">更换</sg-button>
         </div>
       </div>
@@ -43,23 +44,43 @@
         <sg-button @click="onLogout">退&nbsp;出&nbsp;登&nbsp;陆</sg-button>
       </div>
     </div>
+
+    <!-- 头像编辑 -->
+    <div class="sg-mask" v-if="imageEditorVisible">
+      <div class="sg-flex-column">
+        <sg-header style="color: white" @back="handleAvatarBack" :centerStatus="''">
+          <template slot="left">头像编辑</template>
+          <sg-button type="text" slot="right" @click="onConfirmAvatar">确定</sg-button>
+        </sg-header>
+        <image-editor ref="imageEditor" class="sg-flex-one" :autoOpen="true"></image-editor>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { base64ToFile } from '@/common/image'
+import { apiURL, apiPostUpload } from '@/api'
 import Cache from '@/common/cache-center'
 
 export default {
   name: 'Personal',
+
+  components: {
+    ImageEditor: () => import('@/components/image-editor')
+  },
 
   data () {
     return {
       personalID: 0,
       personalName: '',
       personalAvatar: '',
+      isAvatarBase64: false,
 
-      isEditing: false
+      isEditing: false,
+
+      imageEditorVisible: false
     }
   },
 
@@ -105,6 +126,7 @@ export default {
         this.personalName = info.username
         this.personalAvatar = info.avatar
       }
+      this.isAvatarBase64 = false
     },
     getPersonalPeotryInfo () {},
 
@@ -120,20 +142,59 @@ export default {
     },
 
     onOpenChangeAvatar () {
-      this.$toast('正在码...')
+      this.imageEditorVisible = true
+    },
+    handleAvatarBack () {
+      this.imageEditorVisible = false
+    },
+    onConfirmAvatar () {
+      if (this.isAvatarUploading) {
+        return
+      }
+      this.isAvatarUploading = true
+      this.$refs.imageEditor.getImage(base64 => {
+        this.personalAvatar = base64
+        this.isAvatarBase64 = true
+
+        const formData = new FormData()
+        formData.append(
+          'file',
+          base64ToFile(base64, this.personalID + '-avatar.png')
+        )
+        apiPostUpload(apiURL.upload, formData, { pathType: 'icon' })
+          .then(resp => {
+            this.personalAvatar = resp.data[0]
+            this.isAvatarBase64 = false
+          })
+          .finally(() => {
+            this.imageEditorVisible = false
+            this.isAvatarUploading = false
+          })
+      })
     },
     onEditOrSave () {
       if (this.isEditing) {
         if (this.hasEditChange()) {
-          this.$toast('正在码...')
+          if (this.isAvatarBase64) {
+            return
+          }
+          this.update({
+            name: this.personalName,
+            avatar: this.personalAvatar
+          }).then(resp => {
+            this.$toast('保存成功')
+            this.isEditing = false
+          })
+        } else {
+          this.isEditing = false
         }
       } else {
         this.saveData = {
           personalName: this.personalName,
           personalAvatar: this.personalAvatar
         }
+        this.isEditing = true
       }
-      this.isEditing = !this.isEditing
     },
     onBack () {
       if (this.isEditing) {
@@ -155,10 +216,17 @@ export default {
       }
     },
     onLogout () {
-      this.logout()
+      this.$confirm({
+        title: '提示',
+        content: '退出后将清空本地信息，是否退出？',
+        confirm: () => {
+          this.logout()
+        }
+      })
     },
     ...mapActions({
-      logout: 'auth/logout'
+      logout: 'auth/logout',
+      update: 'auth/update'
     })
   }
 }
