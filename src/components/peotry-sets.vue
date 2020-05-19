@@ -61,7 +61,10 @@ export default {
     getPeotSets (selectLast) {
       apiGetData(apiURL.peotSets, { userId: this.userID }).then(resp => {
         const selfId = this.userID
-        this.sets = resp.data.map(o => {
+        const sortFunc = function (o0, o1) {
+          return o0.userId < o1.userId ? -1 : 1
+        }
+        this.sets = resp.data.sort(sortFunc).map(o => {
           return {
             id: o.id,
             name: o.name,
