@@ -542,6 +542,7 @@ export default {
     height: 100%;
     padding: 1rem;
     box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 }

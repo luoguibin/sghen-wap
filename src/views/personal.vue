@@ -218,7 +218,7 @@ export default {
     onLogout () {
       this.$confirm({
         title: '提示',
-        content: '退出后将清空本地信息，是否退出？',
+        content: '退出后需要重新登录验证',
         confirm: () => {
           this.logout()
         }
@@ -233,6 +233,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .personal {
   .personal-main {
     padding: 1rem;
@@ -240,33 +242,32 @@ export default {
   .info-item {
     display: flex;
     flex-direction: row;
-    overflow: hidden;
-    margin-bottom: 1.6rem;
+    height: $height-text;
+    line-height: $height-text;
+    margin-bottom: 1.5rem;
     > span {
       display: inline-block;
       width: 6rem;
       padding-right: 1rem;
+      color: $color-tip;
       text-align: right;
-      font-size: 1.2rem;
-      color: #555;
+      font-size: $size-text;
     }
     > div {
       flex: 1;
       font-size: 1.2rem;
+      color: $color-text;
     }
   }
   .avatar-item {
     img {
       display: inline-block;
-      width: 2rem;
-      height: 2rem;
+      width: $height-text;
+      height: $height-text;
       vertical-align: top;
     }
     .sg-button {
-      font-size: 1.2rem;
       margin-left: 2rem;
-      line-height: 2rem;
-      color: rgb(61, 104, 139);
     }
   }
   .logout-item {
@@ -282,14 +283,17 @@ export default {
     input {
       display: block;
       width: 100%;
-      padding: 0.3rem 0.5rem;
-      font-size: 1.2rem;
-      line-height: 1.5rem;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
+      padding: 0 $padding-small;
+      font-size: $size-text;
+      line-height: $height-text;;
+      border: none;
+      border-bottom: 1px solid #ddd;
       outline: none;
       box-sizing: border-box;
       background-color: transparent;
+      &:focus {
+        border-bottom-color: $color-theme-focus;
+      }
     }
   }
 }

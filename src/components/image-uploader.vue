@@ -241,7 +241,7 @@ export default {
     height: 100%;
     overflow: hidden;
     box-sizing: border-box;
-    border: 1px solid gray;
+    border: 1px solid $color-border;
     border-radius: 5px;
   }
 }

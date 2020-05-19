@@ -222,6 +222,7 @@ export default {
   padding: 1rem 0;
   box-sizing: border-box;
   background-color: #eeeeee;
+  overflow-x: hidden;
   overflow-y: auto;
   .item {
     margin-bottom: 2rem;

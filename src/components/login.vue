@@ -1,7 +1,7 @@
 <template>
   <div class="login sg-flex-column">
     <sg-header @back="$router.go(-1)">Sghen三行</sg-header>
-    <div class="sg-flex-one" style="overflow-y: auto;">
+    <div class="sg-flex-one" style="overflow-x: hidden; overflow-y: auto;">
       <sg-form ref="form" :formData="formData" :formRules="formRules">
         <div class="login-captcha" slot="captchaValue">
           <input v-model="formData.captchaValue" v-focus-within />

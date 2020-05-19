@@ -315,6 +315,7 @@ export default {
     overflow: hidden;
     .scroll {
       height: 100%;
+      overflow-x: hidden;
       overflow-y: auto;
     }
   }

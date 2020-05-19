@@ -1,6 +1,6 @@
 <template>
-  <div class="sg-mask dialog-mask">
-    <div class="dialog-wrapper">
+  <div class="sg-mask">
+    <div class="peotry-edit-wrapper">
       <div class="peotry-edit">
         <sg-header @back="$emit('close')">
           <span style="font-size: 1.6rem;">诗词{{peotry ? '更新':'创建'}}</span>
@@ -9,14 +9,8 @@
         <div class="main">
           <div class="main-wrapper">
             <sg-form ref="form" :formData="formData" :formRules="formRules">
-              <div slot="setId" class="peotry-item set">
-                <sg-dropdown
-                  ref="dropdown"
-                  :options="setOptions"
-                  :optionActive="true"
-                  @change="handleDropdown"
-                ></sg-dropdown>
-                <span class="iconfont icon-increase" @click="onNewSet"></span>
+              <div slot="setId" class="set-item">
+                <sg-button type="text" @click="onOpenSetChoice">{{ setName ? setName : '选择'}}</sg-button>
               </div>
 
               <div v-if="!formData.id" slot="imageNames" class="petory-item">
@@ -35,18 +29,24 @@
         </div>
       </div>
     </div>
+
+    <!-- 选集选择 -->
+    <div v-show="peotrySetsVisible" class="peotry-sets-wrapper">
+      <peotry-sets :defId="formData.setId" @back="peotrySetsVisible = false" @select="handleSetSelect"></peotry-sets>
+    </div>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
-import { apiURL, apiGetData, apiPostData } from '@/api'
+import { apiURL, apiPostData } from '@/api'
 
 export default {
   name: 'PeotryEdit',
 
   components: {
-    'image-uploader': () => import('@/components/image-uploader')
+    'image-uploader': () => import('@/components/image-uploader'),
+    'peotry-sets': () => import('@/components/peotry-sets')
   },
 
   props: {
@@ -121,7 +121,8 @@ export default {
         }
       ],
 
-      setOptions: [],
+      setName: '',
+      peotrySetsVisible: false,
       isSaveing: false
     }
   },
@@ -136,7 +137,6 @@ export default {
   created () {
     window.peotryEdit = this
     this.initFormData()
-    this.getPeotSets()
   },
 
   methods: {
@@ -146,65 +146,23 @@ export default {
         const data = this.formData
         data.id = peotry.id
         data.setId = peotry.set && peotry.set.id
-        data.setName = peotry.set && peotry.set.name
         data.title = peotry.title
         data.content = peotry.content
         data.end = peotry.end
 
+        this.setName = peotry.set && peotry.set.name
         this.formRules[this.formRules.length - 1].hidden = true
       }
     },
-    getPeotSets (isLast) {
-      apiGetData(apiURL.peotSets, { userId: this.userID }).then(resp => {
-        const options = resp.data.map(o => {
-          return {
-            label: o.name,
-            value: o.id
-          }
-        })
-        this.setOptions = options
-        if (isLast) {
-          this.$refs.dropdown.setSelectOption(options[options.length - 1])
-        } else {
-          const peotry = this.peotry
-          if (peotry && peotry.id && peotry.set) {
-            const { id, name } = peotry.set
-            this.$refs.dropdown.setSelectOption({ value: id, label: name })
-          }
-        }
-      })
+    onOpenSetChoice () {
+      this.peotrySetsVisible = true
     },
-    handleDropdown (key) {
-      this.formData.setId = key
+    handleSetSelect ({ id, name }) {
+      this.formData.setId = id
+      this.setName = name
+      this.peotrySetsVisible = false
     },
-    onNewSet () {
-      this.$confirm({
-        title: '选集创建',
-        type: 'input',
-        placeholder: '请输入选集名',
-        validator: v => {
-          if (!v) {
-            this.$toast('请输入选集名')
-            return '请输入选集名'
-          }
-          if (v.length > 20) {
-            this.$toast('选集名长度不能超过20个字符')
-            return '选集名长度不能超过20个字符'
-          }
-          const o = this.setOptions.find(o => o.label === v)
-          if (o) {
-            this.$toast('选集名重复')
-            return '选集名重复'
-          }
-          return ''
-        },
-        confirm: v => {
-          apiPostData(apiURL.peotSetCreate, { name: v }).then(resp => {
-            this.getPeotSets(true)
-          })
-        }
-      })
-    },
+
     handleUpload (images = []) {
       if (images.length) {
         this.formData.imageNames = JSON.stringify(images)
@@ -226,8 +184,13 @@ export default {
           return
         }
         this.isSaveing = true
-        // 调用上传，产生回调事件
-        this.$refs.uploader.start()
+
+        if (!this.formData.id) {
+          // 调用上传，产生回调事件
+          this.$refs.uploader.start()
+        } else {
+          this.handleUpload()
+        }
       })
     },
 
@@ -262,14 +225,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.dialog-mask {
-  .dialog-wrapper {
+.sg-mask {
+  .peotry-edit-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
     overflow: hidden;
   }
+
+  .peotry-sets-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: white;
+  }
 }
+
 .peotry-edit {
   display: flex;
   flex-direction: column;
@@ -288,6 +262,7 @@ export default {
     height: 100%;
     padding: 1rem 0;
     box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
   }
 
@@ -312,26 +287,8 @@ export default {
     border-radius: 5px;
   }
 
-  .peotry-item {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 1rem;
-  }
-  .icon-increase {
-    margin-left: 1rem;
-  }
-}
-</style>
-
-<style lang="scss">
-.peotry-edit {
-  .sg-dropdown {
-    line-height: 1.5;
-    .sg-dropdown-text {
-      font-size: 2rem;
-    }
+  .set-item {
+    padding: 1rem 1rem;
   }
 }
 </style>
