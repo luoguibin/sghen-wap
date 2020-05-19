@@ -5,7 +5,7 @@
       <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
     </sg-header>
     <!-- 选集列表 -->
-    <div class="sg-flex-one">
+    <div class="sg-flex-one" style="overflow: hidden;">
       <div class="scroll">
         <div class="wrapper">
           <div
