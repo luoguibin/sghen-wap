@@ -10,7 +10,10 @@
           <div class="main-wrapper">
             <sg-form ref="form" :formData="formData" :formRules="formRules">
               <div slot="setId" class="set-item">
-                <sg-button type="text" @click="onOpenSetChoice">{{ setName ? setName : '选择'}}</sg-button>
+                <span
+                  :class="{'is-setname': !!setName}"
+                  @click="onOpenSetChoice"
+                >{{ setName ? setName : '请选择'}}</span>
               </div>
 
               <div v-if="!formData.id" slot="imageNames" class="petory-item">
@@ -32,7 +35,11 @@
 
     <!-- 选集选择 -->
     <div v-show="peotrySetsVisible" class="peotry-sets-wrapper">
-      <peotry-sets :defId="formData.setId" @back="peotrySetsVisible = false" @select="handleSetSelect"></peotry-sets>
+      <peotry-sets
+        :defId="formData.setId"
+        @back="peotrySetsVisible = false"
+        @select="handleSetSelect"
+      ></peotry-sets>
     </div>
   </div>
 </template>
@@ -225,6 +232,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .sg-mask {
   .peotry-edit-wrapper {
     position: relative;
@@ -288,7 +297,20 @@ export default {
   }
 
   .set-item {
-    padding: 1rem 1rem;
+    padding: 0.5rem 0 0.5rem 1rem;
+    span {
+      display: block;
+      padding: 0.5rem 1rem;
+      box-sizing: border-box;
+      font-size: $size-text;
+      color: $color-tip;
+      background-color: $color-bg;
+      border-radius: 0.5rem;
+    }
+    .is-setname {
+      color: $color-theme-focus;
+      background-color: $color-theme-disabled;
+    }
   }
 }
 </style>
