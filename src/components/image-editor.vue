@@ -186,6 +186,9 @@ export default {
      * @param {CanvasRenderingContext2D} ctx0
      */
     getImage (call, ctx0) {
+      if (!this.currentSrc) {
+        return
+      }
       const canvas = document.createElement('CANVAS')
 
       const inner = this.$refs.inner
