@@ -70,6 +70,9 @@ export default {
           required: true,
           hidden: false,
           validator: (v, rule) => {
+            if (this.isNormalLogin) {
+              return v ? '' : '请输入' + rule.label
+            }
             return sgIsPhone(v) ? '' : '请输入' + rule.label
           },
           _error: ''
@@ -162,6 +165,7 @@ export default {
     if (this.isLogin) {
       this.$router.push({ name: 'home' })
     }
+    this.isNormalLogin = this.$route.query.mode === 'normal'
   },
 
   computed: {
@@ -254,11 +258,15 @@ export default {
         } else {
           params.pw = pw
         }
-        if (loginType === 'create') {
+
+        const isCreateType = loginType === 'create'
+        if (isCreateType) {
           params.name = name
+        } else if (this.isNormalLogin) {
+          params.type = 1
         }
 
-        const method = loginType === 'create' ? this.createUser : this.login
+        const method = isCreateType ? this.createUser : this.login
         method(params)
           .then(() => {
             this.$toast('登录成功')
