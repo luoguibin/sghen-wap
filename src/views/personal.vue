@@ -10,7 +10,7 @@
         @click="onEditOrSave"
       >{{isEditing ? '保存' : '编辑'}}</sg-button>
     </sg-header>
-    <div class="personal-main">
+    <div class="personal-main" v-if="personalID">
       <div class="info-item">
         <span>
           昵称
@@ -49,11 +49,11 @@
           <input v-else v-model="personalMood" />
         </div>
       </div>
-      <div>
+      <div v-show="!isEditing">
         <sg-button
           type="primary"
           @click="$router.push({name: 'peotry-list', query: {uuid: personalID}})"
-        >TA&nbsp;的&nbsp;诗&nbsp;词</sg-button>
+        >{{isSelf ? '我' : 'TA'}}&nbsp;的&nbsp;诗&nbsp;词</sg-button>
       </div>
       <div v-if="isSelf && !isEditing" class="logout-item">
         <sg-button @click="onLogout">退&nbsp;出&nbsp;登&nbsp;陆</sg-button>
@@ -109,7 +109,7 @@ export default {
       return phone.substr(0, 3) + '****' + phone.substr(7)
     },
     isSelf () {
-      return +this.userID === +this.personalID
+      return this.userID && +this.userID === +this.personalID
     },
     ...mapState({
       userID: state => state.auth.userID,
