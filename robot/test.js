@@ -1,13 +1,25 @@
-var arr = [
-  '十载长怀旧玉山',
-  '春光如此等闲还',
-  '花明柳暗人家路',
-  '莺老梅残驿戍关',
-  '一榻青毡聊可伴',
-  '百年金印尚馀班',
-  '东坡莫笑诗才拙',
-  '东坡莫笑诗才拙',
-  '更欲登楼尽日攀'
-]
+const test = function (num = 100) {
+  return new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      if (num >= 100) {
+        resolve({ num })
+      } else {
+        reject(new Error('num is smaller than 100'))
+      }
+    }, 1000)
+  })
+}
 
-console.log(arr.join(''))
+const filter = function (data) {
+  console.log(data)
+  if (data.num !== 100) {
+    return Promise.reject(data)
+  }
+  return data.num
+}
+
+test(1).then(filter).then(num => {
+  console.log(`num=${num}`)
+}).catch(err => {
+  console.log(`err`, err)
+})

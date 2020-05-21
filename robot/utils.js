@@ -1,3 +1,5 @@
+const crypto = require('crypto')
+
 exports.randomString = function (len) {
   len = len || 32
   // 默认去掉容易混淆的字符oOLl,9gq,Vv,Uu,I1
@@ -17,4 +19,10 @@ exports.randomIndex = randomIndex
 
 exports.randomItem = function (arrs = []) {
   return arrs[randomIndex(arrs)]
+}
+
+exports.md5 = function (data) {
+  // 以md5的格式创建一个哈希值
+  const hash = crypto.createHash('md5')
+  return hash.update(data).digest('base64')
 }

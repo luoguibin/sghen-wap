@@ -1,5 +1,6 @@
 const SERVICE = require('./service')
 const Utils = require('./utils')
+const Log = require('./log')
 
 // const host = 'jiuge.thunlp.cn'
 const host = '47.52.252.160'
@@ -60,7 +61,6 @@ const JiuGe = {
   },
   getTypeParams (key = 'jueju') {
     const jiugeType = this.typeMap[key]
-    console.log('getTypeParams', jiugeType)
     const params = {
       genre: jiugeType.genre,
       level: 1,
@@ -73,6 +73,7 @@ const JiuGe = {
     if (jiugeType.userStyles) {
       params.style = Utils.randomIndex(jiugeType.userStyles)
     }
+    Log.push(params.sghenId, `getTypeParams() ${params}`)
     return params
   }
 }
@@ -92,7 +93,7 @@ const EventBus = {
 }
 
 const getPoem = function (params, loopCount = 0) {
-  console.log('getPoem')
+  Log.push(params.sghenId, `getPoem() start`)
   const data = {
     style: params.style || -1,
     genre: params.genre,
@@ -110,19 +111,19 @@ const getPoem = function (params, loopCount = 0) {
           return
         }
         setTimeout(() => {
-          console.log('getPoem() continue')
+          Log.push(params.sghenId, `getPoem() continue`)
           getPoem(params, loopCount)
         }, 2000)
       } else {
-        console.log('getPoem', resp)
+        Log.push(params.sghenId, `getPoem() resp:${resp}`)
       }
     }).catch(err => {
-      console.log('getPoem err::', err)
+      Log.print(params.sghenId, `getPoem() err:${err}`)
     })
 }
 
 const sendPoem = function (params) {
-  console.log('sendPoem')
+  Log.push(params.sghenId, `sendPoem() start`)
   const data = {
     style: params.style || -1,
     genre: params.genre,
@@ -137,15 +138,15 @@ const sendPoem = function (params) {
     if (resp.code === '0') {
       getPoem(params)
     } else {
-      console.log('sendPoem', resp)
+      Log.push(params.sghenId, `sendPoem() resp:${resp}`)
     }
   }).catch(err => {
-    console.log('sendPoem err::', err)
+    Log.print(params.sghenId, `sendPoem() err:${err}`)
   })
 }
 
 const sendKeyWord = function (params) {
-  console.log('sendKeyWord', params.keywords)
+  Log.push(params.sghenId, `sendKeyWord() start`)
   SERVICE.post(`${baseUrl}/getKeyword`, {
     level: params.level,
     genre: params.genre,
@@ -158,10 +159,10 @@ const sendKeyWord = function (params) {
       params.foramtKeywords = resp.data
       sendPoem(params)
     } else {
-      console.log('sendKeyWord', resp)
+      Log.push(params.sghenId, `sendKeyWord() resp::${resp}`)
     }
   }).catch(err => {
-    console.log('sendKeyWord err::', err)
+    Log.print(params.sghenId, `sendKeyWord() err::${err}`)
   })
 }
 
@@ -190,25 +191,27 @@ const buildPeomText = function (arr) {
   return arr.join('')
 }
 
-const createPeotry = function (keywords, call) {
-  console.log(`createPeotry() keywords=${keywords}`)
-  if (!keywords) {
-    return
-  }
-  const originParams = JiuGe.getRandomParams()
-  // const originParams = JiuGe.getTypeParams('lvshi')
-  if (originParams.isInputValid(keywords)) {
+const createPeotry = function (keywords, sghenId) {
+  return new Promise(function (resolve, reject) {
+    if (!keywords) {
+      reject(new Error('keywords is empty'))
+      return
+    }
+    const originParams = JiuGe.getRandomParams()
+    // const originParams = JiuGe.getTypeParams('lvshi')
+    if (!originParams.isInputValid(keywords)) {
+      reject(new Error(`keywords check is invalid, originParams.genre=${originParams.genre}`))
+      return
+    }
     originParams.keywords = keywords
-    console.log('userCreatePeotry()', originParams)
+    originParams.sghenId = sghenId
+    Log.push(originParams.sghenId, 'userCreatePeotry()')
     EventBus.setCall(originParams.userId, data => {
-      console.log('EventBus::call success:', data)
-      call && call(buildPeomText(data.poem))
+      Log.push(originParams.sghenId, `getPoem() success`)
+      resolve(buildPeomText(data.poem))
     })
     sendKeyWord(originParams)
-  } else {
-    console.log('userCreatePeotry() keywords check is invalid', originParams)
-    call && call()
-  }
+  })
 }
 
 exports.createPeotry = createPeotry
