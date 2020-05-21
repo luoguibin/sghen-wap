@@ -6,6 +6,7 @@ export default {
     userID: '',
     userName: '',
     userAvatar: '',
+    mood: '',
     phone: '',
     token: ''
   },
@@ -14,7 +15,8 @@ export default {
       return {
         id: state.userID,
         username: state.userName,
-        avatar: state.userAvatar
+        avatar: state.userAvatar,
+        mood: state.mood
       }
     },
     isLogin (state) {
@@ -29,6 +31,7 @@ export default {
       state.userAvatar = data.avatar
       state.userName = data.username || data.name
       state.phone = data.phone
+      state.mood = data.mood
       state.token = data.token
     }
   },
@@ -64,13 +67,14 @@ export default {
         }
       })
     },
-    update (context, { name, avatar }) {
-      return apiPostData(apiURL.userUpdate, { name, avatar }).then(resp => {
+    update (context, { name, avatar, mood }) {
+      return apiPostData(apiURL.userUpdate, { name, avatar, mood }).then(resp => {
         const temp = sessionStorage.getItem('sghen_user_info')
         if (temp) {
           const userinfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
           userinfo.username = name
           userinfo.avatar = avatar
+          userinfo.mood = mood
           context.commit('setUserInfo', userinfo)
         }
       })

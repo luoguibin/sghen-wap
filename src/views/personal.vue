@@ -37,9 +37,24 @@
           手机号码
           <i>:</i>
         </span>
-        <div>{{phoneText}}</div>
+        <div>{{phoneText || '-'}}</div>
       </div>
-
+      <div class="info-item">
+        <span>
+          心情
+          <i>:</i>
+        </span>
+        <div>
+          <template v-if="!isEditing">{{personalMood || '-'}}</template>
+          <input v-else v-model="personalMood" />
+        </div>
+      </div>
+      <div>
+        <sg-button
+          type="primary"
+          @click="$router.push({name: 'peotry-list', query: {uuid: personalID}})"
+        >TA&nbsp;的&nbsp;诗&nbsp;词</sg-button>
+      </div>
       <div v-if="isSelf && !isEditing" class="logout-item">
         <sg-button @click="onLogout">退&nbsp;出&nbsp;登&nbsp;陆</sg-button>
       </div>
@@ -61,8 +76,8 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { base64ToFile } from '@/common/image'
-import { apiURL, apiPostUpload } from '@/api'
-import Cache from '@/common/cache-center'
+import { apiURL, apiGetData, apiPostUpload } from '@/api'
+// import Cache from '@/common/cache-center'
 
 export default {
   name: 'Personal',
@@ -76,6 +91,7 @@ export default {
       personalID: 0,
       personalName: '',
       personalAvatar: '',
+      personalMood: '',
       isAvatarBase64: false,
 
       isEditing: false,
@@ -121,10 +137,26 @@ export default {
       if (this.isSelf) {
         this.personalName = this.selfPublicInfo.username
         this.personalAvatar = this.selfPublicInfo.avatar
+        this.personalMood = this.selfPublicInfo.mood
       } else {
-        const info = Cache.UserCache.getData(+uuid) || {}
-        this.personalName = info.username
-        this.personalAvatar = info.avatar
+        if (this.saveData) {
+          const saveData = this.saveData
+          for (const key in saveData) {
+            this[key] = saveData[key]
+          }
+          this.saveData = null
+        } else {
+          apiGetData(apiURL.userInfoList, { datas: this.personalID })
+            .then(resp => {
+              const info = resp.data[0]
+              this.personalName = info.username
+              this.personalAvatar = info.avatar
+              this.personalMood = info.mood
+            })
+            .catch(() => {
+              this.$toast('获取个人信息失败')
+            })
+        }
       }
       this.isAvatarBase64 = false
     },
@@ -180,7 +212,8 @@ export default {
           }
           this.update({
             name: this.personalName,
-            avatar: this.personalAvatar
+            avatar: this.personalAvatar,
+            mood: this.personalMood
           }).then(resp => {
             this.$toast('保存成功')
             this.isEditing = false
@@ -191,7 +224,8 @@ export default {
       } else {
         this.saveData = {
           personalName: this.personalName,
-          personalAvatar: this.personalAvatar
+          personalAvatar: this.personalAvatar,
+          personalMood: this.personalMood
         }
         this.isEditing = true
       }
@@ -233,7 +267,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
 .personal {
   .personal-main {
@@ -285,7 +319,7 @@ export default {
       width: 100%;
       padding: 0 $padding-small;
       font-size: $size-text;
-      line-height: $height-text;;
+      line-height: $height-text;
       border: none;
       border-bottom: 1px solid #ddd;
       outline: none;
