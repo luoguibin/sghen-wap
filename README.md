@@ -1,29 +1,147 @@
-# sghen-wap
+### 项目简介
+**Sghen三行**&nbsp;&nbsp;起于个人不定期写词句的兴趣爱好。作为一个Web菜鸟攻城狮，应该有个自己的项目，把想敲得代码敲上去，把想写得诗词管理起来。
 
-## Project setup
+**Demo：**
+	PC端：https://www.sghen.cn/index.html
+	Wap端：https://www.sghen.cn/sghen-wap/index.html
+
+
+### Vue项目结构
 ```
-npm install
+项目（不定期更新）
+|--public					css、js、附件等静态文件目录
+|--robot 					机器人测试：自动登陆账号创建、评论诗词，九歌爬诗词
+|--src						
+	|--api   				接口定义
+	|--assets				资源文件
+	|--common				普通js代码，如
+	|--components			各种vue组件
+	|--directives			指令
+	|--filters   			过滤器
+	|--router    			路由定义
+	|--store 				数据中心
+	|--style 				项目样式
+	|--ui					项目自定义UI库
+	|--utils 				工具类
+	|--views 				视图组件
+	|  App.vue				
+	|  main.js				
+|  .browserslistrc			
+|  .editorconfig			
+|  .eslintrc.js  			eslint代码规则配置
+|  .gitignore				
+|  babel.config.js			
+|  jsconfig.json			
+|  package-lock.json		
+|  package.json				
+|  README.md				
+|  vue.config.js 			vue配置文件
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+### Todo
+- [ ] 密码动态加密
+- [ ] 诗词列表界面缓存
+- [ ] 个人诗词概况：总创建数，各选集诗词数，获赞总数
 
-### Compiles and minifies for production
-```
-npm run build
-```
+### 更新记录
+2020-05-20 
+[+]九歌诗词测试
+[+]普通账号登陆测试
 
-### Run your tests
-```
-npm run test
-```
+2020-05-19 
+[+]选集组件
+[+]添加个人头像编辑，信息更改
 
-### Lints and fixes files
-```
-npm run lint
-```
+2020-05-14 
+[+]个人中心
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+2020-05-12 
+[+]添加诗词的图集展示
+[+]旋转相册盒
+
+2020-05-08 
+[+]诗词图片上传
+[+]诗词新增与编辑、选集创建
+
+2020-05-07 
+[+]创建诗词
+[+]诗词详情页，优化诗词列表
+
+2020-05-01 
+[+]统一跳转登录信息获取
+
+2020-04-30 
+[+]添加诗词右侧滑动菜单
+[+]主页我的诗词入口
+[+]sg-header组件
+
+2020-04-29 
+[+]首页书三行轮询展示
+
+2020-04-27 
+[+]添加网页底部说明
+
+2020-04-26 
+[+]账号注册
+
+2020-04-22 
+[+]添加图形校验获取验证码
+
+2020-04-20 
+[!]适配重构的user接口
+
+2020-04-18 
+[+]修复作者列表获取
+
+2020-04-17 
+[+]添加作者的诗词列表跳转
+[+]点击作者直接评论
+[+]添加诗词点赞组件
+
+2020-04-16 
+[+]诗词评论及点赞
+[+]添加诗词评论组件
+[+]全局图片过滤器
+
+2020-04-15 
+[!]配置本地开发host
+
+2020-04-14 
+[+]诗词的图片预览
+
+2020-04-13 
+[+]诗词列表
+[!]更改请求本地代理
+[+]sg-time组件
+
+2020-04-02 
+[+]sg-dropdown组件
+
+2020-03-31 
+[+]添加登陆逻辑
+[+]添加请求库
+[+]添加全局toast
+[+]sg-form添加单个字段验证
+[+]sg-swipper组件
+[+]sg-swipper组件
+
+2020-03-28 
+[+]sg-scroll组件
+
+2020-03-23 
+[+]sg-form字段
+[+]sg-form添加字段
+
+2020-03-22 
+[+]登录退出逻辑
+[+]auth状态存储
+[+]登录、主页路由
+[+]sg-button组件
+
+2020-03-21 
+[+]confirm组件
+[!]初始化项目
+
+
+### 启停项目
+>自己百度Vue项目启动
