@@ -77,6 +77,15 @@
     </div>
 
     <div class="item">
+      <div class="label">滑动卡片</div>
+      <div class="component" style="height: 20rem;">
+        <sg-slider :items="sliderItems">
+          <div v-for="item in sliderItems" :key="item.slot" :slot="item.slot">{{item.slot}}</div>
+        </sg-slider>
+      </div>
+    </div>
+
+    <div class="item">
       <div class="label">下拉选择</div>
       <div class="component">
         <SgDropdown :options="dropdownOptions" @change="$toast($event)"></SgDropdown>
@@ -150,6 +159,39 @@ export default {
         { label: '红色', value: 'red' },
         { label: '绿色', value: 'greeen' },
         { label: '蓝色', value: 'blue' }
+      ],
+
+      sliderItems: [
+        {
+          slot: 'slot-0',
+          itemStyle: {
+            backgroundColor: 'rgba(12, 123, 234, 0.3)'
+          }
+        },
+        {
+          slot: 'slot-1',
+          itemStyle: {
+            backgroundColor: 'rgba(123, 12, 234, 0.3)'
+          }
+        },
+        {
+          slot: 'slot-2',
+          itemStyle: {
+            backgroundColor: 'rgba(234, 12, 123, 0.3)'
+          }
+        },
+        {
+          slot: 'slot-3',
+          itemStyle: {
+            backgroundColor: 'rgba(12, 234, 123, 0.3)'
+          }
+        },
+        {
+          slot: 'slot-4',
+          itemStyle: {
+            backgroundColor: 'rgba(123, 234, 12, 0.3)'
+          }
+        }
       ]
     }
   },

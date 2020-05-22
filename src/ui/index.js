@@ -10,6 +10,7 @@ import SgSwipper from './sg-swipper'
 import SgDropdown from './sg-dropdown'
 import SgTime from './sg-time'
 import SgHeader from './sg-header'
+import SgSlider from './sg-slider'
 
 Vue.use(SgButton)
 Vue.use(SgForm)
@@ -20,3 +21,4 @@ Vue.use(SgSwipper)
 Vue.use(SgDropdown)
 Vue.use(SgTime)
 Vue.use(SgHeader)
+Vue.use(SgSlider)
