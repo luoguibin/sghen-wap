@@ -37,6 +37,7 @@ export default {
   color: white;
   font-size: $size-text;
   line-height: $height-text;
+  text-align: center;
   background-color: $color-mask;
   border-radius: 0.6rem;
   transform: translateX(-50%);

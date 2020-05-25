@@ -11,6 +11,7 @@ import SgDropdown from './sg-dropdown'
 import SgTime from './sg-time'
 import SgHeader from './sg-header'
 import SgSlider from './sg-slider'
+import SgTable from './sg-table'
 
 Vue.use(SgButton)
 Vue.use(SgForm)
@@ -22,3 +23,4 @@ Vue.use(SgDropdown)
 Vue.use(SgTime)
 Vue.use(SgHeader)
 Vue.use(SgSlider)
+Vue.use(SgTable)

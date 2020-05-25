@@ -105,6 +105,15 @@
         <SgButton @click="$toast($refs.time.getTimeValues())">确认</SgButton>
       </div>
     </div>
+
+    <div class="item">
+      <div class="label">表格</div>
+      <div class="component" style="height: 18rem;">
+        <SgTable :headers="tableHeaders" :items="tableItems">
+          <sg-button type="text" slot="options" slot-scope="scope" @click="onTableItemDetail(scope)">详情</sg-button>
+        </SgTable>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -192,12 +201,28 @@ export default {
             backgroundColor: 'rgba(123, 234, 12, 0.3)'
           }
         }
-      ]
+      ],
+
+      tableHeaders: [
+        { key: 'id', label: 'ID', style: { width: '50px' } },
+        { key: 'name', label: '姓名' },
+        { key: 'address', label: '地址(具体地球经纬度，例如：N43.234234 W123.3211)' },
+        { key: 'options', label: '操作', slot: true, style: { width: '50px' } }
+      ],
+      tableItems: []
     }
   },
 
   created () {
     window.sgComponents = this
+
+    for (let i = 0; i < 30; i++) {
+      this.tableItems.push({
+        id: i,
+        name: 'name-name-name-name-name-name-' + i,
+        address: 'address-address-address-address-address-' + i
+      })
+    }
   },
 
   methods: {
@@ -253,6 +278,11 @@ export default {
           this.$refs.scroll.success()
         })
       }, 1000)
+    },
+
+    onTableItemDetail (item) {
+      console.log('onTableItemDetail', item)
+      this.$toast(JSON.stringify(item))
     }
   }
 }
