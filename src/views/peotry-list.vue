@@ -96,7 +96,7 @@ export default {
   },
 
   beforeRouteLeave (to, from, next) {
-    if (to.name === 'peotry-detail') {
+    if (to.name === 'peotry-detail' || to.name === 'personal') {
       this.savePageData()
     }
     next()
@@ -129,7 +129,9 @@ export default {
       return true
     },
     checkRestorePageData () {
-      this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
+      const uuid = this.$route.query.uuid || CACHE_ROOT_ID
+      // 强制转换为string作为id
+      this.uuid = '' + uuid
       this.scrollItemMap = {}
 
       if (!this.resotrePageData()) {
@@ -196,6 +198,7 @@ export default {
     },
     handleRefresh () {
       this.page = 1
+      this.scrollItemMap = {}
       Cache.PeotryPageCache.delete(this.uuid)
       Cache.UserCache.clear()
       this.handleLoad(true)
@@ -236,7 +239,7 @@ export default {
           break
         case 'peot-avatar':
           this.$router.push({
-            name: 'peotry-list',
+            name: 'personal',
             query: { uuid: peotry.user.id, username: peotry.user.username }
           })
           break
