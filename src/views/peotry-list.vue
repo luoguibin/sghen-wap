@@ -51,7 +51,7 @@ export default {
       limit: 20,
       isEnd: false,
       peotries: [],
-      peotriesLoadCount: 0,
+      isDataReady: false,
 
       viewerVisible: false,
       images: [],
@@ -77,53 +77,69 @@ export default {
       return +this.userID === +this.uuid
     },
     isEmpty () {
-      return !this.peotries.length && this.peotriesLoadCount
+      return !this.peotries.length && this.isDataReady
     },
     ...mapState({
       userID: state => state.auth.userID
     })
   },
 
-  created () {
+  mounted () {
     window.peotryList = this
-    this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
-    this.scrollItemMap = {}
+    this.checkRestorePageData()
   },
 
   beforeRouteUpdate (to, from, next) {
-    const sgScroll = this.$refs.sgScroll
-    const pageCache = Cache.PeotryPageCache
-    pageCache.setData(this.uuid, {
-      peotries: this.peotries,
-      page: this.page,
-      isEnd: this.isEnd,
-      scrollTop: sgScroll.getScrollTop()
-    })
+    this.savePageData()
     next()
+    this.checkRestorePageData()
+  },
 
-    this.uuid = to.query.uuid || CACHE_ROOT_ID
-    this.peotriesLoadCount = 0
-    this.page = 1
-    this.scrollItemMap = {}
-
-    const pageCacheData = pageCache.getData(this.uuid)
-    if (pageCacheData) {
-      this.peotries = pageCacheData.peotries
-      this.page = pageCacheData.page
-      this.isEnd = pageCacheData.isEnd
-      this.peotriesLoadCount++
-
-      sgScroll.success()
-      this.$nextTick(() => {
-        sgScroll.setScrollTop(pageCacheData.scrollTop)
-      })
-    } else {
-      this.peotries = []
-      sgScroll.refresh()
+  beforeRouteLeave (to, from, next) {
+    if (to.name === 'peotry-detail') {
+      this.savePageData()
     }
+    next()
   },
 
   methods: {
+    savePageData () {
+      Cache.PeotryPageCache.setData(this.uuid, {
+        peotries: this.peotries,
+        page: this.page,
+        isEnd: this.isEnd,
+        scrollTop: this.$refs.sgScroll.getScrollTop()
+      })
+    },
+    resotrePageData () {
+      const pageCacheData = Cache.PeotryPageCache.getData(this.uuid)
+      if (!pageCacheData) {
+        return false
+      }
+
+      this.peotries = pageCacheData.peotries
+      this.page = pageCacheData.page
+      this.isEnd = pageCacheData.isEnd
+      this.isDataReady = true
+
+      this.$refs.sgScroll.success()
+      this.$nextTick(() => {
+        this.$refs.sgScroll.setScrollTop(pageCacheData.scrollTop)
+      })
+      return true
+    },
+    checkRestorePageData () {
+      this.uuid = this.$route.query.uuid || CACHE_ROOT_ID
+      this.scrollItemMap = {}
+
+      if (!this.resotrePageData()) {
+        this.isDataReady = false
+        this.page = 1
+        this.peotries = []
+        this.$refs.sgScroll.refresh()
+      }
+    },
+
     handleLoad (isRefresh) {
       if (!isRefresh) {
         this.page += 1
@@ -159,7 +175,7 @@ export default {
           } else {
             this.peotries.push(...list)
           }
-          this.peotriesLoadCount++
+          this.isDataReady = true
           this.isEnd = this.peotries.length === data.totalCount
 
           this.$refs.sgScroll.success()
