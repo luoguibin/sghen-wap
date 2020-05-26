@@ -329,6 +329,9 @@ export default {
       font-size: 1.4rem;
       line-height: 2.4rem;
     }
+    h2 {
+      margin: 1rem 0;
+    }
     .item-bg {
       position: absolute;
       top: 0;
