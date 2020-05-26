@@ -31,7 +31,7 @@ const routes = [
   },
   {
     path: '/sg-components',
-    name: 'sgComponents',
+    name: 'sg-components',
     component: () => import(/* webpackChunkName: 'sg-components' */'@/views/sg-components')
   },
   {
