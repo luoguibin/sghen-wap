@@ -39,6 +39,10 @@ export default {
     isEnd: {
       type: Boolean,
       default: false
+    },
+    auto: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -61,7 +65,7 @@ export default {
 
   created () {
     window.sgScroll = this
-    this.refresh()
+    this.auto && this.refresh()
   },
 
   computed: {
