@@ -33,7 +33,7 @@ import { apiURL, apiGetData } from '@/api'
 import { getItemIndex, getItemTypeIndex } from '@/utils/sgDom'
 import Cache from '@/common/cache-center'
 
-const CACHE_ROOT_ID = 'peotry-list-root'
+const CACHE_ROOT_ID = 'peotry_list_root'
 
 export default {
   nae: 'PeotryList',
@@ -47,6 +47,8 @@ export default {
   data () {
     return {
       uuid: '',
+      setId: '',
+      setName: '',
       page: 1,
       limit: 20,
       isEnd: false,
@@ -63,6 +65,9 @@ export default {
 
   computed: {
     title () {
+      if (this.setName) {
+        return this.setName
+      }
       const text = '诗词列表'
       let username = this.$route.query.username
       if (this.uuid !== CACHE_ROOT_ID) {
@@ -103,8 +108,11 @@ export default {
   },
 
   methods: {
+    getSaveID () {
+      return `${this.uuid}-${this.setId}`
+    },
     savePageData () {
-      Cache.PeotryPageCache.setData(this.uuid, {
+      Cache.PeotryPageCache.setData(this.getSaveID(), {
         peotries: this.peotries,
         page: this.page,
         isEnd: this.isEnd,
@@ -112,7 +120,7 @@ export default {
       })
     },
     resotrePageData () {
-      const pageCacheData = Cache.PeotryPageCache.getData(this.uuid)
+      const pageCacheData = Cache.PeotryPageCache.getData(this.getSaveID())
       if (!pageCacheData) {
         return false
       }
@@ -129,9 +137,11 @@ export default {
       return true
     },
     checkRestorePageData () {
-      const uuid = this.$route.query.uuid || CACHE_ROOT_ID
+      const query = this.$route.query
       // 强制转换为string作为id
-      this.uuid = '' + uuid
+      this.uuid = query.uuid ? ('' + query.uuid) : CACHE_ROOT_ID
+      this.setId = query.setId ? ('' + query.setId) : '0'
+      this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
       if (!this.resotrePageData()) {
@@ -153,6 +163,9 @@ export default {
       }
       if (this.uuid !== CACHE_ROOT_ID) {
         params.userId = this.uuid
+      }
+      if (this.setId) {
+        params.setId = this.setId
       }
 
       apiGetData(apiURL.peotryList, params)
@@ -199,7 +212,7 @@ export default {
     handleRefresh () {
       this.page = 1
       this.scrollItemMap = {}
-      Cache.PeotryPageCache.delete(this.uuid)
+      Cache.PeotryPageCache.delete(this.getSaveID())
       Cache.UserCache.clear()
       this.handleLoad(true)
     },

@@ -35,14 +35,14 @@
 
         <div class="info-panel year-info" v-if="yearPoetrySets.length">
           <h2>{{year}}年度诗词概况</h2>
-          <p>
+          <p @click="onClickItemType">
             本年度共创建
             <span>{{yearPeotryCount}}</span>首诗词，其中以选集
-            <span>《{{yearPoetrySets[0].name}}》</span>
+            <span item-type="year-set">《{{yearPoetrySets[0].name}}》</span>
             {{yearPoetrySets[0].count}}首稳居榜首；
             <template v-if="yearPeots.length">
               诗词创建数量最多的是
-              <span>[{{yearPeots[0].username}}]</span>
+              <span item-type="year-poet">[{{yearPeots[0].username}}]</span>
               ，共创建{{yearPeots[0].count}}首。
             </template>
           </p>
@@ -50,8 +50,12 @@
 
         <div class="info-panel">
           <h2>选集总排行榜</h2>
-          <div class="popular-sets">
-            <div v-for="item in popularPeotrySets" :key="item.id">{{item.name}}({{item.count}}首)</div>
+          <div class="popular-sets" @click="onClickItemType">
+            <div
+              v-for="item in popularPeotrySets"
+              :key="item.id"
+              item-type="popular-set"
+            >{{item.name}}({{item.count}}首)</div>
           </div>
         </div>
 
@@ -59,7 +63,7 @@
           <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">更多诗词~</sg-button>
         </div>
 
-        <div class="module-panel">
+        <div class="module-panel" @click="onClickItemType">
           <rotate-box v-if="lastestImages.length" :items="rotateItems">
             <div
               v-for="(item, index) in lastestImages"
@@ -68,13 +72,15 @@
               class="item-panel album-item"
             >
               <!-- 相册中不超过2张图片，默认显示第一张图片 -->
-              <img v-if="item.images.length < 3" class="album-image1" :src="item.images[0]" />
+              <div v-if="item.images.length < 3" class="album-image1">
+                <img item-type="latest-image" :src="item.images[0]" />
+              </div>
 
               <!-- 相册中超过2张图片，默认显示最新的前3张图片 -->
               <div v-else class="album-images3">
-                <img :src="item.images[0]" />
-                <img :src="item.images[1]" />
-                <img :src="item.images[2]" />
+                <img item-type="latest-image" :src="item.images[0]" />
+                <img item-type="latest-image" :src="item.images[1]" />
+                <img item-type="latest-image" :src="item.images[2]" />
               </div>
             </div>
           </rotate-box>
@@ -90,6 +96,7 @@
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
+import { getItemIndex } from '@/utils/sgDom'
 
 const getSmallImage = v => {
   if (v.endsWith('.jpg')) {
@@ -266,6 +273,53 @@ export default {
         query: { redirect: this.$route.fullPath }
       })
     },
+    onClickItemType (e) {
+      const itemType = e.target.getAttribute('item-type')
+      console.log('onClickItemType()', itemType)
+      if (!itemType) {
+        return
+      }
+      switch (itemType) {
+        case 'popular-set':
+          {
+            const index = getItemIndex(e.target)
+            const set = this.popularPeotrySets[index]
+            const query = { setId: set.id, setName: set.name }
+            if (set.userId && set.userId !== '0') {
+              query.uuid = set.userId
+            }
+            this.$router.push({ name: 'peotry-list', query })
+          }
+          break
+        case 'year-set':
+          {
+            const set = this.yearPoetrySets[0]
+            this.$router.push({
+              name: 'peotry-list',
+              query: { setId: set.id, setName: set.name }
+            })
+          }
+          break
+        case 'year-poet':
+          this.$router.push({
+            name: 'personal',
+            query: { uuid: this.yearPeots[0].id }
+          })
+          break
+        case 'latest-image':
+          {
+            const typeItemEl = e.target.parentElement.parentElement.parentElement
+            const index = getItemIndex(typeItemEl)
+            this.$router.push({
+              name: 'peotry-detail',
+              params: { id: this.lastestImages[index].id }
+            })
+          }
+          break
+        default:
+          break
+      }
+    },
     ...mapActions({
       logout: 'auth/logout'
     })
@@ -396,7 +450,10 @@ export default {
       object-fit: cover;
     }
     .album-image1 {
-      width: 100%;
+      height: 100%;
+      img {
+        width: 100%;
+      }
     }
     .album-images3 {
       height: 100%;
