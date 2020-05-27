@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="info-item">
+      <div class="info-item" v-show="!isEditing">
         <span>
           诗词概况
           <i>:</i>
