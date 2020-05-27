@@ -56,7 +56,7 @@
           <i>:</i>
         </span>
         <div>
-          <template v-if="peotryCount !== 0 && peotSetCount !== 0">
+          <template v-if="peotryCount !== 0 || peotSetCount !== 0">
             {{isSelf ? '我' : 'TA'}}共创建{{peotSetCount | numFilter}}个选集，
             <br />
             共{{peotryCount | numFilter}}首诗词，
