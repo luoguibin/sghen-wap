@@ -49,6 +49,24 @@
           <input v-else v-model="personalMood" />
         </div>
       </div>
+
+      <div class="info-item">
+        <span>
+          诗词概况
+          <i>:</i>
+        </span>
+        <div>
+          <template v-if="peotryCount !== 0 && peotSetCount !== 0">
+            {{isSelf ? '我' : 'TA'}}共创建{{peotSetCount | numFilter}}个选集，
+            <br />
+            共{{peotryCount | numFilter}}首诗词，
+            <br />
+            收获了{{praiseCount | numFilter}}赞
+          </template>
+          <template v-else>Opps，{{isSelf ? '我' : 'TA'}}暂未有选集和诗词</template>
+        </div>
+      </div>
+
       <div v-show="!isEditing">
         <sg-button
           type="primary"
@@ -94,6 +112,10 @@ export default {
       personalMood: '',
       isAvatarBase64: false,
 
+      peotryCount: -1,
+      praiseCount: -1,
+      peotSetCount: -1,
+
       isEditing: false,
 
       imageEditorVisible: false
@@ -120,8 +142,26 @@ export default {
     })
   },
 
+  filters: {
+    numFilter (v) {
+      if (v < 0) {
+        return '?'
+      }
+      if (v && (v + '').length > 4) {
+        return v.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+      }
+      return v || 0
+    }
+  },
+
   created () {
     window.personal = this
+    this.initData()
+    this.getPersonalPeotryInfo()
+  },
+
+  beforeRouteUpdate (to, from, next) {
+    next()
     this.initData()
     this.getPersonalPeotryInfo()
   },
@@ -160,7 +200,19 @@ export default {
       }
       this.isAvatarBase64 = false
     },
-    getPersonalPeotryInfo () {},
+    getPersonalPeotryInfo () {
+      const params = { id: this.personalID }
+      apiGetData(apiURL.userPoetryCount, params).then(resp => {
+        this.peotryCount = resp.data[0].count
+      })
+      apiGetData(apiURL.userPraiseCount, params).then(resp => {
+        this.praiseCount = resp.data[0].count
+      })
+      apiGetData(apiURL.peotSets, { userId: this.personalID }).then(resp => {
+        const userID = this.personalID
+        this.peotSetCount = resp.data.filter(o => o.userId === userID).length
+      })
+    },
 
     hasEditChange () {
       const saveData = this.saveData
@@ -276,7 +328,7 @@ export default {
   .info-item {
     display: flex;
     flex-direction: row;
-    height: $height-text;
+    // height: $height-text;
     line-height: $height-text;
     margin-bottom: 1.5rem;
     > span {

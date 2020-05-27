@@ -60,6 +60,10 @@ export const apiURL = {
 
   // 获取作者基本信息
   userInfoList: `${preffix}/v1/api/get/user/list`,
+  // 作者诗词总数
+  userPoetryCount: `${preffix}/v1/api/get/user/peotry-count`,
+  // 作者诗词总数
+  userPraiseCount: `${preffix}/v1/api/get/user/peotry-praise-count`,
 
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
