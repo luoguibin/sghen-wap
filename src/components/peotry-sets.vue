@@ -78,7 +78,7 @@ export default {
         }
         this.sets = [...systemSets.sort(timeSortFunc), ...selfSets.sort(timeSortFunc)]
         if (selectLast) {
-          this.onClickSet(this.sets[this.sets.length - 1])
+          this.onClickSet(selfSets[0])
         }
       })
     },
