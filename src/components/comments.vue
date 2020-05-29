@@ -10,6 +10,7 @@
         item-type="comment-avatar"
         alt
       />
+      <div v-show="hasAvatarsMore" class="more" item-type="avatars-more">...</div>
     </div>
 
     <div v-show="currentPraises.length && comments.length" style="border-bottom: 1px solid white;"></div>
@@ -32,6 +33,8 @@
         </span>
         <p item-type="comment-content">{{comment.content}}</p>
       </div>
+
+      <div v-show="hasCommentsMore" class="more" item-type="comments-more">加载更多...</div>
     </div>
   </div>
 </template>
@@ -50,11 +53,19 @@ export default {
         return []
       }
     },
+    praiseTotal: {
+      type: Number,
+      default: -1
+    },
     comments: {
       type: Array,
       default () {
         return []
       }
+    },
+    commentTotal: {
+      type: Number,
+      default: -1
     },
     isDetail: {
       type: Boolean,
@@ -70,6 +81,18 @@ export default {
   },
 
   computed: {
+    hasAvatarsMore () {
+      if (this.praiseTotal < 0) {
+        return false
+      }
+      return this.praises.length < this.praiseTotal
+    },
+    hasCommentsMore () {
+      if (this.commentTotal < 0) {
+        return false
+      }
+      return this.comments.length < this.commentTotal
+    },
     currentPraises () {
       const srcFilter = Vue.filter('img-src')
       return this.praises.map(o => {
@@ -81,6 +104,7 @@ export default {
   },
 
   created () {
+    window.comments = this
     if (this.isDetail) {
       this.setScrollIntoView()
     }
@@ -118,7 +142,15 @@ $background: rgba(0, 0, 0, 0.05);
     box-sizing: border-box;
     overflow: hidden;
     user-select: none;
-
+    .more {
+      display: inline-block;
+      width: 3rem;
+      height: 3rem;
+      line-height: 3rem;
+      font-size: 1.6rem;
+      text-align: center;
+      vertical-align: top;
+    }
     img {
       width: 3rem;
       height: 3rem;
@@ -138,6 +170,9 @@ $background: rgba(0, 0, 0, 0.05);
 
   .contents {
     padding: 5px 8px;
+    .more {
+      text-align: center;
+    }
   }
   .comment {
     .names {

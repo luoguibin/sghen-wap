@@ -74,6 +74,7 @@ export default {
       images: [],
       imageIndex: 0,
 
+      myPraiseComment: null,
       commentVisible: false,
       commentID: 0,
       commentToID: 0,
@@ -83,7 +84,11 @@ export default {
       praiseId: 0,
       praiseFromStyle: {},
       praiseToStyle: {},
-      praiseMap: {}
+      praiseMap: {},
+
+      praiseOffset: 0,
+      commentOffset: 0,
+      pageLimit: 20
     }
   },
 
@@ -101,21 +106,10 @@ export default {
     },
 
     /**
-     * @returns {Comment} 返回我的点赞对象
-     */
-    myPraiseComment () {
-      const userID = this.userID
-      if (!userID || !this.peotry) return
-      return this.peotry.praiseComments.find(
-        comment => comment.toId === -1 && comment.fromId === userID
-      )
-    },
-
-    /**
      * @returns {Boolean} 返回当前登录用户是否点赞当前诗词
      */
     isPraise () {
-      return this.myPraiseComment && this.myPraiseComment.content === 'praise'
+      return !!this.myPraiseComment
     },
 
     ...mapState({
@@ -128,7 +122,7 @@ export default {
 
   created () {
     window.peotryDetail = this
-    this.getPeotry()
+    this.getPeotryDetail()
   },
 
   beforeRouteUpdate (to, from, next) {
@@ -144,7 +138,7 @@ export default {
       this.peotry = JSON.parse(pageCacheData.peotry)
       this.resetDropdownOptions()
     } else {
-      this.getPeotry()
+      this.getPeotryDetail()
     }
   },
 
@@ -152,63 +146,121 @@ export default {
     onBack () {
       this.$router.go(-1)
     },
-    getPeotry () {
+    getPeotryDetail () {
       const id = this.$route.params.id
       this.peotryID = id
-      apiGetData(apiURL.peotryList, { id, needComment: true }).then(data => {
+      apiGetData(apiURL.peotryList, { id }).then(data => {
         const o = data.data
-        this.checkPeotry(o)
+        o.praiseTotal = -1
+        o.praiseComments = []
+        o.commentTotal = -1
+        o.realComments = []
+        if (o.user) {
+          o.user = Object.freeze(o.user)
+        }
         this.peotry = o
-        this.resetDropdownOptions()
+        this.getPeotryPraise()
+        this.getWordComments()
+        this.getPraiseComments()
       })
     },
 
-    checkPeotry (peotry) {
-      const userCache = Cache.UserCache
-      const peotIdMap = []
-      const timeFunc = function (o0, o1) {
-        // 按时间排序评论列表
-        const time0 = new Date(o0.createTime).getTime()
-        const time1 = new Date(o1.createTime).getTime()
-        return time0 < time1 ? -1 : 1
+    getPeotryPraise () {
+      if (!this.userID) {
+        return
       }
-
-      const o = peotry
-      if (o.user) {
-        o.user = Object.freeze(o.user)
-      }
-      if (!o.comments) {
-        o.comments = []
-        o.praiseComments = []
-        o.realComments = []
-      } else {
-        const praiseComments = []
-        const realComments = []
-        o.comments.forEach(o_ => {
-          // 判断评论的创建者
-          if (userCache.getData(o_.fromId)) {
-            o_.fromPeot = Object.freeze(userCache.getData(o_.fromId))
-          } else {
-            peotIdMap[o_.fromId] = true
-          }
-
-          if (o_.toId > 0) {
-            if (userCache.getData(o_.toId)) {
-              o_.toPeot = Object.freeze(userCache.getData(o_.toId))
-            } else {
-              peotIdMap[o_.toId] = true
-            }
-            realComments.push(o_)
-          } else {
-            if (o_.toId === -1 && o_.content === 'praise') {
-              praiseComments.push(o_)
-            }
-          }
+      this.praiseRequesting = true
+      apiGetData(apiURL.commentPraises, {
+        id: this.peotryID,
+        datas: [this.userID].toString()
+      })
+        .then(resp => {
+          this.myPraiseComment = this.formatComments(resp.data || [])[0]
+          this.resetDropdownOptions()
         })
-        o.praiseComments = praiseComments.sort(timeFunc)
-        o.realComments = realComments.sort(timeFunc)
-      }
+        .finally(() => {
+          this.praiseRequesting = false
+        })
+    },
 
+    getWordComments () {
+      apiGetData(apiURL.commentWords, {
+        id: this.peotryID,
+        limit: this.pageLimit,
+        offset: this.commentOffset
+      }).then(resp => {
+        const data = resp.data
+        if (!data || data.length < 2) {
+          return
+        }
+        const total = +data[0][0].count || 0
+        const comments = this.formatComments(data[1])
+        this.commentOffset += this.pageLimit
+        this.peotry.realComments.push(...comments)
+        this.peotry.commentTotal = total
+        this.checkComments(comments)
+      })
+    },
+    getPraiseComments () {
+      apiGetData(apiURL.commentPraise, {
+        id: this.peotryID,
+        limit: this.pageLimit,
+        offset: this.praiseOffset
+      }).then(resp => {
+        const data = resp.data
+        if (!data || data.length < 2) {
+          return
+        }
+        const total = +data[0][0].count || 0
+        const comments = this.formatComments(data[1])
+        this.praiseOffset += this.pageLimit
+        this.peotry.praiseTotal = total
+        this.peotry.praiseComments.push(...comments)
+        this.checkComments(comments)
+      })
+    },
+    formatComments (comments = []) {
+      return comments.map(o => {
+        return {
+          id: o.id,
+          fromId: o.from_id,
+          toId: o.to_id,
+          content: o.content,
+          createTime: o.create_time,
+          type: o.type,
+          typeId: o.type_id
+        }
+      })
+    },
+    checkComments (comments) {
+      if (!comments) {
+        return
+      }
+      const userCache = Cache.UserCache
+      const peotIdMap = {}
+      // const timeFunc = function (o0, o1) {
+      //   // 按时间排序评论列表
+      //   const time0 = new Date(o0.createTime).getTime()
+      //   const time1 = new Date(o1.createTime).getTime()
+      //   return time0 < time1 ? -1 : 1
+      // }
+
+      comments.forEach(o => {
+        // 判断评论的创建者
+        if (userCache.getData(o.fromId)) {
+          o.fromPeot = Object.freeze(userCache.getData(o.fromId))
+        } else {
+          peotIdMap[o.fromId] = true
+        }
+
+        if (o.toId > 0) {
+          if (userCache.getData(o.toId)) {
+            o.toPeot = Object.freeze(userCache.getData(o.toId))
+          } else {
+            peotIdMap[o.toId] = true
+          }
+        }
+      })
       const peotIds = Object.keys(peotIdMap)
       if (!peotIds.length) {
         return
@@ -218,7 +270,7 @@ export default {
         data.forEach(o => {
           userCache.setData(+o.id, o)
         })
-        this.buildPeotryComments(peotry)
+        this.buildPeotryComments(comments)
       })
     },
     getUsersInfo (ids) {
@@ -240,14 +292,9 @@ export default {
         return data
       })
     },
-    buildPeotryComments (peotry) {
+    buildPeotryComments (comments) {
       const userCache = Cache.UserCache
-      peotry.praiseComments.forEach(o => {
-        if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
-        }
-      })
-      peotry.realComments.forEach(o => {
+      comments.forEach(o => {
         if (!o.fromPeot) {
           this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
         }
@@ -272,14 +319,14 @@ export default {
         this.$toast('请登陆后再操作')
         return
       }
-      if (this.praiseRequesting) {
+      // null判断表示没请求到是否点赞该诗词数据
+      if (this.praiseRequesting || this.myPraiseComment === null) {
         return
       }
-      this.praiseRequesting = true
 
-      const isPraise = this.isPraise
+      this.praiseRequesting = true
       const comment = this.myPraiseComment
-      if (isPraise) {
+      if (this.isPraise) {
         apiPostData(apiURL.commentDelete, {
           id: comment.id,
           fromId: comment.fromId
@@ -288,6 +335,7 @@ export default {
             const comments = this.peotry.praiseComments
             const index = comments.findIndex(o => o.id === comment.id)
             comments.splice(index, 1)
+            this.myPraiseComment = undefined
             this.resetDropdownOptions()
           })
           .finally(() => {
@@ -302,13 +350,14 @@ export default {
           toId: -1
         })
           .then(({ data }) => {
-            data.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
-            data.itemTag = 'opacity'
-            this.peotry.praiseComments.push(data)
+            const comment = this.formatComments([data])[0]
+            comment.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
+            comment.itemTag = 'opacity'
+            this.myPraiseComment = comment
             this.resetDropdownOptions()
 
             this.$nextTick(() => {
-              this.onPraiseAnime(e, data)
+              this.onPraiseAnime(e, comment)
             })
           })
           .finally(() => {
@@ -367,12 +416,10 @@ export default {
               apiPostData(apiURL.peotryDelete, {
                 userId: this.userID,
                 id: this.peotry.id
-              }).then(
-                resp => {
-                  this.$toast('删除成功')
-                  this.onBack()
-                }
-              )
+              }).then(resp => {
+                this.$toast('删除成功')
+                this.onBack()
+              })
             }
           })
           break
@@ -439,6 +486,14 @@ export default {
           const commentIndex = getItemIndex(target.parentElement)
           this.onClickComment(peotry, peotry.realComments[commentIndex])
           break
+        case 'avatars-more':
+          console.log('avatars-more')
+          this.getPraiseComments()
+          break
+        case 'comments-more':
+          console.log('comments-more')
+          this.getWordComments()
+          break
         default:
           break
       }
@@ -469,7 +524,7 @@ export default {
 
     handleSave () {
       this.editVisible = false
-      this.getPeotry()
+      this.getPeotryDetail()
     },
     handleCommentOk (o) {
       o.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))

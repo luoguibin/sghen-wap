@@ -7,16 +7,17 @@ class CacheCenter {
   }
 
   setData (id, data) {
+    id = '' + id
     this.currentId = id
     this.cache.set(id, data)
   }
 
   getData (id) {
-    return this.cache.get(id)
+    return this.cache.get('' + id)
   }
 
   delete (id) {
-    return this.cache.delete(id)
+    return this.cache.delete('' + id)
   }
 
   deleteCurrent () {

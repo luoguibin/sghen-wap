@@ -48,7 +48,9 @@
       <comments
         ref="comments"
         :praises="peotry.praiseComments"
+        :praiseTotal="peotry.praiseTotal"
         :comments="peotry.realComments"
+        :commentTotal="peotry.commentTotal"
         :isDetail="isDetail"
       ></comments>
     </div>

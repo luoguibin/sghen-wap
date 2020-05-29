@@ -99,5 +99,11 @@ export const apiURL = {
   // 评论创建
   commentCreate: `${preffix}/v1/comment/create`,
   // 评论删除
-  commentDelete: `${preffix}/v1/comment/delete`
+  commentDelete: `${preffix}/v1/comment/delete`,
+  // 点赞列表
+  commentPraise: `${preffix}/v1/api/get/peotry/praise-comments`,
+  // 用户评论列表
+  commentWords: `${preffix}/v1/api/get/peotry/word-comments`,
+  // 用户是否点赞诗词
+  commentPraises: `${preffix}/v1/api/get/peotry/is-praise`
 }
