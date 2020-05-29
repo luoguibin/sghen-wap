@@ -88,7 +88,7 @@ export default {
 
       praiseOffset: 0,
       commentOffset: 0,
-      pageLimit: 10
+      pageLimit: 20
     }
   },
 
