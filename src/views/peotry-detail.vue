@@ -88,7 +88,7 @@ export default {
 
       praiseOffset: 0,
       commentOffset: 0,
-      pageLimit: 20
+      pageLimit: 10
     }
   },
 
@@ -159,6 +159,7 @@ export default {
           o.user = Object.freeze(o.user)
         }
         this.peotry = o
+        this.resetDropdownOptions()
         this.getPeotryPraise()
         this.getWordComments()
         this.getPraiseComments()
@@ -183,7 +184,10 @@ export default {
         })
     },
 
-    getWordComments () {
+    getWordComments (isReset) {
+      if (isReset) {
+        this.commentOffset = 0
+      }
       apiGetData(apiURL.commentWords, {
         id: this.peotryID,
         limit: this.pageLimit,
@@ -194,14 +198,21 @@ export default {
           return
         }
         const total = +data[0][0].count || 0
-        const comments = this.formatComments(data[1])
+        const comments = this.formatComments(data[1] || [])
         this.commentOffset += this.pageLimit
-        this.peotry.realComments.push(...comments)
+        if (isReset) {
+          this.peotry.realComments = comments
+        } else {
+          this.peotry.realComments.push(...comments)
+        }
         this.peotry.commentTotal = total
         this.checkComments(comments)
       })
     },
-    getPraiseComments () {
+    getPraiseComments (isReset) {
+      if (isReset) {
+        this.praiseOffset = 0
+      }
       apiGetData(apiURL.commentPraise, {
         id: this.peotryID,
         limit: this.pageLimit,
@@ -212,10 +223,14 @@ export default {
           return
         }
         const total = +data[0][0].count || 0
-        const comments = this.formatComments(data[1])
+        const comments = this.formatComments(data[1] || [])
         this.praiseOffset += this.pageLimit
         this.peotry.praiseTotal = total
-        this.peotry.praiseComments.push(...comments)
+        if (isReset) {
+          this.peotry.praiseComments = comments
+        } else {
+          this.peotry.praiseComments.push(...comments)
+        }
         this.checkComments(comments)
       })
     },
@@ -332,9 +347,12 @@ export default {
           fromId: comment.fromId
         })
           .then(data => {
-            const comments = this.peotry.praiseComments
-            const index = comments.findIndex(o => o.id === comment.id)
-            comments.splice(index, 1)
+            const { praiseTotal, praiseComments } = this.peotry
+            if (praiseTotal === praiseComments.length) {
+              const index = praiseComments.findIndex(o => o.id === comment.id)
+              praiseComments.splice(index, 1)
+            }
+            this.peotry.praiseTotal -= 1
             this.myPraiseComment = undefined
             this.resetDropdownOptions()
           })
@@ -350,10 +368,15 @@ export default {
           toId: -1
         })
           .then(({ data }) => {
-            const comment = this.formatComments([data])[0]
-            comment.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
-            comment.itemTag = 'opacity'
+            const comment = data
+            const { praiseTotal, praiseComments } = this.peotry
+            if (praiseTotal === praiseComments.length) {
+              comment.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
+              comment.itemTag = 'opacity'
+              praiseComments.push(comment)
+            }
             this.myPraiseComment = comment
+            this.peotry.praiseTotal += 1
             this.resetDropdownOptions()
 
             this.$nextTick(() => {
@@ -370,9 +393,7 @@ export default {
         id: comment.id,
         fromId: comment.fromId
       }).then(data => {
-        const comments = peotry.realComments
-        const index = comments.findIndex(o => o.id === comment.id)
-        comments.splice(index, 1)
+        this.getWordComments(true)
       })
     },
     resetDropdownOptions () {
@@ -403,7 +424,7 @@ export default {
           this.editVisible = true
           break
         case 'comment':
-          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          this.openCommentInput(peotry.id, this.userID, '请输入评论')
           break
         case 'praise':
           this.onCheckPraisePeotry(e)
@@ -451,18 +472,18 @@ export default {
           this.viewerVisible = true
           break
         case 'peot':
-          this.openCommentInput(peotry.id, peotry.user.id, '请输入评论')
+          this.openCommentInput(peotry.id, this.userID, '请输入评论')
           break
         case 'peot-avatar':
           this.$router.push({
-            name: 'peotry-list',
+            name: 'personal',
             query: { uuid: peotry.user.id, username: peotry.user.username }
           })
           break
         case 'comment-avatar':
           const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
           this.$router.push({
-            name: 'peotry-list',
+            name: 'personal',
             query: { uuid: poet.id, username: poet.username }
           })
           break
@@ -470,7 +491,7 @@ export default {
           const fromIndex = getItemIndex(target.parentElement.parentElement)
           const fromComment = peotry.realComments[fromIndex]
           this.$router.push({
-            name: 'peotry-list',
+            name: 'personal',
             query: { uuid: fromComment.fromId }
           })
           break
@@ -478,7 +499,7 @@ export default {
           const toIndex = getItemIndex(target.parentElement.parentElement)
           const toComment = peotry.realComments[toIndex]
           this.$router.push({
-            name: 'peotry-list',
+            name: 'personal',
             query: { uuid: toComment.toId }
           })
           break
@@ -487,11 +508,9 @@ export default {
           this.onClickComment(peotry, peotry.realComments[commentIndex])
           break
         case 'avatars-more':
-          console.log('avatars-more')
           this.getPraiseComments()
           break
         case 'comments-more':
-          console.log('comments-more')
           this.getWordComments()
           break
         default:
@@ -503,8 +522,7 @@ export default {
         this.$toast('请登陆后再操作')
         return
       }
-
-      if (this.userID === comment.fromId) {
+      if ('' + this.userID === '' + comment.fromId) {
         // 当前评论是当前用户创建
         this.$confirm({
           title: '提示',
@@ -527,9 +545,13 @@ export default {
       this.getPeotryDetail()
     },
     handleCommentOk (o) {
-      o.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
-      o.toPeot = Cache.UserCache.getData(+this.commentToID)
-      this.peotry.realComments.push(o)
+      const { commentTotal, realComments } = this.peotry
+      if (commentTotal === realComments.length) {
+        o.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
+        o.toPeot = Cache.UserCache.getData(+this.commentToID)
+        realComments.push(o)
+      }
+      this.peotry.commentTotal += 1
     },
 
     onPraiseAnime (e, data) {

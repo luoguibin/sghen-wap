@@ -10,7 +10,7 @@
         item-type="comment-avatar"
         alt
       />
-      <div v-show="hasAvatarsMore" class="more" item-type="avatars-more">...</div>
+      <div v-if="hasAvatarsMore" class="more" item-type="avatars-more">...</div>
     </div>
 
     <div v-show="currentPraises.length && comments.length" style="border-bottom: 1px solid white;"></div>
@@ -34,7 +34,7 @@
         <p item-type="comment-content">{{comment.content}}</p>
       </div>
 
-      <div v-show="hasCommentsMore" class="more" item-type="comments-more">加载更多...</div>
+      <div v-if="hasCommentsMore" class="more" item-type="comments-more">加载更多...</div>
     </div>
   </div>
 </template>

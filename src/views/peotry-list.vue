@@ -15,7 +15,7 @@
         @scroll="handleScroll"
       >
         <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries">
-          <div v-if="item.timeLine" slot="header" class="time-line">{{item.timeLine}}</div>
+          <div v-if="item.timeLine" :key="item.id" slot="header" class="time-line">{{item.timeLine}}</div>
         </peotry>
       </sg-scroll>
       <div v-show="isEmpty" class="empty">暂未有诗词</div>
@@ -39,7 +39,7 @@ export default {
   nae: 'PeotryList',
 
   components: {
-    'peotry': () => import('@/components/peotry'),
+    peotry: () => import('@/components/peotry'),
     'image-viewer': () => import('@/components/image-viewer'),
     'peotry-edit': () => import('@/components/peotry-edit')
   },
@@ -139,8 +139,8 @@ export default {
     checkRestorePageData () {
       const query = this.$route.query
       // 强制转换为string作为id
-      this.uuid = query.uuid ? ('' + query.uuid) : CACHE_ROOT_ID
-      this.setId = query.setId ? ('' + query.setId) : '0'
+      this.uuid = query.uuid ? '' + query.uuid : CACHE_ROOT_ID
+      this.setId = query.setId ? '' + query.setId : '0'
       this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
