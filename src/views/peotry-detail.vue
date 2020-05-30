@@ -2,11 +2,7 @@
   <div class="peotry-detail">
     <sg-header @back="onBack">
       <span style="font-size: 1.6rem;">诗词详情</span>
-      <div slot="right">
-        <sg-dropdown :options="dropdownOptions" @change="handleDropdown" :pointerVisible="false">
-          <span class="iconfont icon-checkmore"></span>
-        </sg-dropdown>
-      </div>
+      <div slot="right"></div>
     </sg-header>
 
     <div class="main">
@@ -33,6 +29,31 @@
       :placeholder="commentTip"
       @ok="handleCommentOk"
     ></comment-input>
+
+    <div class="right-menus">
+      <div class="menu-item" @click="handleDropdown('praise', $event)">
+        <div :class="{'is-praise': isPraise}">
+          <i class="iconfont icon-like"></i>
+        </div>
+        <span>{{peotry && peotry.praiseTotal}}</span>
+      </div>
+      <div class="menu-item" @click="handleDropdown('comment', $event)">
+        <div>
+          <i class="iconfont icon-message"></i>
+        </div>
+        <span>{{peotry && peotry.commentTotal}}</span>
+      </div>
+      <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
+        <div>
+          <i class="iconfont icon-edit"></i>
+        </div>
+      </div>
+      <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('delete', $event)">
+        <div>
+          <i class="iconfont icon-delete"></i>
+        </div>
+      </div>
+    </div>
 
     <praise-anime
       v-if="praiseVisible"
@@ -182,7 +203,6 @@ export default {
           o.user = Object.freeze(o.user)
         }
         this.peotry = o
-        this.resetDropdownOptions()
         this.getPeotryPraise()
         this.getWordComments()
         this.getPraiseComments()
@@ -200,7 +220,6 @@ export default {
       })
         .then(resp => {
           this.myPraiseComment = this.formatComments(resp.data || [])[0]
-          this.resetDropdownOptions()
         })
         .finally(() => {
           this.praiseRequesting = false
@@ -311,6 +330,18 @@ export default {
         this.buildPeotryComments(comments)
       })
     },
+    buildPeotryComments (comments) {
+      const userCache = Cache.UserCache
+      comments.forEach(o => {
+        if (!o.fromPeot) {
+          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
+        }
+        if (o.toId > 0 && !o.toPeot) {
+          this.$set(o, 'toPeot', Object.freeze(userCache.getData(o.toId)))
+        }
+      })
+    },
+
     getUsersInfo (ids) {
       const reqs = []
       const max = 100
@@ -328,17 +359,6 @@ export default {
           data = data.concat(o.data)
         })
         return data
-      })
-    },
-    buildPeotryComments (comments) {
-      const userCache = Cache.UserCache
-      comments.forEach(o => {
-        if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
-        }
-        if (o.toId > 0 && !o.toPeot) {
-          this.$set(o, 'toPeot', Object.freeze(userCache.getData(o.toId)))
-        }
       })
     },
 
@@ -377,7 +397,6 @@ export default {
             }
             this.peotry.praiseTotal -= 1
             this.myPraiseComment = undefined
-            this.resetDropdownOptions()
           })
           .finally(() => {
             this.praiseRequesting = false
@@ -394,13 +413,14 @@ export default {
             const comment = data
             const { praiseTotal, praiseComments } = this.peotry
             if (praiseTotal === praiseComments.length) {
-              comment.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
+              comment.fromPeot = JSON.parse(
+                JSON.stringify(this.selfPublicInfo)
+              )
               comment.itemTag = 'opacity'
               praiseComments.push(comment)
             }
             this.myPraiseComment = comment
             this.peotry.praiseTotal += 1
-            this.resetDropdownOptions()
 
             this.$nextTick(() => {
               this.onPraiseAnime(e, comment)
@@ -417,19 +437,6 @@ export default {
         fromId: comment.fromId
       }).then(data => {
         this.getWordComments(true)
-      })
-    },
-    resetDropdownOptions () {
-      this.$nextTick(() => {
-        const options = [
-          { label: this.isPraise ? '取消点赞' : '点赞', value: 'praise' },
-          { label: '评论', value: 'comment' }
-        ]
-        if (this.isSelfPeotry) {
-          options.push({ label: '编辑', value: 'edit' })
-          options.push({ label: '删除', value: 'delete' })
-        }
-        this.dropdownOptions = options
       })
     },
 
@@ -620,6 +627,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .peotry-detail {
   display: flex;
   flex-direction: column;
@@ -644,6 +653,27 @@ export default {
     box-sizing: border-box;
     overflow-x: hidden;
     overflow-y: auto;
+  }
+
+  .right-menus {
+    position: fixed;
+    right: 0;
+    top: 11rem;
+    padding: 1rem;
+    background-color: rgba($color-theme, 0.5);
+    .menu-item {
+      text-align: center;
+      color: white;
+    }
+    .menu-item + .menu-item {
+      margin-top: 1.5rem;
+    }
+    .iconfont {
+      font-size: 2rem;
+    }
+    .is-praise .icon-like {
+      color: $color-theme;
+    }
   }
 }
 </style>

@@ -123,7 +123,7 @@ export default {
 <style lang="scss" scoped>
 @import '@/ui/style/const.scss';
 
-$background: rgba(0, 0, 0, 0.05);
+$background: rgba(0, 0, 0, 0.03);
 .comments {
   position: relative;
   border-radius: 8px;

@@ -5,7 +5,7 @@
     @after-enter="afterEnter"
     @enter-cancelled="enterCancelled"
   >
-    <div class="praise-anime iconfont icon-praise" v-show="visible"></div>
+    <div class="praise-anime iconfont icon-like" v-show="visible"></div>
   </transition>
 </template>
 
@@ -73,12 +73,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .praise-anime {
   position: fixed;
   top: 0;
   left: 0;
   font-size: 3.5rem;
-  color: steelblue;
+  color: $color-theme;
   z-index: 99;
   transform: translate(-50%, -50%);
 }

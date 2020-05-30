@@ -20,7 +20,7 @@
       <!-- 诗词作者及创建时间 -->
       <div class="peot--time">
         <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-        <span>--{{peotry.time | time-format}}</span>
+        <span>——{{peotry.time | time-format}}</span>
       </div>
 
       <!-- 诗词内容 -->
