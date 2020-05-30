@@ -92,6 +92,8 @@ export default {
 .sg-dropdown {
   position: relative;
   padding: $padding-small;
+  height: $height-text;
+  line-height: $height-text;
   background-color: white;
   .sg-flex {
     align-items: center;
