@@ -9,7 +9,7 @@ import './style/index.scss'
 
 Vue.config.productionTip = false
 
-const temp = sessionStorage.getItem('sghen_user_info')
+const temp = localStorage.getItem('sghen_user_info')
 if (temp) {
   const userinfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
   store.commit('auth/setUserInfo', userinfo)

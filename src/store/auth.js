@@ -26,7 +26,7 @@ export default {
   mutations: {
     setUserInfo (state, data = {}) {
       const temp = window.btoa(window.encodeURIComponent(JSON.stringify(data)))
-      sessionStorage.setItem('sghen_user_info', temp)
+      localStorage.setItem('sghen_user_info', temp)
       state.userID = data.id
       state.userAvatar = data.avatar
       state.userName = data.username || data.name
@@ -69,7 +69,7 @@ export default {
     },
     update (context, { name, avatar, mood }) {
       return apiPostData(apiURL.userUpdate, { name, avatar, mood }).then(resp => {
-        const temp = sessionStorage.getItem('sghen_user_info')
+        const temp = localStorage.getItem('sghen_user_info')
         if (temp) {
           const userinfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
           userinfo.username = name
