@@ -10,7 +10,7 @@
     </sg-header>
 
     <div class="main">
-      <div class="main-wrapper" @click="onClickPoetry">
+      <div ref="wrapper" class="main-wrapper" @click="onClickPoetry">
         <peotry v-if="peotry" ref="peotry" :peotry="peotry" :isDetail="true">
           <div></div>
         </peotry>
@@ -122,34 +122,57 @@ export default {
 
   created () {
     window.peotryDetail = this
-    this.getPeotryDetail()
+    this.checkRestorePageData()
   },
 
   beforeRouteUpdate (to, from, next) {
-    const pageCache = Cache.PeotryPageCache
-    pageCache.setData(this.peotryID, {
-      peotry: JSON.stringify(this.peotry)
-    })
+    this.savePageData()
     next()
+    this.checkRestorePageData()
+  },
 
-    this.peotryID = to.params.id
-    const pageCacheData = pageCache.getData(this.peotryID)
-    if (pageCacheData) {
-      this.peotry = JSON.parse(pageCacheData.peotry)
-      this.resetDropdownOptions()
-    } else {
-      this.getPeotryDetail()
-    }
+  beforeRouteLeave (to, from, next) {
+    this.savePageData()
+    next()
   },
 
   methods: {
     onBack () {
       this.$router.go(-1)
     },
+
+    savePageData () {
+      Cache.PeotryPageCache.setData(this.peotryID, {
+        peotry: this.peotry,
+        praiseOffset: this.praiseOffset,
+        commentOffset: this.commentOffset,
+        scrollTop: this.$refs.wrapper.scrollTop
+      })
+    },
+    restorePageData () {
+      const pageCacheData = Cache.PeotryPageCache.getData(this.peotryID)
+      if (!pageCacheData) {
+        return false
+      }
+
+      this.peotry = pageCacheData.peotry
+      this.praiseOffset = pageCacheData.praiseOffset
+      this.commentOffset = pageCacheData.commentOffset
+
+      this.$nextTick(() => {
+        this.$refs.wrapper.scrollTop = pageCacheData.scrollTop
+      })
+      return true
+    },
+    checkRestorePageData () {
+      this.peotryID = this.$route.params.id
+      if (!this.restorePageData()) {
+        this.getPeotryDetail()
+      }
+    },
+
     getPeotryDetail () {
-      const id = this.$route.params.id
-      this.peotryID = id
-      apiGetData(apiURL.peotryList, { id }).then(data => {
+      apiGetData(apiURL.peotryList, { id: this.peotryID }).then(data => {
         const o = data.data
         o.praiseTotal = -1
         o.praiseComments = []

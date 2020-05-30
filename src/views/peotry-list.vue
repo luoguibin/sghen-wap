@@ -119,7 +119,7 @@ export default {
         scrollTop: this.$refs.sgScroll.getScrollTop()
       })
     },
-    resotrePageData () {
+    restorePageData () {
       const pageCacheData = Cache.PeotryPageCache.getData(this.getSaveID())
       if (!pageCacheData) {
         return false
@@ -144,7 +144,7 @@ export default {
       this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
-      if (!this.resotrePageData()) {
+      if (!this.restorePageData()) {
         this.isDataReady = false
         this.page = 1
         this.peotries = []
