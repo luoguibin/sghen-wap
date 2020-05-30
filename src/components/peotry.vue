@@ -278,7 +278,7 @@ export default {
   }
 
   .comments {
-    margin-top: 1rem;
+    margin-top: 2rem;
   }
 }
 
