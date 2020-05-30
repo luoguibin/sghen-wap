@@ -34,7 +34,9 @@
         <p item-type="comment-content">{{comment.content}}</p>
       </div>
 
-      <div v-if="hasCommentsMore" class="more" item-type="comments-more">加载更多...</div>
+      <div v-if="hasCommentsMore" class="more">
+        <span item-type="comments-more">加载更多...</span>
+      </div>
     </div>
   </div>
 </template>
@@ -119,6 +121,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 $background: rgba(0, 0, 0, 0.05);
 .comments {
   position: relative;
@@ -171,7 +175,13 @@ $background: rgba(0, 0, 0, 0.05);
   .contents {
     padding: 5px 8px;
     .more {
+      padding: 0.5rem 0 0;
+      margin-top: 1rem;
+      color: $color-tip;
+      line-height: $height-text;
+      font-size: 1rem;
       text-align: center;
+      border-top: 1px dashed white;
     }
   }
   .comment {
