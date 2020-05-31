@@ -1,6 +1,7 @@
 import axios from 'axios'
 import Qs from 'qs'
 import store from '@/store'
+import router from '@/router'
 
 axios.defaults.timeout = 100000
 
@@ -28,6 +29,10 @@ axios.interceptors.response.use(
     const data = res.data || {}
     if (status !== 200 || data.code !== 1000) {
       window._sgGlobal.$toast(data.msg || '操作失败')
+      if (data.code === 1002) {
+        store.dispatch('auth/logout')
+        router.push({ name: 'login', query: { redirect: router.currentRoute.fullPath } })
+      }
       return Promise.reject(res)
     }
 
