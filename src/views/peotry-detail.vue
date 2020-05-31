@@ -1,7 +1,7 @@
 <template>
   <div class="peotry-detail">
     <sg-header @back="onBack">
-      <span style="font-size: 1.6rem;">诗词详情</span>
+      诗词详情
       <div slot="right"></div>
     </sg-header>
 
@@ -629,7 +629,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
 .peotry-detail {
   display: flex;

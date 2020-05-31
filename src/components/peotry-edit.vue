@@ -2,9 +2,7 @@
   <div class="sg-mask">
     <div class="peotry-edit-wrapper">
       <div class="peotry-edit">
-        <sg-header @back="$emit('close')">
-          <span style="font-size: 1.6rem;">诗词{{peotry ? '更新':'创建'}}</span>
-        </sg-header>
+        <sg-header @back="$emit('close')">诗词{{peotry ? '更新':'创建'}}</sg-header>
 
         <div class="main">
           <div class="main-wrapper">
@@ -232,7 +230,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
 .sg-mask {
   .peotry-edit-wrapper {
