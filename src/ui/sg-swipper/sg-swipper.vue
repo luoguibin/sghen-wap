@@ -6,11 +6,13 @@
       :style="wrapperStyle"
       @touchstart="onMouseDown"
       @touchend="onMouseUp"
+      @click="$emit('click', $event)"
     >
       <div
         v-for="(item, index) in items"
         :key="item.slot"
         ref="swipperItems"
+        :item-type="itemType"
         :class="{ 'sg-swipper-item': true, 'sg-swipper-item_active': index === currentIndex }"
       >
         <slot :name="item.slot"></slot>
@@ -46,6 +48,10 @@ export default {
     index: {
       type: Number,
       default: 0
+    },
+    itemType: {
+      type: String,
+      default: ''
     }
   },
 

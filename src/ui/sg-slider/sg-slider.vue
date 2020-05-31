@@ -7,6 +7,7 @@
       @touchstart="onTouchStart"
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
+      @click="$emit('click', $event)"
     >
       <div
         v-for="item in options"
