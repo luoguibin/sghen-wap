@@ -142,18 +142,6 @@ export default {
     })
   },
 
-  filters: {
-    numFilter (v) {
-      if (v < 0) {
-        return '?'
-      }
-      if (v && (v + '').length > 4) {
-        return v.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
-      }
-      return v || 0
-    }
-  },
-
   created () {
     window.personal = this
     this.initData()

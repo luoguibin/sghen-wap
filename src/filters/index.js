@@ -63,5 +63,16 @@ export const imgSrcFormat = function (v) {
   return path
 }
 
+export const numFilter = function (v) {
+  if (v < 0) {
+    return '?'
+  }
+  if (v && (v + '').length > 4) {
+    return v.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
+  }
+  return v || 0
+}
+
 Vue.filter('time-format', timeFormat)
 Vue.filter('img-src', imgSrcFormat)
+Vue.filter('numFilter', numFilter)

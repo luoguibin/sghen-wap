@@ -30,18 +30,18 @@
       @ok="handleCommentOk"
     ></comment-input>
 
-    <div class="right-menus">
+    <div class="right-menus" v-if="peotry">
       <div class="menu-item" @click="handleDropdown('praise', $event)">
         <div :class="{'is-praise': isPraise}">
           <i class="iconfont icon-like"></i>
         </div>
-        <span>{{peotry && peotry.praiseTotal}}</span>
+        <span>{{peotry.praiseTotal | numFilter}}</span>
       </div>
       <div class="menu-item" @click="handleDropdown('comment', $event)">
         <div>
           <i class="iconfont icon-message"></i>
         </div>
-        <span>{{peotry && peotry.commentTotal}}</span>
+        <span>{{peotry.commentTotal | numFilter}}</span>
       </div>
       <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
         <div>
