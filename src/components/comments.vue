@@ -17,7 +17,7 @@
 
     <!-- 评论列表 -->
     <div class="contents" v-show="comments.length">
-      <div v-for="comment in comments" class="comment" :key="comment.id">
+      <div v-for="comment in comments" class="comment" :key="comment.id" item-type="comment">
         <span class="names">
           <span
             class="name"

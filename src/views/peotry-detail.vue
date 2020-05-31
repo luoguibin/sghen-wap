@@ -68,7 +68,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
-import { getItemIndex } from '@/utils/sgDom'
+import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
 import Cache from '@/common/cache-center'
 
 export default {
@@ -479,15 +479,16 @@ export default {
       }
     },
     onClickPoetry (e) {
-      const target = e.target
-      const itemType = target.getAttribute('item-type')
+      const { el, itemType } = getItemTypeObj(e.target) || {}
       if (!itemType) {
         this.menusVisible = !this.menusVisible
         return
       }
 
       const peotry = this.peotry
-      const instance = this.$refs.peotry
+      const itemIndex = getItemIndex(el)
+      const commentIndex = getItemTypeIndex(el, 'comment')
+
       switch (itemType) {
         case 'peotry-content':
           const time = this.previousTime || 0
@@ -498,8 +499,8 @@ export default {
           this.previousTime = currentTime
           break
         case 'peotry-image':
-          this.images = instance.peotryImages
-          this.imageIndex = getItemIndex(target.parentElement.parentElement)
+          this.images = this.$refs.peotry.peotryImages
+          this.imageIndex = itemIndex
           this.viewerVisible = true
           break
         case 'peot':
@@ -512,30 +513,27 @@ export default {
           })
           break
         case 'comment-avatar':
-          const poet = peotry.praiseComments[getItemIndex(target)].fromPeot
+          const poet = peotry.praiseComments[itemIndex].fromPeot
           this.$router.push({
             name: 'personal',
             query: { uuid: poet.id, username: poet.username }
           })
           break
         case 'comment-from':
-          const fromIndex = getItemIndex(target.parentElement.parentElement)
-          const fromComment = peotry.realComments[fromIndex]
+          const fromComment = peotry.realComments[commentIndex]
           this.$router.push({
             name: 'personal',
             query: { uuid: fromComment.fromId }
           })
           break
         case 'comment-to':
-          const toIndex = getItemIndex(target.parentElement.parentElement)
-          const toComment = peotry.realComments[toIndex]
+          const toComment = peotry.realComments[commentIndex]
           this.$router.push({
             name: 'personal',
             query: { uuid: toComment.toId }
           })
           break
         case 'comment-content':
-          const commentIndex = getItemIndex(target.parentElement)
           this.onClickComment(peotry, peotry.realComments[commentIndex])
           break
         case 'avatars-more':
