@@ -8,7 +8,13 @@
       @touchmove="onTouchMove"
       @touchend="onTouchEnd"
     >
-      <div v-for="item in options" :key="item.id" class="card-item-wrapper" :style="item.style">
+      <div
+        v-for="item in options"
+        :key="item.id"
+        class="card-item-wrapper"
+        :style="item.style"
+        :item-type="itemType"
+      >
         <div
           :class="{'card-item': true, 'card-item__active': item.id === activeId}"
           :style="item.itemStyle"
@@ -28,6 +34,10 @@ export default {
     items: {
       type: Array,
       required: true
+    },
+    itemType: {
+      type: String,
+      default: ''
     }
   },
 
@@ -127,7 +137,7 @@ export default {
       if (value > this.swipeDistance) {
         nextIndexValue = -(1 + count)
       } else if (value < -this.swipeDistance) {
-        nextIndexValue = (1 + count)
+        nextIndexValue = 1 + count
       }
 
       let nextIndex = this.activeIndex + nextIndexValue
@@ -176,15 +186,26 @@ export default {
       loop()
     },
     setItemRatio (index, ratio) {
-      this.options[index].itemStyle.transform = `scale(${Math.max(1 - ratio, 0.8)})`
+      this.options[index].itemStyle.transform = `scale(${Math.max(
+        1 - ratio,
+        0.8
+      )})`
       this.options[index].itemStyle.filter = `blur(${ratio * 30}px)`
       if (index !== 0) {
-        this.options[index - 1].itemStyle.transform = `scale(${Math.max(ratio, 0.8)})`
-        this.options[index - 1].itemStyle.filter = `blur(${(1 - ratio) * 30}px)`
+        this.options[index - 1].itemStyle.transform = `scale(${Math.max(
+          ratio,
+          0.8
+        )})`
+        this.options[index - 1].itemStyle.filter = `blur(${(1 - ratio) *
+          30}px)`
       }
       if (index < this.options.length - 1) {
-        this.options[index + 1].itemStyle.transform = `scale(${Math.max(ratio, 0.8)})`
-        this.options[index + 1].itemStyle.filter = `blur(${(1 - ratio) * 30}px)`
+        this.options[index + 1].itemStyle.transform = `scale(${Math.max(
+          ratio,
+          0.8
+        )})`
+        this.options[index + 1].itemStyle.filter = `blur(${(1 - ratio) *
+          30}px)`
       }
     }
   }
