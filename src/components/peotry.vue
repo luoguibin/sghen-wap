@@ -37,9 +37,14 @@
 
       <!-- 诗词图片 -->
       <div v-if="currentThumbnails.length" ref="images" class="images">
-        <div v-for="(value, index) in currentThumbnails" :key="index" class="image-wrapper">
+        <div
+          v-for="(value, index) in currentThumbnails"
+          :key="index"
+          class="image-wrapper"
+          item-type="peotry-image"
+        >
           <div class="image-wrapper__inner">
-            <img item-type="peotry-image" :src="value" />
+            <img :src="value" />
           </div>
         </div>
       </div>

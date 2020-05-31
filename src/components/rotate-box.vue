@@ -1,7 +1,7 @@
 <template>
   <div class="rotate-box">
     <div ref="wrapper" class="wrapper" :style="wrapperStyle" :class="{'anime' : canAnime}">
-      <div v-for="item in itemStyles" :key="item.id" class="rotate-item" :style="item.style">
+      <div v-for="item in itemStyles" :key="item.id" :item-type="itemType" class="rotate-item" :style="item.style">
         <template v-if="item.slot">
           <slot :name="item.slot"></slot>
         </template>
@@ -25,6 +25,10 @@ export default {
     duration: {
       type: Number,
       default: 5000
+    },
+    itemType: {
+      type: String,
+      default: ''
     }
   },
 

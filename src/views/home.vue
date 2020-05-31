@@ -20,7 +20,14 @@
     <!-- 内容 -->
     <div class="home-body">
       <div class="scroll">
-        <sg-swipper ref="sgSwipper" :items="swipperItems" :duration="swipperDuration" :auto="1">
+        <sg-swipper
+          ref="sgSwipper"
+          :items="swipperItems"
+          :itemType="'swipper-peotry'"
+          :duration="swipperDuration"
+          :auto="1"
+          @click="onClickItemType"
+        >
           <div
             v-for="(item, index) in swipperPoetries"
             :slot="swipperItems[index].slot"
@@ -64,7 +71,7 @@
         </div>
 
         <div class="module-panel" @click="onClickItemType">
-          <rotate-box v-if="lastestImages.length" :items="rotateItems">
+          <rotate-box v-if="lastestImages.length" :items="rotateItems" :itemType="'latest-image'">
             <div
               v-for="(item, index) in lastestImages"
               :slot="rotateItems[index].slot"
@@ -73,14 +80,14 @@
             >
               <!-- 相册中不超过2张图片，默认显示第一张图片 -->
               <div v-if="item.images.length < 3" class="album-image1">
-                <img item-type="latest-image" :src="item.images[0]" />
+                <img :src="item.images[0]" />
               </div>
 
               <!-- 相册中超过2张图片，默认显示最新的前3张图片 -->
               <div v-else class="album-images3">
-                <img item-type="latest-image" :src="item.images[0]" />
-                <img item-type="latest-image" :src="item.images[1]" />
-                <img item-type="latest-image" :src="item.images[2]" />
+                <img :src="item.images[0]" />
+                <img :src="item.images[1]" />
+                <img :src="item.images[2]" />
               </div>
             </div>
           </rotate-box>
@@ -96,7 +103,7 @@
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
-import { getItemIndex } from '@/utils/sgDom'
+import { getItemIndex, getItemTypeObj } from '@/utils/sgDom'
 
 const getSmallImage = v => {
   if (v.endsWith('.jpg')) {
@@ -274,16 +281,22 @@ export default {
       })
     },
     onClickItemType (e) {
-      const itemType = e.target.getAttribute('item-type')
-      console.log('onClickItemType()', itemType)
+      const { el, itemType } = getItemTypeObj(e.target) || {}
       if (!itemType) {
         return
       }
+
+      const itemIndex = getItemIndex(el)
       switch (itemType) {
+        case 'swipper-peotry':
+          this.$router.push({
+            name: 'peotry-detail',
+            params: { id: this.swipperPoetries[itemIndex].id }
+          })
+          break
         case 'popular-set':
           {
-            const index = getItemIndex(e.target)
-            const set = this.popularPeotrySets[index]
+            const set = this.popularPeotrySets[itemIndex]
             const query = { setId: set.id, setName: set.name }
             if (set.userId && set.userId !== '0') {
               query.uuid = set.userId
@@ -307,14 +320,10 @@ export default {
           })
           break
         case 'latest-image':
-          {
-            const typeItemEl = e.target.parentElement.parentElement.parentElement
-            const index = getItemIndex(typeItemEl)
-            this.$router.push({
-              name: 'peotry-detail',
-              params: { id: this.lastestImages[index].id }
-            })
-          }
+          this.$router.push({
+            name: 'peotry-detail',
+            params: { id: this.lastestImages[itemIndex].id }
+          })
           break
         default:
           break

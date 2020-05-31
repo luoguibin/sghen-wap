@@ -30,7 +30,7 @@
 <script>
 import { mapState } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
-import { getItemIndex, getItemTypeIndex } from '@/utils/sgDom'
+import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
 import Cache from '@/common/cache-center'
 
 const CACHE_ROOT_ID = 'peotry_list_root'
@@ -230,12 +230,13 @@ export default {
       })
     },
     onClickPoetry (e) {
-      const target = e.target
-      const itemType = target.getAttribute('item-type')
+      const { el, itemType } = getItemTypeObj(e.target) || {}
       if (!itemType) {
         return
       }
-      const index = getItemTypeIndex(target, 'peotry')
+
+      const itemIndex = getItemIndex(el)
+      const index = getItemTypeIndex(el, 'peotry')
       const peotry = this.peotries[index]
       const instance = this.$refs.peotries[index]
       switch (itemType) {
@@ -247,7 +248,7 @@ export default {
           break
         case 'peotry-image':
           this.images = instance.peotryImages
-          this.imageIndex = getItemIndex(target.parentElement.parentElement)
+          this.imageIndex = itemIndex
           this.viewerVisible = true
           break
         case 'peot-avatar':
