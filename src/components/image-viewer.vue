@@ -51,6 +51,7 @@ export default {
 
   data () {
     return {
+      currentIndex: 0,
       imageOptions: [],
       isShowNatural: false
     }
@@ -68,7 +69,7 @@ export default {
       if (!this.images.length) {
         return ''
       }
-      const name = this.images[this.index]
+      const name = this.images[this.currentIndex]
       const index = name.lastIndexOf('/') + 1
       return name.substr(index)
     }
