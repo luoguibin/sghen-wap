@@ -30,7 +30,7 @@
       @ok="handleCommentOk"
     ></comment-input>
 
-    <div class="right-menus" v-if="peotry">
+    <div v-if="peotry" v-show="menusVisible" class="right-menus">
       <div class="menu-item" @click="handleDropdown('praise', $event)">
         <div :class="{'is-praise': isPraise}">
           <i class="iconfont icon-like"></i>
@@ -89,7 +89,7 @@ export default {
       editPeotry: null,
       editVisible: false,
 
-      dropdownOptions: [],
+      menusVisible: true,
 
       viewerVisible: false,
       images: [],
@@ -482,6 +482,7 @@ export default {
       const target = e.target
       const itemType = target.getAttribute('item-type')
       if (!itemType) {
+        this.menusVisible = !this.menusVisible
         return
       }
 
@@ -544,6 +545,7 @@ export default {
           this.getWordComments()
           break
         default:
+          this.menusVisible = !this.menusVisible
           break
       }
     },
