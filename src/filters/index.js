@@ -1,49 +1,57 @@
 import Vue from 'vue'
 import { defaultImgSrc } from '@/common/const'
 
-export const timeFormat = function (date, fmt = 'yyyy-MM-dd hh:mm:ss') {
-  // 2018-04-15T10:10:10+08:00
-  date = new Date(date)
-  const now = new Date()
-  const ms = now.getTime() - date.getTime()
-  if (ms < 10 * 60 * 1000) {
-    return '几分钟前'
-  } else if (ms < 60 * 60 * 1000) {
-    return Math.floor(ms / 60 / 1000) + '分钟前'
-  }
-  let preffix = ''
-  if (now.getFullYear() === date.getFullYear() &&
-    now.getMonth() === date.getMonth() &&
-    now.getDate() === date.getDate()) {
-    fmt = fmt.split(' ')[1]
-    preffix = '今天'
-  }
-  const o = {
-    'M+': date.getMonth() + 1, // 月份
-    'd+': date.getDate(), // 日
-    'h+': date.getHours(), // 小时
-    'm+': date.getMinutes(), // 分
-    's+': date.getSeconds(), // 秒
-    'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
-    S: date.getMilliseconds() // 毫秒
-  }
+const numFormat = function (num, n) {
+  return Array(n > num ? (n - ('' + num).length + 1) : 0).join(0) + num
+}
 
-  if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(
-      RegExp.$1,
-      (date.getFullYear() + '').substr(4 - RegExp.$1.length)
-    )
+const getDateValueMap = function (d) {
+  return {
+    year: d.getFullYear(),
+    month: numFormat(d.getMonth() + 1, 2),
+    date: numFormat(d.getDate(), 2),
+    hour: numFormat(d.getHours(), 2),
+    minute: numFormat(d.getMinutes(), 2),
+    second: numFormat(d.getSeconds(), 2)
   }
+}
 
-  for (const k in o) {
-    if (new RegExp(`(${k})`).test(fmt)) {
-      fmt = fmt.replace(
-        RegExp.$1,
-        RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length)
-      )
+export const timeFormat = function (s) {
+  const d = new Date(s)
+  const n = new Date()
+  const dMap = getDateValueMap(d)
+  const nMap = getDateValueMap(n)
+
+  const time0 = new Date(`${nMap.year}-${nMap.month}-${nMap.date}`).getTime()
+  const timeVal = time0 - d.getTime()
+  let output = ''
+  if (timeVal >= 0) {
+    // 非当天时间
+    const day = Math.floor(timeVal / (24 * 60 * 60 * 1000))
+    if (day < 1) {
+      output = `昨天 ${dMap.hour}:${dMap.minute}`
+    } else if (day < 2) {
+      output = `前天 ${dMap.hour}:${dMap.minute}`
+    } else if (day < 7) {
+      output = `${day}天前`
+    } else {
+      output = `${dMap.year}-${dMap.month}-${dMap.date} ${dMap.hour}:${dMap.minute}`
+    }
+  } else {
+    // 当天时间内
+    const seconds = (n.getTime() - d.getTime()) / 1000
+    if (seconds < 60) {
+      output = '刚刚'
+    } else if (seconds < 60 * 60) {
+      output = `${Math.floor(seconds / 60)}分钟前`
+    } else if (seconds <= 3 * 60 * 60 * 1000) {
+      output = `${Math.floor(seconds / 60 / 60)}小时前`
+    } else {
+      output = `今天 ${dMap.hour}:${dMap.minute}`
     }
   }
-  return preffix + fmt
+
+  return output
 }
 
 export const imgSrcFormat = function (v) {
