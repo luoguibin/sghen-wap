@@ -16,7 +16,7 @@ const getDateValueMap = function (d) {
   }
 }
 
-export const timeFormat = function (s) {
+export const timeFilter = function (s) {
   const d = new Date(s)
   const n = new Date()
   const dMap = getDateValueMap(d)
@@ -54,7 +54,7 @@ export const timeFormat = function (s) {
   return output
 }
 
-export const imgSrcFormat = function (v) {
+export const imgSrcFilter = function (v) {
   if (!v) {
     return defaultImgSrc
   }
@@ -81,6 +81,6 @@ export const numFilter = function (v) {
   return v || 0
 }
 
-Vue.filter('time-format', timeFormat)
-Vue.filter('img-src', imgSrcFormat)
+Vue.filter('timeFilter', timeFilter)
+Vue.filter('imgSrcFilter', imgSrcFilter)
 Vue.filter('numFilter', numFilter)

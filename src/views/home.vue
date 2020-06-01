@@ -10,7 +10,7 @@
         >
           <div class="user">
             <span>{{userName}}</span>
-            <img :src="userAvatar | img-src" />
+            <img :src="userAvatar | imgSrcFilter" />
           </div>
         </sg-dropdown>
         <sg-button v-else type="text" @click="onGoLogin">登陆~</sg-button>
@@ -204,7 +204,7 @@ export default {
         limit
       })
       const data = resp.data
-      const imgSrcFunc = Vue.filter('img-src')
+      const imgSrcFunc = Vue.filter('imgSrcFilter')
       this.swipperPoetries = data.map(o => {
         const temp = {
           id: o.id,
@@ -227,7 +227,7 @@ export default {
     },
     getRotateImages () {
       apiGetData(apiURL.peotryImages, { limit: 4 }).then(({ data }) => {
-        const imgSrcFunc = Vue.filter('img-src')
+        const imgSrcFunc = Vue.filter('imgSrcFilter')
         this.lastestImages = data
           .filter(o => o.count)
           .map(o => {

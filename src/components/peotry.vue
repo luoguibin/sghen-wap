@@ -13,14 +13,14 @@
           v-if="showAvatar"
           class="avatar"
           item-type="peot-avatar"
-          :src="(peotry.user && peotry.user.avatar) | img-src"
+          :src="(peotry.user && peotry.user.avatar) | imgSrcFilter"
         />
       </div>
 
       <!-- 诗词作者及创建时间 -->
       <div class="peot--time">
         <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-        <span>——{{peotry.time | time-format}}</span>
+        <span>——{{peotry.time | timeFilter}}</span>
       </div>
 
       <!-- 诗词内容 -->
@@ -127,7 +127,7 @@ export default {
     peotryImages () {
       const imageObj = this.peotry.image
       if (imageObj && imageObj.count) {
-        const srcFilter = Vue.filter('img-src')
+        const srcFilter = Vue.filter('imgSrcFilter')
         return JSON.parse(imageObj.images).map(v => {
           return srcFilter(v)
         })

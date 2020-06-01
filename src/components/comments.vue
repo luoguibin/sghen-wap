@@ -96,7 +96,7 @@ export default {
       return this.comments.length < this.commentTotal
     },
     currentPraises () {
-      const srcFilter = Vue.filter('img-src')
+      const srcFilter = Vue.filter('imgSrcFilter')
       return this.praises.map(o => {
         const temp = { ...o }
         temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar) : this.defaultImgSrc
