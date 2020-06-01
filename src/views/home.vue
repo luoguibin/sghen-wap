@@ -25,7 +25,6 @@
           :items="swipperItems"
           :itemType="'swipper-peotry'"
           :duration="swipperDuration"
-          :auto="1"
           @click="onClickItemType"
         >
           <div
@@ -34,9 +33,11 @@
             :key="item.id"
             class="item-panel"
           >
-            <img class="item-bg" v-if="item.image0" :src="item.image0" />
-            <h2 v-if="item.setName">《{{item.setName}}》</h2>
-            <p v-for="(l, i) in item.lines" :key="i">{{l}}</p>
+            <img class="item-bg" v-if="item.images && item.images.length" :src="item.images[0]" />
+            <h2 :style="{'opacity': item.set ? 1 : 0}">《{{item.set && item.set.name}}》</h2>
+            <div class="content-wrapper">
+              <p>{{item.content}}</p>
+            </div>
           </div>
         </sg-swipper>
 
@@ -165,7 +166,7 @@ export default {
   created () {
     window.home = this
     this.getYearInfos()
-    this.getWipperPeotries()
+    this.getSwipperPeotries()
     this.getRotateImages()
   },
 
@@ -185,45 +186,63 @@ export default {
         this.popularPeotrySets = resp.data
       })
     },
-    async getWipperPeotries () {
-      const limit = 3
-      if (!this.line3Total) {
-        const resp = await apiGetData(apiURL.peotryCount10001)
-        this.line3Total = +resp.data[0].total
-        this.line3Page = 1
-      } else {
-        this.line3Page++
-        if (this.line3Page > Math.ceil(this.line3Total / limit)) {
-          this.line3Page = 1
+    async getSwipperPeotries () {
+      const resp = await apiGetData(apiURL.peotryPopular)
+      const list = resp.data.map(o => {
+        let lines = o.content.split('\n')
+        const isOver = lines.length > 3
+        if (isOver) {
+          lines = lines.splice(0, 3)
+          lines.push('...')
         }
-      }
-
-      const resp = await apiGetData(apiURL.peotryList, {
-        setId: 10001,
-        page: this.line3Page,
-        limit
-      })
-      const data = resp.data
-      const imgSrcFunc = Vue.filter('imgSrcFilter')
-      this.swipperPoetries = data.map(o => {
-        const temp = {
+        return {
+          content: isOver ? lines.join('\n') : o.content,
+          isOver,
+          count: o.count,
+          end: o.end,
           id: o.id,
-          setName: o.set && o.set.name,
-          lines: o.content.split('\n')
+          setId: o.set_id,
+          set: null,
+          time_create: o.timeCreate,
+          title: o.title,
+          user_id: o.userId,
+          images: []
         }
-        if (o.image && o.image.count) {
-          temp.image0 = getSmallImage(
-            imgSrcFunc(JSON.parse(o.image.images)[0])
-          )
-        }
-        return temp
       })
-      this.swipperItems = data.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
+      this.swipperPoetries = list
+      this.swipperItems = list.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
       this.$refs.sgSwipper.start()
 
-      this.line3Timer = setTimeout(() => {
-        this.getWipperPeotries()
-      }, this.swipperDuration * this.swipperItems.length)
+      const ids = list.map(o => o.id)
+      const resp0 = await apiGetData(apiURL.peotryImageQuery, {
+        datas: ids.toString()
+      })
+      const imageMap = {}
+      const imgSrcFunc = Vue.filter('imgSrcFilter')
+      resp0.data.forEach(o => {
+        if (o && o.images) {
+          imageMap[o.id] = JSON.parse(o.images).map(v =>
+            getSmallImage(imgSrcFunc(v))
+          )
+        } else {
+          imageMap[o.id] = []
+        }
+      })
+      this.swipperPoetries.forEach(o => {
+        o.images = imageMap[o.id] || []
+      })
+
+      const setMap = {}
+      const setIds = list.map(o => o.setId)
+      const resp1 = await apiGetData(apiURL.peotrySetQuery, {
+        datas: setIds.toString()
+      })
+      resp1.data.forEach(o => {
+        setMap[o.id] = o
+      })
+      this.swipperPoetries.forEach(o => {
+        o.set = setMap[o.setId]
+      })
     },
     getRotateImages () {
       apiGetData(apiURL.peotryImages, { limit: 4 }).then(({ data }) => {
@@ -332,10 +351,6 @@ export default {
     ...mapActions({
       logout: 'auth/logout'
     })
-  },
-
-  beforeDestroy () {
-    clearTimeout(this.line3Timer)
   }
 }
 </script>
@@ -388,10 +403,6 @@ export default {
     box-sizing: border-box;
     text-align: center;
     overflow: hidden;
-    p {
-      font-size: 1.4rem;
-      line-height: 2.4rem;
-    }
     h2 {
       margin: 1rem 0;
     }
@@ -483,6 +494,20 @@ export default {
           padding-top: 2px;
         }
       }
+    }
+  }
+
+  .content-wrapper {
+    padding: 0 3rem;
+    text-align: center;
+    max-height: 9.6rem;
+    overflow: hidden;
+    p {
+      display: inline-block;
+      text-align: left;
+      font-size: 1.4rem;
+      line-height: 2.4rem;
+      white-space: pre-line;
     }
   }
 }

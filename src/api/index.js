@@ -68,7 +68,7 @@ export const apiURL = {
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
-  peotryHot: `${preffix}/v1/peotry/query-popular`,
+  peotryPopular: `${preffix}/v1/api/get/peotry/popular`,
   // 诗词创建
   peotryCreate: `${preffix}/v1/peotry/create`,
   // 诗词更新
@@ -77,6 +77,10 @@ export const apiURL = {
   peotryDelete: `${preffix}/v1/peotry/delete`,
   // 诗词图片
   peotryImages: `${preffix}/v1/api/get/peotry/images`,
+  // 诗词图片查询
+  peotryImageQuery: `${preffix}/v1/api/get/peotry/images-query`,
+  // 诗词选集查询
+  peotrySetQuery: `${preffix}/v1/api/get/peotry/set-query`,
 
   // 选集列表
   peotSets: `${preffix}/v1/peotry-set/query`,
