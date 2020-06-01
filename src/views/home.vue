@@ -105,6 +105,9 @@ import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
 import { getItemIndex, getItemTypeObj } from '@/utils/sgDom'
+import Cache from '@/common/cache-center'
+
+const HOME_ID = 'home'
 
 const getSmallImage = v => {
   if (v.endsWith('.jpg')) {
@@ -165,12 +168,46 @@ export default {
 
   created () {
     window.home = this
-    this.getYearInfos()
-    this.getSwipperPeotries()
-    this.getRotateImages()
+    this.checkRestorePageData()
   },
 
   methods: {
+    savePageData () {
+      const data = {
+        swipperPoetries: this.swipperPoetries,
+        swipperItems: this.swipperItems,
+        yearPoetrySets: this.yearPoetrySets,
+        yearPeots: this.yearPeots,
+        popularPeotrySets: this.popularPeotrySets,
+        rotateItems: this.rotateItems
+      }
+      Cache.PeotryPageCache.setData(HOME_ID, data)
+    },
+    resotrePageData () {
+      const pageData = Cache.PeotryPageCache.getData(HOME_ID)
+      if (pageData) {
+        this.swipperPoetries = pageData.swipperPoetries
+        this.swipperItems = pageData.swipperItems
+        this.yearPoetrySets = pageData.yearPoetrySets
+        this.yearPeots = pageData.yearPeots
+        this.popularPeotrySets = pageData.popularPeotrySets
+        this.rotateItems = pageData.rotateItems
+
+        this.$nextTick(() => {
+          this.$refs.sgSwipper.start()
+        })
+        return true
+      } else {
+        return false
+      }
+    },
+    checkRestorePageData () {
+      if (!this.resotrePageData()) {
+        this.getYearInfos()
+        this.getSwipperPeotries()
+        this.getRotateImages()
+      }
+    },
     getYearInfos () {
       const params = {
         date0: `${this.year}-01-01 00:00:00`,
@@ -351,6 +388,10 @@ export default {
     ...mapActions({
       logout: 'auth/logout'
     })
+  },
+
+  beforeDestroy () {
+    this.savePageData()
   }
 }
 </script>
