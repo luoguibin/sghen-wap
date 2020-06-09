@@ -167,7 +167,8 @@ export default {
         peotry: this.peotry,
         praiseOffset: this.praiseOffset,
         commentOffset: this.commentOffset,
-        scrollTop: this.$refs.wrapper.scrollTop
+        scrollTop: this.$refs.wrapper.scrollTop,
+        myPraiseComment: this.myPraiseComment
       })
     },
     restorePageData () {
@@ -179,6 +180,7 @@ export default {
       this.peotry = pageCacheData.peotry
       this.praiseOffset = pageCacheData.praiseOffset
       this.commentOffset = pageCacheData.commentOffset
+      this.myPraiseComment = pageCacheData.myPraiseComment
 
       this.$nextTick(() => {
         this.$refs.wrapper.scrollTop = pageCacheData.scrollTop
@@ -390,10 +392,11 @@ export default {
           fromId: comment.fromId
         })
           .then(data => {
-            const { praiseTotal, praiseComments } = this.peotry
-            if (praiseTotal === praiseComments.length) {
-              const index = praiseComments.findIndex(o => o.id === comment.id)
+            const { praiseComments } = this.peotry
+            const index = praiseComments.findIndex(o => o.id === comment.id)
+            if (index >= 0) {
               praiseComments.splice(index, 1)
+              this.praiseOffset -= 1
             }
             this.peotry.praiseTotal -= 1
             this.myPraiseComment = undefined
