@@ -133,6 +133,7 @@ export default {
       this.$refs.sgScroll.success()
       this.$nextTick(() => {
         this.$refs.sgScroll.setScrollTop(pageCacheData.scrollTop)
+        this.checkPeotriesVisible()
       })
       return true
     },
@@ -196,14 +197,7 @@ export default {
           this.$refs.sgScroll.success()
           isRefresh && this.$refs.sgScroll.onScrollToTop()
 
-          if (isRefresh) {
-            this.timeHandler = setInterval(() => {
-              if (this.$refs.peotries) {
-                clearInterval(this.timeHandler)
-                this.handleScroll(0, this.$el.clientHeight)
-              }
-            }, 100)
-          }
+          isRefresh && this.checkPeotriesVisible()
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
@@ -215,6 +209,14 @@ export default {
       Cache.PeotryPageCache.delete(this.getSaveID())
       Cache.UserCache.clear()
       this.handleLoad(true)
+    },
+    checkPeotriesVisible () {
+      this.timeHandler = setInterval(() => {
+        if (this.$refs.peotries) {
+          clearInterval(this.timeHandler)
+          this.handleScroll(0, this.$el.clientHeight)
+        }
+      }, 100)
     },
     handleScroll (scrollTop, clientHeight) {
       const map = this.scrollItemMap
