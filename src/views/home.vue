@@ -180,7 +180,7 @@ export default {
         yearPeots: this.yearPeots,
         popularPeotrySets: this.popularPeotrySets,
         rotateItems: this.rotateItems,
-        peotryImages: this.peotryImages
+        lastestImages: this.lastestImages
       }
       Cache.PeotryPageCache.setData(HOME_ID, data)
     },
@@ -193,7 +193,7 @@ export default {
         this.yearPeots = pageData.yearPeots
         this.popularPeotrySets = pageData.popularPeotrySets
         this.rotateItems = pageData.rotateItems
-        this.peotryImages = pageData.peotryImages
+        this.lastestImages = pageData.lastestImages
 
         this.$nextTick(() => {
           this.$refs.sgSwipper.start()
