@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import { defaultImgSrc } from '@/common/const'
 
-const numFormat = function (num, n) {
-  return Array(n > num ? (n - ('' + num).length + 1) : 0).join(0) + num
+const numFormat = function (num, len) {
+  if (String(num).length > len) return num
+  return (Array(len).join(0) + num).slice(-len)
 }
 
 const getDateValueMap = function (d) {
