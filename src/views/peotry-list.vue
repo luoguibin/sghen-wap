@@ -145,12 +145,20 @@ export default {
       this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
-      if (!this.restorePageData()) {
-        this.isDataReady = false
-        this.page = 1
-        this.peotries = []
-        this.$refs.sgScroll.refresh()
+      // 若删除了诗词，列表应该刷新
+      const optionData = Cache.OptionCache.getData(Cache.OPTION.DELETE)
+      if (!optionData || optionData.type !== 'peotry') {
+        if (this.restorePageData()) {
+          return
+        }
       }
+      if (optionData) {
+        Cache.OptionCache.delete(Cache.OPTION.DELETE)
+      }
+      this.isDataReady = false
+      this.page = 1
+      this.peotries = []
+      this.$refs.sgScroll.refresh()
     },
 
     handleLoad (isRefresh) {

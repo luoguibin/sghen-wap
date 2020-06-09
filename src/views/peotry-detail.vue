@@ -472,6 +472,11 @@ export default {
                 id: this.peotry.id
               }).then(resp => {
                 this.$toast('删除成功')
+                Cache.PeotryPageCache.delete(this.peotryID)
+                Cache.OptionCache.setData(Cache.OPTION.DELETE, {
+                  id: this.peotryID,
+                  type: 'peotry'
+                })
                 this.onBack()
               })
             }
