@@ -31,9 +31,9 @@ div, p, span, a {
     display: flex;
     flex-direction: column;
     height: 100%;
-    // .sg-flex-one {
-    //     height: 100%;
-    // }
+    .sg-flex-one {
+       overflow: hidden;
+    }
 }
 .sg-flex-one {
     flex: 1;
