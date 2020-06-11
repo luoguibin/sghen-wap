@@ -32,8 +32,15 @@ class CacheCenter {
 const cache = {
   UserCache: new CacheCenter('user'),
   PeotryPageCache: new CacheCenter('petory-page'),
-  PeotrySetCache: new CacheCenter('petory-set')
+  PeotrySetCache: new CacheCenter('petory-set'),
+  OptionCache: new CacheCenter('option'),
+  OPTION: {
+    CREATE: 'option-create',
+    UDPATE: 'option-update',
+    DELETE: 'option-delete'
+  }
 }
+
 window.GlobalCache = cache
 export default cache
 

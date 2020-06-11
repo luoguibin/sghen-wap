@@ -133,6 +133,7 @@ export default {
       this.$refs.sgScroll.success()
       this.$nextTick(() => {
         this.$refs.sgScroll.setScrollTop(pageCacheData.scrollTop)
+        this.checkPeotriesVisible()
       })
       return true
     },
@@ -144,12 +145,20 @@ export default {
       this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
-      if (!this.restorePageData()) {
-        this.isDataReady = false
-        this.page = 1
-        this.peotries = []
-        this.$refs.sgScroll.refresh()
+      // 若删除了诗词，列表应该刷新
+      const optionData = Cache.OptionCache.getData(Cache.OPTION.DELETE)
+      if (!optionData || optionData.type !== 'peotry') {
+        if (this.restorePageData()) {
+          return
+        }
       }
+      if (optionData) {
+        Cache.OptionCache.delete(Cache.OPTION.DELETE)
+      }
+      this.isDataReady = false
+      this.page = 1
+      this.peotries = []
+      this.$refs.sgScroll.refresh()
     },
 
     handleLoad (isRefresh) {
@@ -196,14 +205,7 @@ export default {
           this.$refs.sgScroll.success()
           isRefresh && this.$refs.sgScroll.onScrollToTop()
 
-          if (isRefresh) {
-            this.timeHandler = setInterval(() => {
-              if (this.$refs.peotries) {
-                clearInterval(this.timeHandler)
-                this.handleScroll(0, this.$el.clientHeight)
-              }
-            }, 100)
-          }
+          isRefresh && this.checkPeotriesVisible()
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
@@ -215,6 +217,14 @@ export default {
       Cache.PeotryPageCache.delete(this.getSaveID())
       Cache.UserCache.clear()
       this.handleLoad(true)
+    },
+    checkPeotriesVisible () {
+      this.timeHandler = setInterval(() => {
+        if (this.$refs.peotries) {
+          clearInterval(this.timeHandler)
+          this.handleScroll(0, this.$el.clientHeight)
+        }
+      }, 100)
     },
     handleScroll (scrollTop, clientHeight) {
       const map = this.scrollItemMap
