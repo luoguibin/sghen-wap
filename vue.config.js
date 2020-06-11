@@ -72,6 +72,15 @@ module.exports = {
         // pathRewrite: {
         //   '^/rng': ''
         // }
+      },
+      '/napi/': {
+        target: 'http://localhost:8282',
+        ws: false,
+        secure: true,
+        changeOrigin: true,
+        pathRewrite: {
+          '/napi/': '/'
+        }
       }
     }
   }

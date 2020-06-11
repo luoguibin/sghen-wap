@@ -30,6 +30,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'personal' */'@/views/personal')
   },
   {
+    path: '/api-manage',
+    name: 'api-manage',
+    component: () => import(/* webpackChunkName: 'api-manage' */'@/views/api-manage')
+  },
+  {
     path: '/sg-components',
     name: 'sg-components',
     component: () => import(/* webpackChunkName: 'sg-components' */'@/views/sg-components')
