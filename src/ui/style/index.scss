@@ -32,7 +32,7 @@ div, p, span, a {
     flex-direction: column;
     height: 100%;
     .sg-flex-one {
-        height: 100%;
+       overflow: hidden;
     }
 }
 .sg-flex-one {
