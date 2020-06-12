@@ -65,7 +65,7 @@ export default {
   height: 100%;
 
   .row-item {
-    line-height: $height-text * 1.3;
+    line-height: $height-text * 2.5;
     font-size: $size-text;
     color: $color-text;
   }
