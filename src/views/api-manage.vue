@@ -25,7 +25,6 @@
                 ref="statusDropdown"
                 :options="statusOptions"
                 @change="handleStatusChange"
-                :pointerVisible="false"
                 :optionActive="true"
               ></sg-dropdown>
             </div>
@@ -34,7 +33,6 @@
                 ref="methodDropdown"
                 :options="methodOptions"
                 @change="handleMethodChange"
-                :pointerVisible="false"
                 :optionActive="true"
               ></sg-dropdown>
             </div>
@@ -81,7 +79,7 @@ export default {
         comment: '',
         suffixPath: 'comment/list10',
         content: '[{"key":"data","sql":"SELECT * FROM comment LIMIT 10"}]',
-        params: '',
+        params: '{}',
         method: '',
         methodLabel: '',
         status: null,
@@ -237,10 +235,15 @@ export default {
 
     onOpenNew () {
       this.saveVisible = true
-      // this.$nextTick(() => {
-      //   this.$refs.statusDropdown.setSelectOption(this.statusOptions[0])
-      //   this.$refs.methodDropdown.setSelectOption(this.methodOptions[0])
-      // })
+      this.$nextTick(() => {
+        const statusOption = this.statusOptions[1]
+        this.$refs.statusDropdown.setSelectOption(statusOption)
+        this.handleStatusChange(statusOption.value)
+
+        const methodOption = this.methodOptions[0]
+        this.$refs.methodDropdown.setSelectOption(methodOption)
+        this.handleMethodChange(methodOption.value)
+      })
     },
     onConfirmSave () {
       this.$refs.form.validate(error => {
@@ -252,22 +255,42 @@ export default {
         }
         this.isSaveing = true
 
-        const { id, name, comment, content, params, method, status, suffixPath } = this.formData
-        const data = { name, comment, content, params, method, status, suffixPath }
+        const {
+          id,
+          name,
+          comment,
+          content,
+          params,
+          method,
+          status,
+          suffixPath
+        } = this.formData
+        const data = {
+          name,
+          comment,
+          content,
+          params,
+          method,
+          status,
+          suffixPath
+        }
 
         let url = apiCenterURL.create
         if (id) {
           data.id = id
           url = apiCenterURL.update
         }
-        apiPostData(url, data).then(resp => {
-          this.getAPIs()
-          this.saveVisible = false
-        }).catch(() => {
-          this.$toast('保存失败')
-        }).finally(() => {
-          this.isSaveing = false
-        })
+        apiPostData(url, data)
+          .then(resp => {
+            this.getAPIs()
+            this.saveVisible = false
+          })
+          .catch(() => {
+            this.$toast('保存失败')
+          })
+          .finally(() => {
+            this.isSaveing = false
+          })
       })
     },
 
@@ -312,9 +335,17 @@ export default {
 </style>
 
 <style lang="scss">
+@import "@/ui/style/const";
+
 .api-manage {
   .sg-mask {
     background-color: white;
+  }
+  .sg-table {
+    .sg-table-header,
+    .sg-scroll {
+      padding: 0 $padding-normal;
+    }
   }
 }
 </style>
