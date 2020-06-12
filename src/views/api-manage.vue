@@ -1,23 +1,40 @@
 <template>
   <div class="api-manage sg-flex-column">
     <sg-header @back="$router.go(-1)">
-      API管理
+      API管理中心
       <sg-button slot="right" type="text" @click="onOpenNew">新建</sg-button>
     </sg-header>
     <div class="sg-flex-one">
       <sg-table :headers="tableHeaders" :items="tableItems">
-        <sg-button type="text" slot="options" slot-scope="scope" @click="onItemDetail(scope)">详情</sg-button>
+        <sg-button
+          type="text"
+          slot="options"
+          slot-scope="row"
+          :class="{'item__selected': row.scope.id === formData.id}"
+          @click="onItemDetail(row.scope)"
+        >
+          <span class="choice"></span>
+        </sg-button>
       </sg-table>
     </div>
     <div class="footer">
-      <sg-button type="text" @click="onNextPage(-1)" :disabled="offset === 0">上一页</sg-button>
-      <sg-button type="text" @click="onNextPage()" :disabled="isEnd">下一页</sg-button>
-      <sg-button type="text">共{{total}}项</sg-button>
+      <div v-show="!hasSelected">
+        <sg-button type="text" @click="onNextPage(-1)" :disabled="offset === 0">上一页</sg-button>
+        <sg-button type="text" @click="onNextPage()" :disabled="isEnd">下一页</sg-button>
+        <sg-button type="text">共{{total}}项</sg-button>
+      </div>
+
+      <div v-show="hasSelected">
+        <sg-button type="text" @click="onDelete">删除</sg-button>
+        <sg-button type="text" @click="onEdit">编辑</sg-button>
+        <sg-button type="text" @click="onOpenTest">测试</sg-button>
+        <sg-button type="text" @click="onCancel">取消</sg-button>
+      </div>
     </div>
 
     <div class="sg-mask" v-if="saveVisible">
       <div class="sg-flex-column">
-        <sg-header @back="saveVisible = false">API{{formData.id ? '编辑' :'创建'}}</sg-header>
+        <sg-header @back="onCancel">API{{formData.id ? '编辑' :'创建'}}</sg-header>
         <div class="sg-flex-one">
           <sg-form ref="form" :formData="formData" :formRules="formRules">
             <div slot="status">
@@ -41,6 +58,49 @@
         </div>
       </div>
     </div>
+
+    <div class="sg-mask" v-if="testVisible">
+      <div class="sg-flex-column">
+        <sg-header @back="onCancel">API测试</sg-header>
+        <div class="test-item sg-flex api-name">
+          <span>
+            名称
+            <i>:</i>
+          </span>
+          <div class="sg-flex-one">{{formData.name}}</div>
+        </div>
+        <div class="test-item sg-flex api-suffix-path">
+          <span>
+            路由
+            <i>:</i>
+          </span>
+          <div class="sg-flex-one">{{formData.suffixPath}}</div>
+        </div>
+        <div class="test-item sg-flex api-suffix-path">
+          <span>
+            参数
+            <i>:</i>
+          </span>
+          <div class="sg-flex-one overflow-hidden">
+            <textarea v-model="testParamsStr"></textarea>
+          </div>
+        </div>
+        <div class="test-item sg-flex-one overflow-hidden">
+          <div class="sg-flex overflow-hidden" style="height: 100%;">
+            <span>
+              结果
+              <i>:</i>
+            </span>
+            <div class="sg-flex-one overflow-hidden">
+              <div class="test-result">{{testResultStr}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="test-item" style="margin: 2rem 0;">
+          <sg-button type="primary" @click="onTestAPI">测试</sg-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -51,7 +111,18 @@ const preffix = '/napi'
 const apiCenterURL = {
   list: `${preffix}/open/api-center/list`,
   create: `${preffix}/auth/api-center/create`,
-  update: `${preffix}/auth/api-center/update`
+  update: `${preffix}/auth/api-center/update`,
+  delete: `${preffix}/auth/api-center/delete`
+}
+const SQL_KEY_REG = /\$\{[0-9a-zA-Z_]{1,}\}/g
+const getSQLKeys = function (v) {
+  if (!v) {
+    return
+  }
+  const keys = v.match(SQL_KEY_REG) || []
+  return keys.map(v => {
+    return v.substring(2, v.length - 1)
+  })
 }
 
 export default {
@@ -62,7 +133,8 @@ export default {
       tableHeaders: [
         { key: 'id', label: 'ID', style: { width: '50px' } },
         { key: 'suffixPath', label: '路由' },
-        { key: 'name', label: '姓名' },
+        { key: 'name', label: '名称' },
+        { key: 'method', label: '请求方式' },
         { key: 'count', label: '调用次数' },
         { key: 'options', label: '操作', slot: true, style: { width: '50px' } }
       ],
@@ -176,6 +248,10 @@ export default {
         }
       ],
 
+      testVisible: false,
+      testResultStr: '',
+      testParamsStr: '',
+
       statusOptions: [
         { value: 0, label: '禁用' },
         { value: 1, label: '启用' },
@@ -191,11 +267,33 @@ export default {
   computed: {
     isEnd () {
       return this.total === this.tableItems.length
+    },
+    hasSelected () {
+      return !!this.formData.id
+    }
+  },
+
+  watch: {
+    'formData.content': {
+      handler (v) {
+        if (this.formData.id) {
+          return
+        }
+        const keys = getSQLKeys(v)
+        const params = {}
+        const currentParams = JSON.parse(this.formData.params)
+
+        keys.forEach(key => {
+          params[key] = currentParams[key] || { type: 'STRING' }
+        })
+        this.formData.params = JSON.stringify(params)
+      }
     }
   },
 
   created () {
     window.apiManage = this
+    this.defaultFormData = JSON.parse(JSON.stringify(this.formData))
     this.getAPIs()
   },
 
@@ -213,6 +311,11 @@ export default {
       apiGetData(apiCenterURL.list, params)
         .then(resp => {
           const { total, list } = resp.data
+          if (list instanceof Array) {
+            list.forEach(o => {
+              o.isSelected = false
+            })
+          }
           this.tableItems = list
           this.total = total
         })
@@ -230,11 +333,121 @@ export default {
     },
 
     onItemDetail (item) {
-      console.log(item)
+      const formData = this.formData
+      if (formData.id === item.id) {
+        this.onCancel()
+        return
+      }
+      const keys = [
+        'id',
+        'name',
+        'comment',
+        'content',
+        'params',
+        'method',
+        'status',
+        'suffixPath'
+      ]
+      keys.forEach(key => {
+        if (item[key] !== undefined) {
+          formData[key] = item[key]
+        }
+      })
+
+      this.currentApi = item
+      item.isSelected = true
+    },
+    onCancel () {
+      this.formData.id = null
+      if (this.currentApi) {
+        this.currentApi.isSelected = false
+        this.currentApi = null
+      }
+      this.saveVisible = false
+      this.testVisible = false
+    },
+
+    onOpenTest () {
+      this.testVisible = true
+      this.testResultStr = ''
+
+      const keys = getSQLKeys(this.formData.content)
+      const params = {}
+      keys.forEach(key => {
+        params[key] = ''
+      })
+      this.testParamsStr = JSON.stringify(params)
+    },
+
+    onTestAPI () {
+      this.testResultStr = ''
+      let params
+      try {
+        params = JSON.parse(this.testParamsStr)
+      } catch (error) {
+        this.$toast('请输入JSON参数')
+        return
+      }
+
+      const { suffixPath, method } = this.formData
+      if (method === 'GET') {
+        apiGetData(preffix + '/dynamic-api/' + suffixPath, params)
+          .then(resp => {
+            this.testResultStr = JSON.stringify(resp.data)
+            this.$toast('测试成功')
+          })
+          .catch(err => {
+            if (err && err.data) {
+              this.testResultStr = JSON.stringify(err.data)
+            }
+            this.$toast('测试失败')
+          })
+      } else {
+        this.$toast('正在码...')
+      }
+    },
+    onDelete () {
+      if (this.isDeleting) {
+        return
+      }
+      this.isDeleting = true
+      this.$confirm({
+        title: '提示',
+        content: '是否删除该API',
+        confirm: () => {
+          apiPostData(apiCenterURL.delete, { id: this.formData.id })
+            .then(resp => {
+              this.$toast('删除成功')
+              this.onCancel()
+              this.getAPIs()
+            })
+            .catch(() => {
+              this.$toast('删除失败')
+            })
+            .finally(() => {
+              this.isDeleting = false
+            })
+        }
+      })
+    },
+    onEdit () {
+      this.saveVisible = true
+      this.setDropdownsValue({
+        status: this.formData.status,
+        method: this.formData.method
+      })
     },
 
     onOpenNew () {
       this.saveVisible = true
+      const object = this.defaultFormData
+      const formData = this.formData
+      for (const key in object) {
+        formData[key] = object[key]
+      }
+      this.setDropdownsValue()
+    },
+    setDropdownsValue () {
       this.$nextTick(() => {
         const statusOption = this.statusOptions[1]
         this.$refs.statusDropdown.setSelectOption(statusOption)
@@ -283,7 +496,8 @@ export default {
         apiPostData(url, data)
           .then(resp => {
             this.getAPIs()
-            this.saveVisible = false
+            this.onCancel()
+            this.$toast('保存成功')
           })
           .catch(() => {
             this.$toast('保存失败')
@@ -317,7 +531,12 @@ export default {
   height: 100%;
   overflow: hidden;
 
+  .overflow-hidden {
+    overflow: hidden;
+  }
+
   .footer {
+    position: relative;
     padding: $padding-normal;
     border-top: 1px solid $color-theme-disabled;
     text-align: right;
@@ -330,6 +549,56 @@ export default {
     height: 100%;
     padding: 0 $padding-normal;
     overflow-y: auto;
+  }
+  .choice {
+    position: relative;
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 1rem;
+    border-radius: 50%;
+    border: 2px solid $color-theme-disabled;
+  }
+  .item__selected {
+    color: $color-theme;
+    .choice {
+      border-color: $color-theme;
+      &::before {
+        content: "";
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: $color-theme;
+      }
+    }
+  }
+
+  .test-item {
+    padding: 0 $padding-normal;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    span {
+      margin-right: 1rem;
+    }
+    textarea {
+      display: block;
+      width: 100%;
+      height: 10rem;
+      margin: 0;
+      outline: 0;
+      box-sizing: border-box;
+    }
+  }
+  .test-result {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    white-space: pre-wrap;
   }
 }
 </style>
