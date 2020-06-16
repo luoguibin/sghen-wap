@@ -62,37 +62,42 @@
     <div class="sg-mask" v-if="testVisible">
       <div class="sg-flex-column">
         <sg-header @back="onCancel">API测试</sg-header>
-        <div class="test-item sg-flex api-name">
-          <span>
-            名称
-            <i>:</i>
-          </span>
-          <div class="sg-flex-one">{{formData.name}}</div>
-        </div>
-        <div class="test-item sg-flex api-suffix-path">
-          <span>
-            路由
-            <i>:</i>
-          </span>
-          <div class="sg-flex-one">{{formData.suffixPath}}</div>
-        </div>
-        <div class="test-item sg-flex api-suffix-path">
-          <span>
-            参数
-            <i>:</i>
-          </span>
-          <div class="sg-flex-one overflow-hidden">
-            <textarea v-model="testParamsStr"></textarea>
-          </div>
-        </div>
-        <div class="test-item sg-flex-one overflow-hidden">
-          <div class="sg-flex overflow-hidden" style="height: 100%;">
-            <span>
-              结果
-              <i>:</i>
-            </span>
-            <div class="sg-flex-one overflow-hidden">
-              <div class="test-result">{{testResultStr}}</div>
+        <div class="sg-flex-one">
+          <div class="scroll-vertical">
+            <div class="test-item sg-flex api-name">
+              <span>
+                名称
+                <i>:</i>
+              </span>
+              <div class="sg-flex-one">{{formData.name}}</div>
+            </div>
+            <div class="test-item sg-flex">
+              <span>
+                路由
+                <i>:</i>
+              </span>
+              <div class="sg-flex-one">{{formData.suffixPath}}</div>
+            </div>
+            <div class="test-item sg-flex">
+              <span>
+                参数
+                <i>:</i>
+              </span>
+              <div class="sg-flex-one overflow-hidden">
+                <textarea v-model="testParamsStr"></textarea>
+              </div>
+            </div>
+            <div class="test-item sg-flex">
+              <span>
+                结果
+                <i>:</i>
+              </span>
+              <div class="sg-flex-one">
+                <div
+                  class="scroll-vertical"
+                  style="height: 10rem; white-space: pre-wrap;"
+                >{{testResultStr}}</div>
+              </div>
             </div>
           </div>
         </div>
@@ -374,7 +379,13 @@ export default {
       const keys = getSQLKeys(this.formData.content)
       const params = {}
       keys.forEach(key => {
-        params[key] = ''
+        if (key === 'limit') {
+          params[key] = 10
+        } else if (key === 'offset') {
+          params[key] = 0
+        } else {
+          params[key] = ''
+        }
       })
       this.testParamsStr = JSON.stringify(params)
     },
@@ -593,12 +604,6 @@ export default {
       outline: 0;
       box-sizing: border-box;
     }
-  }
-  .test-result {
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    white-space: pre-wrap;
   }
 }
 </style>

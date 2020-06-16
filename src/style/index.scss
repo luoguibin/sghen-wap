@@ -48,3 +48,9 @@ h2 {
         font-size: 17px;
     }
 }
+
+.scroll-vertical {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
