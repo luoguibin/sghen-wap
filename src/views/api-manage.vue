@@ -114,6 +114,7 @@ import { apiGetData, apiPostData } from '@/api'
 
 const preffix = '/napi'
 const apiCenterURL = {
+  config: `${preffix}/open/api-center/config`,
   list: `${preffix}/open/api-center/list`,
   create: `${preffix}/auth/api-center/create`,
   update: `${preffix}/auth/api-center/update`,
@@ -222,9 +223,15 @@ export default {
               return '请输入' + rule.label
             }
             try {
-              JSON.parse(v)
+              const params = JSON.parse(v)
+              for (const key in params) {
+                if (!this.paramTypes.includes(params[key].type)) {
+                  this.$toast('可选参数类型：' + this.paramTypes.join())
+                  return '请输入合法参数类型'
+                }
+              }
             } catch (error) {
-              return '请输入JSON数组数据'
+              return '请输入JSON数据'
             }
           },
           _error: ''
@@ -256,6 +263,7 @@ export default {
       testVisible: false,
       testResultStr: '',
       testParamsStr: '',
+      paramTypes: [],
 
       statusOptions: [
         { value: 0, label: '禁用' },
@@ -300,9 +308,17 @@ export default {
     window.apiManage = this
     this.defaultFormData = JSON.parse(JSON.stringify(this.formData))
     this.getAPIs()
+    this.getConfig()
   },
 
   methods: {
+    getConfig () {
+      apiGetData(apiCenterURL.config).then(resp => {
+        this.paramTypes = resp.data
+      }).catch(() => {
+        this.$toast('配置信息加载失败')
+      })
+    },
     getAPIs () {
       if (this.isLoading) {
         return
