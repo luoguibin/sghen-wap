@@ -32,7 +32,7 @@
       </div>
     </div>
 
-    <div class="sg-mask" v-if="saveVisible">
+    <div class="sg-mask sg-mask-white" v-if="saveVisible">
       <div class="sg-flex-column">
         <sg-header @back="onCancel">API{{formData.id ? '编辑' :'创建'}}</sg-header>
         <div class="sg-flex-one">
@@ -43,6 +43,7 @@
                 :options="statusOptions"
                 @change="handleStatusChange"
                 :optionActive="true"
+                :optionType="'center'"
               ></sg-dropdown>
             </div>
             <div slot="method">
@@ -51,6 +52,7 @@
                 :options="methodOptions"
                 @change="handleMethodChange"
                 :optionActive="true"
+                :optionType="'center'"
               ></sg-dropdown>
             </div>
             <sg-button type="primary" style="margin: 2rem 0;" @click="onConfirmSave">保存</sg-button>
@@ -59,7 +61,7 @@
       </div>
     </div>
 
-    <div class="sg-mask" v-if="testVisible">
+    <div class="sg-mask sg-mask-white" v-if="testVisible">
       <div class="sg-flex-column">
         <sg-header @back="onCancel">API测试</sg-header>
         <div class="sg-flex-one">
@@ -628,7 +630,7 @@ export default {
 @import "@/ui/style/const";
 
 .api-manage {
-  .sg-mask {
+  .sg-mask-white {
     background-color: white;
   }
   .sg-table {
