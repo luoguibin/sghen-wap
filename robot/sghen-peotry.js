@@ -101,26 +101,23 @@ function createPeotry (userInfo, setId, title, content) {
   })
 }
 
-const keyWords = '雨后阴云'
-let jiugeCurrentId = JiugetRobotStartID
+const keyWords = '蝉鸣'
 const loopOneCreatPeotry = function () {
-  const userId = jiugeCurrentId
+  const userId = Math.floor(Math.random() * (JiugetRobotEndID - JiugetRobotStartID)) + JiugetRobotEndID
   loginUser(userId).then(resp => {
     JiuGe.createPeotry(keyWords, userId).then(content => {
       Log.push(userId, `JiuGe.createPeotry() content=${content}`)
       createPeotry(resp.data, '', keyWords, content).then(() => {
         Log.print(userId, 'createPoetry() success')
-        setTimeout(() => {
-          jiugeCurrentId += 1
-          loopOneCreatPeotry()
-        }, 5000)
+        // setTimeout(() => {
+        //   loopOneCreatPeotry()
+        // }, 5000)
       })
     }).catch(err => {
       Log.print(userId, err)
-      setTimeout(() => {
-        jiugeCurrentId += 1
-        loopOneCreatPeotry()
-      }, 5000)
+      // setTimeout(() => {
+      //   loopOneCreatPeotry()
+      // }, 5000)
     })
   }).catch(err => {
     Log.print(userId, err)
@@ -175,17 +172,19 @@ function autoComments () {
 
   setTimeout(() => {
     autoComments()
-  }, 5000)
+  }, 10000)
 }
 
 // Log.push(0, 'getPoetriesInfos() start')
 // getPoetriesInfos().then(resp => {
-//   Log.print(0, 'getPoetriesInfos() success')
 //   const len = resp.data.length
-//   peotries.push(...resp.data.slice(len - 20))
+//   Log.print(0, 'getPoetriesInfos() success count=' + len)
+
+//   peotries.push(...resp.data.slice(len - 5))
+//   // peotries.push(...resp.data)
 //   autoComments()
 // }).catch(err => {
 //   Log.print(0, `getPoetriesInfos() err: ${err}`)
 // })
 
-// loopOneCreatPeotry()
+loopOneCreatPeotry()

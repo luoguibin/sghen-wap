@@ -3,6 +3,7 @@ const argv = require('yargs').argv
 
 module.exports = {
   lintOnSave: true,
+  runtimeCompiler: true,
 
   publicPath: process.env.NODE_ENV === 'production' ? '/sghen-wap/' : './',
 
@@ -74,13 +75,13 @@ module.exports = {
         // }
       },
       '/napi/': {
-        target: 'http://localhost:8282',
+        target: 'https://www.sghen.cn',
         ws: false,
         secure: true,
-        changeOrigin: true,
-        pathRewrite: {
-          '/napi/': '/'
-        }
+        changeOrigin: true
+        // pathRewrite: {
+        //   '/napi/': '/'
+        // }
       }
     }
   }
