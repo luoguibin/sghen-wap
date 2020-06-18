@@ -10,13 +10,7 @@ const toastFunc = function (msg, options = {}) {
     document.body.append(toast.$el)
     _sgInstance = toast
   }
-  if (toast.visible) {
-    return
-  }
   toast.show(msg, options)
-  setTimeout(() => {
-    toast.hide()
-  }, options.duration || 3000)
 }
 
 Vue.prototype.$toast = toastFunc
