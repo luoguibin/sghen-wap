@@ -1,19 +1,19 @@
 <template>
   <transition name="confirm">
     <div class="sg-mask" v-show="visible">
-      <div class="sg-confirm">
-        <div class="sg-confirm-title">{{title}}</div>
-        <div class="sg-confirm-content">
+      <div :class="{'sg-confirm': true, 'no-title': !title }">
+        <div v-show="title" class="title">{{title}}</div>
+        <div class="content">
           <input v-if="type === 'input'" v-model="content" :placeholder="placeholder" />
           <textarea v-else-if="type === 'textarea'" :placeholder="placeholder" v-model="content"></textarea>
           <template v-else>{{content}}</template>
         </div>
-        <div class="sg-confirm-options">
-          <div v-show="cancelVisible">
+        <div class="options sg-flex">
+          <div v-show="cancelVisible" class="sg-flex-one">
             <button class="cancel" @click="hide()">取消</button>
           </div>
           <span v-show="cancelVisible"></span>
-          <div>
+          <div class="sg-flex-one">
             <button class="confirm" @click="confirm">确定</button>
           </div>
         </div>
@@ -36,15 +36,22 @@ export default {
     }
   },
 
+  created () {
+    window.sgConfirm = this
+  },
+
   methods: {
-    show (options = {}) {
-      this.title = options.title
-      this.content = options.content
-      this.type = options.type
-      this.placeholder = options.placeholder
-      this.validator = options.validator
-      this.confirmCall = options.confirm
-      this.cancelVisible = options.cancelVisible !== false
+    show (params = {}) {
+      this.title = params.title
+      this.type = params.type
+      this.content = params.content
+      this.confirmCall = params.confirm
+      this.cancelVisible = params.cancelVisible !== false
+
+      if (this.type === 'input' || this.type === 'textarea') {
+        this.placeholder = params.placeholder
+        this.validator = params.validator
+      }
       this.visible = true
     },
     hide () {
@@ -64,12 +71,13 @@ export default {
 
 <style lang="scss" scoped>
 @import "../style/const.scss";
+@import "../style/index.scss";
 
 .sg-confirm {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 90%;
+  width: 85%;
   border-radius: 1rem;
   background-color: white;
   transform: translate(-50%, -50%);
@@ -78,39 +86,33 @@ export default {
   textarea {
     display: block;
     width: 100%;
-    padding: $padding-small;
+    padding: $padding-small * 0.5 $padding-small;
     font-size: $size-text;
     line-height: $height-text;
     border: none;
     outline: none;
     box-sizing: border-box;
-    background-color: transparent;
-    border-bottom: 2px solid $color-border;
+    background-color: $color-border;
   }
 
-  .sg-confirm-title {
+  .title {
     text-align: center;
     color: $color-title;
     font-size: $size-title;
     font-weight: bold;
     line-height: $height-title + 1rem;
   }
-  .sg-confirm-content {
-    padding: 2px 1rem 2rem;
+  .content {
+    padding: 2px 1rem 2rem 1rem;
     text-align: center;
     color: $color-text;
     font-size: $size-text;
     line-height: $height-text;
   }
-  .sg-confirm-options {
-    display: flex;
+  .options {
     align-items: center;
     line-height: 3.3rem;
     border-top: 1px solid $color-border;
-    div {
-      flex: 1;
-      text-align: center;
-    }
     span {
       display: inline-block;
       width: 1px;
@@ -130,6 +132,14 @@ export default {
         color: $color-theme-active;
       }
     }
+  }
+  .sg-flex-one {
+      text-align: center;
+    }
+}
+.no-title {
+  .content {
+    padding: 2rem 1rem;
   }
 }
 
