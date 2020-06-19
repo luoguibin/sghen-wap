@@ -2,7 +2,12 @@
   <div class="peotry-list">
     <sg-header @back="$router.go(-1)">
       {{title}}
-      <span v-show="isSelf" slot="right" class="iconfont icon-increase" @click="onGoNewPeotry"></span>
+      <span
+        v-show="isSelf"
+        slot="right"
+        class="iconfont icon-increase"
+        @click="onGoNewPeotry"
+      ></span>
     </sg-header>
 
     <div class="main" @click="onClickPoetry">
@@ -22,8 +27,6 @@
     </div>
 
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
-
-    <peotry-edit v-if="editVisible" @close="editVisible = false" @success="handleCreated"></peotry-edit>
   </div>
 </template>
 
@@ -40,8 +43,7 @@ export default {
 
   components: {
     peotry: () => import('@/components/peotry'),
-    'image-viewer': () => import('@/components/image-viewer'),
-    'peotry-edit': () => import('@/components/peotry-edit')
+    'image-viewer': () => import('@/components/image-viewer')
   },
 
   data () {
@@ -57,9 +59,7 @@ export default {
 
       viewerVisible: false,
       images: [],
-      imageIndex: 0,
-
-      editVisible: false
+      imageIndex: 0
     }
   },
 
@@ -272,11 +272,11 @@ export default {
       }
     },
     onGoNewPeotry () {
-      this.editVisible = true
-    },
-    handleCreated () {
-      this.editVisible = false
-      this.$refs.sgScroll.refresh()
+      this.$router.push({
+        name: 'peotry-edit',
+        params: { id: 'new' },
+        query: { setId: this.setId, setName: this.setName }
+      })
     }
   }
 }

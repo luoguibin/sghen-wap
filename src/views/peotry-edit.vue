@@ -2,11 +2,11 @@
   <div class="sg-mask">
     <div class="peotry-edit-wrapper">
       <div class="peotry-edit">
-        <sg-header @back="$emit('close')">诗词{{peotry ? '更新':'创建'}}</sg-header>
+        <sg-header @back="onBack">诗词{{formData.id ? '更新':'创建'}}</sg-header>
 
         <div class="main">
           <div class="main-wrapper">
-            <sg-form ref="form" :formData="formData" :formRules="formRules">
+            <sg-form v-if="isFormInit" ref="form" :formData="formData" :formRules="formRules">
               <div slot="setId" class="set-item">
                 <span
                   :class="{'is-setname': !!setName}"
@@ -24,7 +24,7 @@
                 :disabled="isSaveing"
                 :isLoading="isSaveing"
                 @click="onConfirm"
-              >{{peotry ? '更新':'创建'}}</sg-button>
+              >{{formData.id ? '更新':'创建'}}</sg-button>
             </sg-form>
           </div>
         </div>
@@ -32,7 +32,7 @@
     </div>
 
     <!-- 选集选择 -->
-    <div v-show="peotrySetsVisible" class="peotry-sets-wrapper">
+    <div v-if="isFormInit" v-show="peotrySetsVisible" class="peotry-sets-wrapper">
       <peotry-sets
         :defId="formData.setId"
         @back="peotrySetsVisible = false"
@@ -44,7 +44,8 @@
 
 <script>
 import { mapState } from 'vuex'
-import { apiURL, apiPostData } from '@/api'
+import { apiURL, apiGetData, apiPostData } from '@/api'
+import { PEOTRY } from '@/const'
 
 export default {
   name: 'PeotryEdit',
@@ -54,17 +55,9 @@ export default {
     'peotry-sets': () => import('@/components/peotry-sets')
   },
 
-  props: {
-    peotry: {
-      type: Object,
-      default () {
-        return null
-      }
-    }
-  },
-
   data () {
     return {
+      isFormInit: false,
       formData: {
         id: null,
         setId: null,
@@ -145,9 +138,21 @@ export default {
   },
 
   methods: {
+    onBack () {
+      this.$router.go(-1)
+    },
     initFormData () {
-      const peotry = this.peotry
-      if (peotry) {
+      // 是否新建诗词判断
+      const tempId = this.$route.params.id
+      if (tempId === 'new') {
+        const { setId, setName } = this.$route.query
+        this.formData.setId = +setId || ''
+        this.setName = setName
+        this.isFormInit = true
+        return
+      }
+      const jsonStr = sessionStorage.getItem(PEOTRY.EDIT_DATA)
+      const onSuccess = peotry => {
         const data = this.formData
         data.id = peotry.id
         data.setId = peotry.set && peotry.set.id
@@ -157,6 +162,33 @@ export default {
 
         this.setName = peotry.set && peotry.set.name
         this.formRules[this.formRules.length - 1].hidden = true
+        this.isFormInit = true
+      }
+      if (jsonStr) {
+        // 读取本地数据
+        onSuccess(JSON.parse(jsonStr))
+      } else {
+        // 加载网络数据
+        this.$toast('加载中...', {
+          direction: 'middle',
+          duration: -1,
+          loading: true
+        })
+        apiGetData(apiURL.peotryList, { id })
+          .then(data => {
+            onSuccess(data.data)
+            this.$toast('加载中...', {
+              direction: 'middle',
+              duration: 1,
+              loading: true,
+              replace: true
+            })
+          })
+          .catch(err => {
+            this.$toast((err && err.msg) || '加载失败，请返回', {
+              replace: true
+            })
+          })
       }
     },
     onOpenSetChoice () {
@@ -216,10 +248,17 @@ export default {
       if (id) {
         params.id = id
       }
+      this.$toast('保存中...', {
+        direction: 'middle',
+        duration: -1,
+        loading: true,
+        replace: true
+      })
       apiPostData(id ? apiURL.peotryUpdate : apiURL.peotryCreate, params)
         .then(resp => {
-          this.$toast(id ? '更新成功' : '创建成功')
-          this.$emit('success')
+          this.$toast(id ? '更新成功' : '创建成功', { replace: true })
+          sessionStorage.removeItem(PEOTRY.EDIT_DATA)
+          this.$router.go(-1)
         })
         .finally(() => {
           this.isSaveing = false

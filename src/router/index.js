@@ -25,6 +25,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'peotry-detail' */'@/views/peotry-detail')
   },
   {
+    path: '/peotry-edit/:id',
+    name: 'peotry-edit',
+    component: () => import(/* webpackChunkName: 'peotry-edit' */'@/views/peotry-edit')
+  },
+  {
     path: '/personal',
     name: 'personal',
     component: () => import(/* webpackChunkName: 'personal' */'@/views/personal')

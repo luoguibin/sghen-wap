@@ -13,13 +13,6 @@
       </div>
     </div>
 
-    <peotry-edit
-      v-if="editVisible"
-      :peotry="editPeotry"
-      @close="editVisible = false"
-      @success="handleSave"
-    ></peotry-edit>
-
     <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
     <comment-input
@@ -70,13 +63,13 @@ import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
 import Cache from '@/common/cache-center'
+import { PEOTRY } from '@/const'
 
 export default {
   name: 'PeotryDetail',
 
   components: {
     peotry: () => import('@/components/peotry'),
-    'peotry-edit': () => import('@/components/peotry-edit'),
     'image-viewer': () => import('@/components/image-viewer'),
     'comment-input': () => import('@/components/comment-input'),
     'praise-anime': () => import('@/components/praise-anime')
@@ -86,8 +79,6 @@ export default {
     return {
       peotryID: 0,
       peotry: null,
-      editPeotry: null,
-      editVisible: false,
 
       menusVisible: true,
 
@@ -447,14 +438,15 @@ export default {
       const peotry = this.peotry
       switch (key) {
         case 'edit':
-          this.editPeotry = {
+          const editPeotry = {
             id: peotry.id,
             set: peotry.set,
             title: peotry.title,
             content: peotry.content,
             end: peotry.end
           }
-          this.editVisible = true
+          sessionStorage.setItem(PEOTRY.EDIT_DATA, JSON.stringify(editPeotry))
+          this.$router.push({ name: 'peotry-edit', params: { id: editPeotry.id } })
           break
         case 'comment':
           this.openCommentInput(peotry.id, this.userID, '请输入评论')
@@ -576,11 +568,6 @@ export default {
         comment.fromId,
         `回复 ${comment.fromPeot.username}`
       )
-    },
-
-    handleSave () {
-      this.editVisible = false
-      this.getPeotryDetail()
     },
     handleCommentOk (o) {
       const { commentTotal, realComments } = this.peotry
