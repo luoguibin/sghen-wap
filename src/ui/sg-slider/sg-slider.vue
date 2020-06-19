@@ -34,7 +34,41 @@ export default {
   props: {
     items: {
       type: Array,
-      required: true
+      // required: true,
+      default () {
+        return [
+          {
+            slot: 'slot-0',
+            itemStyle: {
+              backgroundColor: 'rgba(12, 123, 234, 0.3)'
+            }
+          },
+          {
+            slot: 'slot-1',
+            itemStyle: {
+              backgroundColor: 'rgba(123, 12, 234, 0.3)'
+            }
+          },
+          {
+            slot: 'slot-2',
+            itemStyle: {
+              backgroundColor: 'rgba(234, 12, 123, 0.3)'
+            }
+          },
+          {
+            slot: 'slot-3',
+            itemStyle: {
+              backgroundColor: 'rgba(12, 234, 123, 0.3)'
+            }
+          },
+          {
+            slot: 'slot-4',
+            itemStyle: {
+              backgroundColor: 'rgba(123, 234, 12, 0.3)'
+            }
+          }
+        ]
+      }
     },
     itemType: {
       type: String,
@@ -107,7 +141,7 @@ export default {
       this.addTrans(touch.clientX - this.preClientX)
       this.preClientX = touch.clientX
     },
-    onTouchEnd (e) {
+    onTouchEnd () {
       this.isStart = false
       this.activeIndex = this.getNextIndex()
       this.$emit('change', this.activeIndex)
@@ -167,11 +201,12 @@ export default {
     },
     animeToIndex (index) {
       const v = this.getItemTrans(index)
-      const stepValue = v - this.transX > 0 ? 15 : -15
+      const stepValue = v - this.transX > 0 ? 30 : -30
       const stepCount = Math.floor(
         Math.abs(v - this.transX) / Math.abs(stepValue)
       )
 
+      cancelAnimationFrame(this.frameTimer)
       let stepIndex = 0
       const loop = () => {
         this.addTrans(stepValue)
@@ -180,33 +215,25 @@ export default {
         if (stepIndex > stepCount) {
           this.setTrans(v)
         } else {
-          window.requestAnimationFrame(loop)
+          this.frameTimer = requestAnimationFrame(loop)
           // setTimeout(loop, 100)
         }
       }
       loop()
     },
     setItemRatio (index, ratio) {
-      this.options[index].itemStyle.transform = `scale(${Math.max(
-        1 - ratio,
-        0.8
-      )})`
-      this.options[index].itemStyle.filter = `blur(${ratio * 30}px)`
+      let itemStyle = this.options[index].itemStyle
+      itemStyle.transform = `scale(${Math.max(1 - ratio, 0.8)})`
+      itemStyle.filter = `blur(${ratio * 30}px)`
       if (index !== 0) {
-        this.options[index - 1].itemStyle.transform = `scale(${Math.max(
-          ratio,
-          0.8
-        )})`
-        this.options[index - 1].itemStyle.filter = `blur(${(1 - ratio) *
-          30}px)`
+        itemStyle = this.options[index - 1].itemStyle
+        itemStyle.transform = `scale(${Math.max(ratio, 0.8)})`
+        itemStyle.filter = `blur(${(1 - ratio) * 30}px)`
       }
       if (index < this.options.length - 1) {
-        this.options[index + 1].itemStyle.transform = `scale(${Math.max(
-          ratio,
-          0.8
-        )})`
-        this.options[index + 1].itemStyle.filter = `blur(${(1 - ratio) *
-          30}px)`
+        itemStyle = this.options[index + 1].itemStyle
+        itemStyle.transform = `scale(${Math.max(ratio, 0.8)})`
+        itemStyle.filter = `blur(${(1 - ratio) * 30}px)`
       }
     }
   }
@@ -232,5 +259,19 @@ export default {
     width: 100%;
     height: 100%;
   }
+}
+</style>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-size: 12px;
+}
+html,
+body {
+  height: 100%;
 }
 </style>
