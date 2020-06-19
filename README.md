@@ -47,6 +47,9 @@ Wap端：https://www.sghen.cn/sghen-wap/index.html
 
 ### 更新记录
 ```
+2020-06
+	[*]优化sg-toast组件
+	[*]优化sg-dropdown组件
 2020-05
 	[+]诗词点赞与评论分页优化
 	[+]个人诗词概况

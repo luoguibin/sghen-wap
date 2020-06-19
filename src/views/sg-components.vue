@@ -45,14 +45,15 @@
       <div class="component">
         <SgButton @click="$toast('默认底部Toast默认底部Toast默认底部Toast', {direction: 'bottom'})">默认底部Toast</SgButton>
         <SgButton @click="$toast('顶部Toast', {direction: 'top'})">顶部Toast</SgButton>
-        <SgButton @click="$toast('中间Toast', {direction: 'middle'})">中间Toast</SgButton>
+        <SgButton @click="$toast('中间Toast', {direction: 'middle', replace: true})">中间Toast（可替换）</SgButton>
+        <SgButton @click="$toast('加载中...', {direction: 'middle', loading: true})">加载中...</SgButton>
       </div>
     </div>
 
     <div class="item">
       <div class="label">确认框</div>
       <div class="component">
-        <SgButton @click="$confirm({title: '提示', content: '你好，世界~'})">提示框</SgButton>
+        <SgButton @click="$confirm({content: '你好，世界~'})">提示框</SgButton>
         <SgButton @click="$confirm({title: '提示', content: '你好，世界~', cancelVisible: false})">确认提示框</SgButton>
         <SgButton @click="onConfirmInput">输入确认框</SgButton>
       </div>
@@ -88,12 +89,18 @@
     <div class="item">
       <div class="label">下拉选择</div>
       <div class="component">
-        <SgDropdown :options="dropdownOptions" @change="$toast($event)"></SgDropdown>
+        <SgDropdown :options="dropdownOptions" @change="$toast($event, {replace: true})"></SgDropdown>
         <SgDropdown
           :options="dropdownOptions"
           :optionActive="true"
+          :optionType="'fullwidth'"
           :pointerVisible="false"
-          @change="$toast($event)"
+          @change="$toast($event, {replace: true})"
+        ></SgDropdown>
+        <SgDropdown
+          :options="dropdownOptions"
+          :optionType="'center'"
+          @change="$toast($event, {replace: true})"
         ></SgDropdown>
       </div>
     </div>
@@ -110,7 +117,12 @@
       <div class="label">表格</div>
       <div class="component" style="height: 18rem;">
         <SgTable :headers="tableHeaders" :items="tableItems">
-          <sg-button type="text" slot="options" slot-scope="scope" @click="onTableItemDetail(scope)">详情</sg-button>
+          <sg-button
+            type="text"
+            slot="options"
+            slot-scope="scope"
+            @click="onTableItemDetail(scope)"
+          >详情</sg-button>
         </SgTable>
       </div>
     </div>
@@ -206,7 +218,10 @@ export default {
       tableHeaders: [
         { key: 'id', label: 'ID', style: { width: '50px' } },
         { key: 'name', label: '姓名' },
-        { key: 'address', label: '地址(具体地球经纬度，例如：N43.234234 W123.3211)' },
+        {
+          key: 'address',
+          label: '地址(具体地球经纬度，例如：N43.234234 W123.3211)'
+        },
         { key: 'options', label: '操作', slot: true, style: { width: '50px' } }
       ],
       tableItems: []
