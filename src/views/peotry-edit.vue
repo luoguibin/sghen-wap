@@ -174,7 +174,7 @@ export default {
           duration: -1,
           loading: true
         })
-        apiGetData(apiURL.peotryList, { id })
+        apiGetData(apiURL.peotryList, { id: +tempId })
           .then(data => {
             onSuccess(data.data)
             this.$toast('加载中...', {
