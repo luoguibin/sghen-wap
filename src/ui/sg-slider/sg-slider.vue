@@ -160,7 +160,6 @@ export default {
       const activeItem = this.slideItems[index]
       const previousItem = this.slideItems[index - 1]
       const nextItem = this.slideItems[index + 1]
-
       if (unit > 0) {
         if (nextItem) {
           activeItem.ratioX = -100
@@ -171,6 +170,7 @@ export default {
           this.$emit('change', this.activeIndex)
         } else {
           activeItem.ratioX = 0
+          this.$emit('change', -2)
         }
       } else if (unit < 0) {
         if (previousItem) {
@@ -182,13 +182,9 @@ export default {
           this.$emit('change', this.activeIndex)
         } else {
           activeItem.ratioX = 0
+          this.$emit('change', -1)
         }
       } else {
-        if (activeItem.ratioX > GAP_IN_PERCENT) {
-          this.$emit('change', -1)
-        } else if (activeItem.ratioX < -GAP_IN_PERCENT) {
-          this.$emit('change', -2)
-        }
         activeItem.ratioX = 0
         if (previousItem) {
           previousItem.ratioX = -100

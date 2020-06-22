@@ -80,7 +80,7 @@
     <div class="item">
       <div class="label">滑动卡片</div>
       <div class="component" style="height: 20rem;">
-        <sg-slider :items="sliderItems">
+        <sg-slider :items="sliderItems" @change="onSlideChange">
           <div v-for="item in sliderItems" :key="item.slot" :slot="item.slot">{{item.slot}}</div>
         </sg-slider>
       </div>
@@ -298,6 +298,9 @@ export default {
     onTableItemDetail (item) {
       console.log('onTableItemDetail', item)
       this.$toast(JSON.stringify(item))
+    },
+    onSlideChange (index) {
+      console.log('onSlideChange', index)
     }
   }
 }
