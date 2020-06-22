@@ -66,39 +66,38 @@
         <sg-header @back="onCancel">API测试</sg-header>
         <div class="sg-flex-one">
           <div class="scroll-vertical">
-            <div class="test-item sg-flex api-name">
+            <div class="test-item api-name">
               <span>
                 名称
                 <i>:</i>
               </span>
-              <div class="sg-flex-one">{{formData.name}}</div>
+              <div>{{formData.name}}</div>
             </div>
-            <div class="test-item sg-flex">
+            <div class="test-item">
               <span>
                 路由
                 <i>:</i>
               </span>
-              <div class="sg-flex-one">{{formData.suffixPath}}</div>
+              <div>{{formData.suffixPath}}</div>
             </div>
-            <div class="test-item sg-flex">
+            <div class="test-item">
               <span>
                 参数
                 <i>:</i>
               </span>
-              <div class="sg-flex-one overflow-hidden">
+              <div class="overflow-hidden">
                 <textarea v-model="testParamsStr"></textarea>
               </div>
             </div>
-            <div class="test-item sg-flex">
+            <div class="test-item">
               <span>
                 结果
                 <i>:</i>
               </span>
-              <div class="sg-flex-one">
-                <div
-                  class="scroll-vertical"
-                  style="height: 10rem; white-space: pre-wrap;"
-                >{{testResultStr}}</div>
+              <div>
+                <!-- <div class="scroll-vertical" style="height: 15rem; white-space: pre-wrap;"> -->
+                <json-viewer :value="testResult" :expand-depth="10" copyable boxed sort></json-viewer>
+                <!-- </div> -->
               </div>
             </div>
           </div>
@@ -112,6 +111,7 @@
 </template>
 
 <script>
+import JsonViewer from 'vue-json-viewer'
 import { apiGetData, apiPostData } from '@/api'
 
 const preffix = '/napi'
@@ -135,6 +135,10 @@ const getSQLKeys = function (v) {
 
 export default {
   name: 'ApiManage',
+
+  components: {
+    JsonViewer
+  },
 
   data () {
     return {
@@ -263,7 +267,7 @@ export default {
       ],
 
       testVisible: false,
-      testResultStr: '',
+      testResult: {},
       testParamsStr: '',
       paramTypes: [],
 
@@ -315,11 +319,13 @@ export default {
 
   methods: {
     getConfig () {
-      apiGetData(apiCenterURL.config).then(resp => {
-        this.paramTypes = resp.data
-      }).catch(() => {
-        this.$toast('配置信息加载失败')
-      })
+      apiGetData(apiCenterURL.config)
+        .then(resp => {
+          this.paramTypes = resp.data
+        })
+        .catch(() => {
+          this.$toast('配置信息加载失败')
+        })
     },
     getAPIs () {
       if (this.isLoading) {
@@ -392,7 +398,7 @@ export default {
 
     onOpenTest () {
       this.testVisible = true
-      this.testResultStr = ''
+      this.testResult = {}
 
       const keys = getSQLKeys(this.formData.content)
       const params = {}
@@ -409,7 +415,7 @@ export default {
     },
 
     onTestAPI () {
-      this.testResultStr = ''
+      this.testResult = {}
       let params
       try {
         params = JSON.parse(this.testParamsStr)
@@ -420,16 +426,17 @@ export default {
 
       const { suffixPath, method } = this.formData
       if (method === 'GET') {
+        this.$toast('加载中...', { direction: 'middle', loading: true, duration: -1 })
         apiGetData(preffix + '/dynamic-api/' + suffixPath, params)
           .then(resp => {
-            this.testResultStr = JSON.stringify(resp.data)
-            this.$toast('测试成功')
+            this.testResult = resp // JSON.stringify(resp.data)
+            this.$toast('测试成功', { replace: true })
           })
           .catch(err => {
             if (err && err.data) {
-              this.testResultStr = JSON.stringify(err.data)
+              this.testResult = err.data // JSON.stringify(err.data)
             }
-            this.$toast('测试失败')
+            this.$toast('测试失败', { replace: true })
           })
       } else {
         this.$toast('正在码...')
@@ -607,12 +614,19 @@ export default {
 
   .test-item {
     padding: 0 $padding-normal;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     overflow: hidden;
     box-sizing: border-box;
 
-    span {
-      margin-right: 1rem;
+    > span {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: $size-text;
+      color: $color-tip;
+    }
+    > div {
+      font-size: $size-text;
+      color: $color-text;
     }
     textarea {
       display: block;
@@ -621,6 +635,8 @@ export default {
       margin: 0;
       outline: 0;
       box-sizing: border-box;
+      font-size: $size-text;
+      color: $color-text;
     }
   }
 }
@@ -638,6 +654,13 @@ export default {
     .sg-scroll {
       padding: 0 $padding-normal;
     }
+  }
+}
+
+.jv-container.jv-light {
+  background: #b8d1ea;
+  .jv-more {
+    background: linear-gradient(0deg, #b8d1ea, transparent);
   }
 }
 </style>
