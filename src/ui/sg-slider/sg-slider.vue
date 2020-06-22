@@ -4,87 +4,31 @@
     @touchstart="onTouchStart"
     @touchmove="onTouchMove"
     @touchend="onTouchEnd"
-    @mousedown="onTouchStart"
-    @mousemove="onTouchMove"
-    @mouseup="onTouchEnd"
     @click="$emit('click', $event)"
   >
     <div
-      v-for="item in options"
+      v-for="item in slideItems"
       ref="items"
       :key="item.id"
       :class="{'slider-item': true, 'card-item__active': item.id === activeId}"
       :style="item.itemStyle"
       :item-type="itemType"
     >
-      <!-- <slot :name="item.slot"></slot> -->
-      <div :style="item.contentStyle">{{item}}</div>
+      <slot :name="item.slot"></slot>
     </div>
   </div>
 </template>
 
 <script>
+const GAP_IN_PERCENT = 20
+
 export default {
   name: 'SgSlider',
 
   props: {
     items: {
       type: Array,
-      // required: true,
-      default () {
-        return [
-          {
-            slot: 'slot-0',
-            itemStyle: {
-              backgroundColor: 'rgba(12, 123, 234, 0.3)'
-            },
-            contentStyle: {
-              width: '180%',
-              height: '150%'
-            }
-          },
-          {
-            slot: 'slot-1',
-            itemStyle: {
-              backgroundColor: 'rgba(123, 12, 234, 0.3)'
-            },
-            contentStyle: {
-              width: '150%',
-              height: '100%'
-            }
-          },
-          {
-            slot: 'slot-2',
-            itemStyle: {
-              backgroundColor: 'rgba(234, 12, 123, 0.3)'
-            },
-            contentStyle: {
-              width: '300%',
-              height: '100%'
-            }
-          },
-          {
-            slot: 'slot-3',
-            itemStyle: {
-              backgroundColor: 'rgba(12, 234, 123, 0.3)'
-            },
-            contentStyle: {
-              width: '100%',
-              height: '100%'
-            }
-          },
-          {
-            slot: 'slot-4',
-            itemStyle: {
-              backgroundColor: 'rgba(123, 234, 12, 0.3)'
-            },
-            contentStyle: {
-              width: '100%',
-              height: '100%'
-            }
-          }
-        ]
-      }
+      required: true
     },
     itemType: {
       type: String,
@@ -94,7 +38,7 @@ export default {
 
   data () {
     return {
-      options: [],
+      slideItems: [],
       isTouching: false,
 
       activeId: 0,
@@ -107,7 +51,7 @@ export default {
   created () {
     window.sgSlider = this
 
-    this.options = this.items.map(o => {
+    this.slideItems = this.items.map(o => {
       return {
         id: o.slot,
         slot: o.slot,
@@ -116,14 +60,13 @@ export default {
         itemStyle: {
           ...o.itemStyle,
           // left: '100%',
-          transform: 'translate(100%, 0)'
+          transform: 'translate(100%, 0) scale(1)'
         }
       }
     })
-    this.options[0].ratioX = 0
-    // this.options[0].itemStyle.left = 0
-    this.options[0].itemStyle.transform = 'translate(0, 0)'
-    this.activeId = this.options[0].id
+    this.slideItems[0].ratioX = 0
+    this.setSlideStyle(this.slideItems[0])
+    this.activeId = this.slideItems[0].id
     this.activeIndex = 0
   },
 
@@ -164,15 +107,14 @@ export default {
       }
 
       const index = this.activeIndex
-      const activeItem = this.options[index]
+      const activeItem = this.slideItems[index]
       const ratio = (xVal * 100) / this.$el.clientWidth
       activeItem.ratioX += ratio
       activeItem.ratioX = Math.max(-100, activeItem.ratioX)
       activeItem.ratioX = Math.min(100, activeItem.ratioX)
-      activeItem.itemStyle.transform = `translate(${activeItem.ratioX}%)`
-      // activeItem.itemStyle.left = `${activeItem.ratioX}%`
+      this.setSlideStyle(activeItem)
 
-      const nextItem = this.options[index + 1]
+      const nextItem = this.slideItems[index + 1]
       if (nextItem) {
         // -100% ~ 0 ~ 100%
         if (activeItem.ratioX <= 0) {
@@ -180,19 +122,17 @@ export default {
         } else {
           nextItem.ratioX = 100
         }
-        nextItem.itemStyle.transform = `translate(${nextItem.ratioX}%)`
-        // nextItem.itemStyle.left = `${nextItem.ratioX}%`
+        this.setSlideStyle(nextItem)
       }
 
-      const previousItem = this.options[index - 1]
+      const previousItem = this.slideItems[index - 1]
       if (previousItem) {
         if (activeItem.ratioX >= 0) {
           previousItem.ratioX = activeItem.ratioX - 100
         } else {
           previousItem.ratioX = -100
         }
-        previousItem.itemStyle.transform = `translate(${previousItem.ratioX}%)`
-        // previousItem.itemStyle.left = `${previousItem.ratioX}%`
+        this.setSlideStyle(previousItem)
       }
 
       this.preClientX = touch.clientX
@@ -202,12 +142,12 @@ export default {
       this.isTouching = false
 
       const index = this.activeIndex
-      const activeItem = this.options[index]
-      // <-20% 或者 >20% 则认为进行切换
-      if (activeItem.ratioX < -20) {
+      const activeItem = this.slideItems[index]
+      // <-GAP_IN_PERCENT% 或者 >GAP_IN_PERCENT% 则认为进行切换
+      if (activeItem.ratioX < -GAP_IN_PERCENT) {
         // 下一页活动
         this.slideChange(1)
-      } else if (activeItem.ratioX > 20) {
+      } else if (activeItem.ratioX > GAP_IN_PERCENT) {
         // 上一页活动
         this.slideChange(-1)
       } else {
@@ -217,47 +157,58 @@ export default {
     },
     slideChange (unit = 0) {
       const index = this.activeIndex
-      const activeItem = this.options[index]
-      const previousItem = this.options[index - 1]
-      const nextItem = this.options[index + 1]
+      const activeItem = this.slideItems[index]
+      const previousItem = this.slideItems[index - 1]
+      const nextItem = this.slideItems[index + 1]
 
       if (unit > 0) {
         if (nextItem) {
           activeItem.ratioX = -100
-          this.activeIndex++
           nextItem.ratioX = 0
-          nextItem.itemStyle.transform = `translate(${nextItem.ratioX}%)`
-          // nextItem.itemStyle.left = `${nextItem.ratioX}%`
+          this.setSlideStyle(nextItem)
+
+          this.activeIndex++
+          this.$emit('change', this.activeIndex)
         } else {
           activeItem.ratioX = 0
         }
       } else if (unit < 0) {
         if (previousItem) {
           activeItem.ratioX = 100
-          this.activeIndex--
           previousItem.ratioX = 0
-          previousItem.itemStyle.transform = `translate(${previousItem.ratioX}%)`
-          // previousItem.itemStyle.left = `${previousItem.ratioX}%`
+          this.setSlideStyle(previousItem)
+
+          this.activeIndex--
+          this.$emit('change', this.activeIndex)
         } else {
           activeItem.ratioX = 0
         }
       } else {
+        if (activeItem.ratioX > GAP_IN_PERCENT) {
+          this.$emit('change', -1)
+        } else if (activeItem.ratioX < -GAP_IN_PERCENT) {
+          this.$emit('change', -2)
+        }
         activeItem.ratioX = 0
         if (previousItem) {
           previousItem.ratioX = -100
-          previousItem.itemStyle.transform = `translate(${previousItem.ratioX}%)`
-          // previousItem.itemStyle.left = `${previousItem.ratioX}%`
+          this.setSlideStyle(previousItem)
         }
         if (nextItem) {
           nextItem.ratioX = 100
-          nextItem.itemStyle.transform = `translate(${nextItem.ratioX}%)`
-          // nextItem.itemStyle.left = `${nextItem.ratioX}%`
+          this.setSlideStyle(nextItem)
         }
       }
-
-      activeItem.itemStyle.transform = `translate(${activeItem.ratioX}%)`
-      // activeItem.itemStyle.left = `${activeItem.ratioX}%`
-      this.activeId = this.options[this.activeIndex].id
+      this.setSlideStyle(activeItem)
+      this.activeId = this.slideItems[this.activeIndex].id
+    },
+    setSlideStyle (slide) {
+      const { ratioX, itemStyle } = slide
+      const scale = Math.max(1 - Math.abs(ratioX / 100), 0.8)
+      itemStyle.transform = `translate(${ratioX}%) scale(${scale}, ${scale})`
+      // const blurNum = Math.floor((1 - scale) * GAP_IN_PERCENT)
+      // itemStyle.filter = `blur(${blurNum}px)`
+      // itemStyle.left = `${ratioX}%`
     }
   }
 }
@@ -282,19 +233,5 @@ export default {
 }
 .slide-anime .slider-item {
   transition: transform 300ms, left 300ms;
-}
-</style>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-}
-html {
-  font-size: 12px;
-}
-html,
-body {
-  height: 100%;
 }
 </style>
