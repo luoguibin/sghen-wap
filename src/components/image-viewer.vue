@@ -5,12 +5,12 @@
         <span slot="left">{{currentName}}</span>
       </sg-header>
       <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
-        <sg-swipper
+        <sg-slider
           v-if="visible"
           ref="swipper"
           :index="index"
           :items="swipperItems"
-          :auto="false"
+          :loopTotal="2"
           @change="hanleChange"
         >
           <div
@@ -21,7 +21,7 @@
           >
             <img v-if="item.visible" :src="item.src" />
           </div>
-        </sg-swipper>
+        </sg-slider>
       </div>
       <div class="image-viewer-footer">
         <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button>
@@ -79,9 +79,10 @@ export default {
     visible (v) {
       if (v) {
         const swipper = this.$refs.swipper
-        swipper && swipper.setCurrentIndex(this.index)
-        this.imageOptions = this.images.map(v => {
-          return { src: v, visible: false }
+        // swipper && swipper.setCurrentIndex(this.index)
+        swipper && swipper.setActiveIndex(this.index)
+        this.imageOptions = this.images.map((v, i) => {
+          return { src: v, visible: Math.abs(i - this.index) < 2 }
         })
       }
     }
@@ -93,6 +94,9 @@ export default {
 
   methods: {
     hanleChange (index) {
+      if (index < 0) {
+        return
+      }
       this.currentIndex = index
       this.isShowNatural = false
       if (!this.imageOptions.length) {
@@ -149,6 +153,9 @@ export default {
     padding: 1rem;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     img {
       width: 100%;
       height: 100%;
@@ -173,7 +180,8 @@ export default {
       background-color: transparent;
     }
   }
-  .image-view-origin .sg-swipper-item_active {
+  .image-view-origin .sg-swipper-item_active,
+  .image-view-origin .card-item__active {
     .image-wrapper {
       img {
         width: initial;
