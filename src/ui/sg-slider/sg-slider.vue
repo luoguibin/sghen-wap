@@ -36,11 +36,15 @@ export default {
     },
     loopTotal: {
       type: Number,
-      default: 2
+      default: 0
     },
     duration: {
       type: Number,
       default: 5000
+    },
+    index: {
+      type: Number,
+      default: 0
     }
   },
 
@@ -74,7 +78,7 @@ export default {
       }
     })
 
-    this.setActiveIndex(0)
+    this.setActiveIndex(this.index)
     this.start()
   },
 
