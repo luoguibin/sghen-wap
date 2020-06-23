@@ -33,6 +33,14 @@ export default {
     itemType: {
       type: String,
       default: ''
+    },
+    loopTotal: {
+      type: Number,
+      default: 2
+    },
+    duration: {
+      type: Number,
+      default: 5000
     }
   },
 
@@ -42,7 +50,8 @@ export default {
       isTouching: false,
 
       activeId: 0,
-      activeIndex: 0
+      activeIndex: 0,
+      loopCount: 0
     }
   },
 
@@ -64,15 +73,15 @@ export default {
         }
       }
     })
-    this.slideItems[0].ratioX = 0
-    this.setSlideStyle(this.slideItems[0])
-    this.activeId = this.slideItems[0].id
-    this.activeIndex = 0
+
+    this.setActiveIndex(0)
+    this.start()
   },
 
   methods: {
     onTouchStart (e) {
       e.preventDefault()
+      this.stop()
       this.isTouching = true
       this.canSlide = true
       const touch = (e.touches && e.touches[0]) || e
@@ -154,6 +163,7 @@ export default {
         // 当前页活动
         this.slideChange()
       }
+      this.start()
     },
     slideChange (unit = 0) {
       const index = this.activeIndex
@@ -205,7 +215,61 @@ export default {
       // const blurNum = Math.floor((1 - scale) * GAP_IN_PERCENT)
       // itemStyle.filter = `blur(${blurNum}px)`
       // itemStyle.left = `${ratioX}%`
+    },
+
+    setActiveIndex (index) {
+      if (index < 0 || index >= this.slideItems.length) {
+        return
+      }
+
+      this.slideItems.forEach((o, i) => {
+        if (i < index) {
+          o.ratioX = -100
+        } else if (i > index) {
+          o.ratioX = 100
+        } else {
+          o.ratioX = 0
+          this.activeId = o.id
+          this.activeIndex = index
+        }
+        this.setSlideStyle(o)
+      })
+    },
+    start () {
+      if (this.loopTotal < 1) {
+        return
+      }
+      if (this.loopCount >= this.loopTotal) {
+        return
+      }
+      this.loopNext()
+    },
+    loopNext () {
+      this.loopTimer = setTimeout(() => {
+        const index = this.activeIndex
+        if (index === this.slideItems.length - 1) {
+          this.loopCount++
+          if (this.loopCount >= this.loopTotal) {
+            return
+          }
+          this.setActiveIndex(0)
+          this.$emit('change', 0)
+        } else {
+          this.slideChange(1)
+        }
+        this.loopNext()
+      }, this.duration)
+    },
+    stop () {
+      if (this.loopTimer) {
+        clearTimeout(this.loopTimer)
+        this.loopTimer = null
+      }
     }
+  },
+
+  beforeDestroy () {
+    this.stop()
   }
 }
 </script>
