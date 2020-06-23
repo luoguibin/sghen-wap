@@ -10,7 +10,6 @@
           ref="swipper"
           :index="index"
           :items="swipperItems"
-          :loopTotal="2"
           @change="hanleChange"
         >
           <div
@@ -78,9 +77,7 @@ export default {
   watch: {
     visible (v) {
       if (v) {
-        const swipper = this.$refs.swipper
-        // swipper && swipper.setCurrentIndex(this.index)
-        swipper && swipper.setActiveIndex(this.index)
+        this.currentIndex = this.index
         this.imageOptions = this.images.map((v, i) => {
           return { src: v, visible: Math.abs(i - this.index) < 2 }
         })
