@@ -20,26 +20,36 @@
     <!-- 内容 -->
     <div class="home-body">
       <div class="scroll">
-        <sg-swipper
-          ref="sgSwipper"
-          :items="swipperItems"
-          :itemType="'swipper-peotry'"
-          :duration="swipperDuration"
-          @click="onClickItemType"
-        >
-          <div
-            v-for="(item, index) in swipperPoetries"
-            :slot="swipperItems[index].slot"
-            :key="item.id"
-            class="item-panel"
+        <!-- 热门诗词TOP10 -->
+        <div style="height: 15rem;">
+          <sg-slider
+            v-if="sliderItems.length"
+            ref="sgSlider"
+            :items="sliderItems"
+            :itemType="'slider-peotry'"
+            :duration="sliderDuration"
+            :loopTotal="99"
+            @click="onClickItemType"
           >
-            <img class="item-bg" v-if="item.images && item.images.length" :src="item.images[0]" />
-            <h2 :style="{'opacity': item.set ? 1 : 0}">《{{item.set && item.set.name}}》</h2>
-            <div class="content-wrapper">
-              <p>{{item.content}}</p>
+            <div
+              v-for="(item, index) in sliderPoetries"
+              :slot="sliderItems[index].slot"
+              :key="item.id"
+              class="item-panel"
+            >
+              <img class="item-bg" v-if="item.images && item.images.length" :src="item.images[0]" />
+              <span class="praise-total">共{{item.praiseTotal | numFilter}}赞</span>
+              <h2>
+                <span>{{item.set.name}}</span>
+                <span v-if="item.title" style="padding: 0 5px;">*</span>
+                <span v-if="item.title">{{item.title}}</span>
+              </h2>
+              <div class="content-wrapper">
+                <p>{{item.content}}</p>
+              </div>
             </div>
-          </div>
-        </sg-swipper>
+          </sg-slider>
+        </div>
 
         <div class="info-panel year-info" v-if="yearPoetrySets.length">
           <h2>{{year}}年度诗词概况</h2>
@@ -138,9 +148,9 @@ export default {
       yearPoetrySets: [],
       popularPeotrySets: [],
 
-      swipperItems: [],
-      swipperPoetries: [],
-      swipperDuration: 5000,
+      sliderItems: [],
+      sliderPoetries: [],
+      sliderDuration: 5000,
 
       lastestImages: [],
       rotateItems: [],
@@ -175,8 +185,8 @@ export default {
   methods: {
     savePageData () {
       const data = {
-        swipperPoetries: this.swipperPoetries,
-        swipperItems: this.swipperItems,
+        sliderPoetries: this.sliderPoetries,
+        sliderItems: this.sliderItems,
         yearPoetrySets: this.yearPoetrySets,
         yearPeots: this.yearPeots,
         popularPeotrySets: this.popularPeotrySets,
@@ -188,17 +198,13 @@ export default {
     resotrePageData () {
       const pageData = Cache.PeotryPageCache.getData(HOME_ID)
       if (pageData) {
-        this.swipperPoetries = pageData.swipperPoetries
-        this.swipperItems = pageData.swipperItems
+        this.sliderPoetries = pageData.sliderPoetries
+        this.sliderItems = pageData.sliderItems
         this.yearPoetrySets = pageData.yearPoetrySets
         this.yearPeots = pageData.yearPeots
         this.popularPeotrySets = pageData.popularPeotrySets
         this.rotateItems = pageData.rotateItems
         this.lastestImages = pageData.lastestImages
-
-        this.$nextTick(() => {
-          this.$refs.sgSwipper.start()
-        })
         return true
       } else {
         return false
@@ -235,7 +241,7 @@ export default {
         const imageMap = arrayToMap(images)
         const imgSrcFunc = Vue.filter('imgSrcFilter')
         list.forEach(o => {
-          o.praiseCount = commentMap[o.id].count
+          o.praiseTotal = commentMap[o.id].count
           o.set = setMap[o.set_id]
           o.user = userMap[o.user_id]
 
@@ -256,9 +262,8 @@ export default {
 
           o.content = isOver ? lines.join('\n') : o.content
         })
-        this.swipperPoetries = list
-        this.swipperItems = list.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
-        this.$refs.sgSwipper.start()
+        this.sliderPoetries = list
+        this.sliderItems = list.map(o => ({ slot: o.id }))
       })
     },
     getRotateImages () {
@@ -324,10 +329,10 @@ export default {
 
       const itemIndex = getItemIndex(el)
       switch (itemType) {
-        case 'swipper-peotry':
+        case 'slider-peotry':
           this.$router.push({
             name: 'peotry-detail',
-            params: { id: this.swipperPoetries[itemIndex].id }
+            params: { id: this.sliderPoetries[itemIndex].id }
           })
           break
         case 'popular-set':
@@ -438,6 +443,12 @@ export default {
       opacity: 0.3;
       object-fit: contain;
       pointer-events: none;
+    }
+    .praise-total {
+      position: absolute;
+      bottom: 1rem;
+      right: 0.5rem;
+      color: $color-tip;
     }
   }
   .info-panel {
