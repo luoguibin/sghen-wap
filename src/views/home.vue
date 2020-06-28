@@ -54,7 +54,7 @@
         <!-- 界面功能按钮 -->
         <div class="info-panel menus">
           <div class="menu-item">
-            <sg-button type="primary" @click="$router.push({name: 'peotry-images'})">诗词美图~</sg-button>
+            <sg-button type="primary" @click="$router.push({name: 'peotry-images'})">诗词图集~</sg-button>
           </div>
           <div class="menu-item">
             <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">最新诗词~</sg-button>
@@ -100,23 +100,10 @@ import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
 import { getItemIndex, getItemTypeObj } from '@/utils/sgDom'
-import { arrayToMap } from '@/utils/sgData'
+import { arrayToMap, getSmallImage } from '@/utils/sgData'
 import Cache from '@/common/cache-center'
 
 const HOME_ID = 'home'
-
-const getSmallImage = v => {
-  if (v.endsWith('.jpg')) {
-    v = v.replace(/.jpg$/, '_100.jpg')
-  } else if (v.endsWith('.png')) {
-    v = v.replace(/.png$/, '_100.png')
-  } else if (v.endsWith('.jpeg')) {
-    v = v.replace(/.jpeg$/, '_100.jpeg')
-  } else {
-    v += '_100.jpg'
-  }
-  return v
-}
 
 export default {
   name: 'Home',

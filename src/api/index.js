@@ -80,6 +80,8 @@ export const apiURL = {
   peotryDelete: `${preffix}/v1/peotry/delete`,
   // 诗词图片
   peotryImages: `${preffix}/v1/api/get/peotry/images`,
+  // 诗词图片列表
+  peotryImageList: `${nodePreffix}/dynamic-api/peotry-image/list`,
   // 诗词图片查询
   peotryImageQuery: `${preffix}/v1/api/get/peotry/images-query`,
   // 诗词选集查询

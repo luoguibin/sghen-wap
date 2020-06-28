@@ -655,12 +655,12 @@ export default {
       padding: 0 $padding-normal;
     }
   }
-}
 
-.jv-container.jv-light {
-  background: #b8d1ea;
-  .jv-more {
-    background: linear-gradient(0deg, #b8d1ea, transparent);
+  .jv-container.jv-light {
+    background: #b8d1ea;
+    .jv-more {
+      background: linear-gradient(0deg, #b8d1ea, transparent);
+    }
   }
 }
 </style>

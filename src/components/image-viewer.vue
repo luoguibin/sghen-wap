@@ -91,14 +91,17 @@ export default {
 
   methods: {
     hanleChange (index) {
+      if (!this.imageOptions.length) {
+        return
+      }
+
+      this.$emit('change', index)
       if (index < 0) {
         return
       }
       this.currentIndex = index
       this.isShowNatural = false
-      if (!this.imageOptions.length) {
-        return
-      }
+
       const min = Math.max(index - 2, 0)
       const max = Math.min(index + 2, this.images.length - 1)
       for (let i = min; i <= max; i++) {
