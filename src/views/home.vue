@@ -105,6 +105,7 @@ import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
 import { getItemIndex, getItemTypeObj } from '@/utils/sgDom'
+import { arrayToMap } from '@/utils/sgData'
 import Cache from '@/common/cache-center'
 
 const HOME_ID = 'home'
@@ -206,7 +207,7 @@ export default {
     checkRestorePageData () {
       if (!this.resotrePageData()) {
         this.getYearInfos()
-        this.getSwipperPeotries()
+        this.getPopularPeotries()
         this.getRotateImages()
       }
     },
@@ -225,62 +226,39 @@ export default {
         this.popularPeotrySets = resp.data
       })
     },
-    async getSwipperPeotries () {
-      const resp = await apiGetData(apiURL.peotryPopular)
-      const list = resp.data.map(o => {
-        let lines = o.content.split('\n')
-        const isOver = lines.length > 3
-        if (isOver) {
-          lines = lines.splice(0, 3)
-          lines.push('...')
-        }
-        return {
-          content: isOver ? lines.join('\n') : o.content,
-          isOver,
-          count: o.count,
-          end: o.end,
-          id: o.id,
-          setId: o.set_id,
-          set: null,
-          time_create: o.timeCreate,
-          title: o.title,
-          user_id: o.userId,
-          images: []
-        }
-      })
-      this.swipperPoetries = list
-      this.swipperItems = list.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
-      this.$refs.sgSwipper.start()
+    getPopularPeotries () {
+      apiGetData(apiURL.peotryPopular).then(resp => {
+        const { comments, list = [], sets, users, images } = resp.data
+        const commentMap = arrayToMap(comments, 'type_id')
+        const setMap = arrayToMap(sets)
+        const userMap = arrayToMap(users)
+        const imageMap = arrayToMap(images)
+        const imgSrcFunc = Vue.filter('imgSrcFilter')
+        list.forEach(o => {
+          o.praiseCount = commentMap[o.id].count
+          o.set = setMap[o.set_id]
+          o.user = userMap[o.user_id]
 
-      const ids = list.map(o => o.id)
-      const resp0 = await apiGetData(apiURL.peotryImageQuery, {
-        datas: ids.toString()
-      })
-      const imageMap = {}
-      const imgSrcFunc = Vue.filter('imgSrcFilter')
-      resp0.data.forEach(o => {
-        if (o && o.images) {
-          imageMap[o.id] = JSON.parse(o.images).map(v =>
-            getSmallImage(imgSrcFunc(v))
-          )
-        } else {
-          imageMap[o.id] = []
-        }
-      })
-      this.swipperPoetries.forEach(o => {
-        o.images = imageMap[o.id] || []
-      })
+          if (imageMap[o.id]) {
+            o.images = JSON.parse(imageMap[o.id].images).map(v =>
+              getSmallImage(imgSrcFunc(v))
+            )
+          } else {
+            o.images = []
+          }
 
-      const setMap = {}
-      const setIds = list.map(o => o.setId)
-      const resp1 = await apiGetData(apiURL.peotrySetQuery, {
-        datas: setIds.toString()
-      })
-      resp1.data.forEach(o => {
-        setMap[o.id] = o
-      })
-      this.swipperPoetries.forEach(o => {
-        o.set = setMap[o.setId]
+          let lines = o.content.split('\n')
+          const isOver = lines.length > 3
+          if (isOver) {
+            lines = lines.splice(0, 3)
+            lines.push('...')
+          }
+
+          o.content = isOver ? lines.join('\n') : o.content
+        })
+        this.swipperPoetries = list
+        this.swipperItems = list.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
+        this.$refs.sgSwipper.start()
       })
     },
     getRotateImages () {

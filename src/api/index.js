@@ -43,6 +43,8 @@ export const apiPostUpload = (url, data, params, call) =>
   })
 
 const preffix = '/sapi'
+const nodePreffix = '/napi'
+
 /**
  * @description 接口地址列表
  */
@@ -68,7 +70,8 @@ export const apiURL = {
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
-  peotryPopular: `${preffix}/v1/api/get/peotry/popular`,
+  peotryPopular: `${nodePreffix}/dynamic-api/peotry/popular`,
+
   // 诗词创建
   peotryCreate: `${preffix}/v1/peotry/create`,
   // 诗词更新
