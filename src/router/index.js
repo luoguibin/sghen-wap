@@ -15,6 +15,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'home' */'@/views/home')
   },
   {
+    path: '/peotry-images',
+    name: 'peotry-images',
+    component: () => import(/* webpackChunkName: 'peotry-images' */'@/views/peotry-images')
+  },
+  {
     path: '/peotry-list',
     name: 'peotry-list',
     component: () => import(/* webpackChunkName: 'peotry-list' */'@/views/peotry-list')

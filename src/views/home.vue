@@ -51,6 +51,17 @@
           </sg-slider>
         </div>
 
+        <!-- 界面功能按钮 -->
+        <div class="info-panel menus">
+          <div class="menu-item">
+            <sg-button type="primary" @click="$router.push({name: 'peotry-images'})">诗词美图~</sg-button>
+          </div>
+          <div class="menu-item">
+            <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">最新诗词~</sg-button>
+          </div>
+        </div>
+
+        <!-- 上一年年度诗词概况 -->
         <div class="info-panel year-info" v-if="yearPoetrySets.length">
           <h2>{{year}}年度诗词概况</h2>
           <p @click="onClickItemType">
@@ -66,6 +77,7 @@
           </p>
         </div>
 
+        <!-- 选集总排行榜 -->
         <div class="info-panel">
           <h2>选集总排行榜</h2>
           <div class="popular-sets" @click="onClickItemType">
@@ -75,33 +87,6 @@
               item-type="popular-set"
             >{{item.name}}({{item.count}}首)</div>
           </div>
-        </div>
-
-        <div class="info-panel">
-          <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">更多诗词~</sg-button>
-        </div>
-
-        <div class="module-panel" @click="onClickItemType">
-          <rotate-box v-if="lastestImages.length" :items="rotateItems" :itemType="'latest-image'">
-            <div
-              v-for="(item, index) in lastestImages"
-              :slot="rotateItems[index].slot"
-              :key="item.id"
-              class="item-panel album-item"
-            >
-              <!-- 相册中不超过2张图片，默认显示第一张图片 -->
-              <div v-if="item.images.length < 3" class="album-image1">
-                <img :src="item.images[0]" />
-              </div>
-
-              <!-- 相册中超过2张图片，默认显示最新的前3张图片 -->
-              <div v-else class="album-images3">
-                <img :src="item.images[0]" />
-                <img :src="item.images[1]" />
-                <img :src="item.images[2]" />
-              </div>
-            </div>
-          </rotate-box>
         </div>
 
         <site-instruction></site-instruction>
@@ -137,7 +122,6 @@ export default {
   name: 'Home',
 
   components: {
-    RotateBox: () => import('@/components/rotate-box'),
     SiteInstruction: () => import('@/components/site-instruction')
   },
 
@@ -151,9 +135,6 @@ export default {
       sliderItems: [],
       sliderPoetries: [],
       sliderDuration: 5000,
-
-      lastestImages: [],
-      rotateItems: [],
 
       dropdownOptions: [
         { label: '我的诗词', value: 'my-list' },
@@ -189,9 +170,7 @@ export default {
         sliderItems: this.sliderItems,
         yearPoetrySets: this.yearPoetrySets,
         yearPeots: this.yearPeots,
-        popularPeotrySets: this.popularPeotrySets,
-        rotateItems: this.rotateItems,
-        lastestImages: this.lastestImages
+        popularPeotrySets: this.popularPeotrySets
       }
       Cache.PeotryPageCache.setData(HOME_ID, data)
     },
@@ -203,8 +182,6 @@ export default {
         this.yearPoetrySets = pageData.yearPoetrySets
         this.yearPeots = pageData.yearPeots
         this.popularPeotrySets = pageData.popularPeotrySets
-        this.rotateItems = pageData.rotateItems
-        this.lastestImages = pageData.lastestImages
         return true
       } else {
         return false
@@ -214,7 +191,6 @@ export default {
       if (!this.resotrePageData()) {
         this.getYearInfos()
         this.getPopularPeotries()
-        this.getRotateImages()
       }
     },
     getYearInfos () {
@@ -264,25 +240,6 @@ export default {
         })
         this.sliderPoetries = list
         this.sliderItems = list.map(o => ({ slot: o.id }))
-      })
-    },
-    getRotateImages () {
-      apiGetData(apiURL.peotryImages, { limit: 4 }).then(({ data }) => {
-        const imgSrcFunc = Vue.filter('imgSrcFilter')
-        this.lastestImages = data
-          .filter(o => o.count)
-          .map(o => {
-            const temp = {
-              id: o.id,
-              count: o.count
-            }
-            const images = JSON.parse(o.images).map(v => {
-              return getSmallImage(imgSrcFunc(v))
-            })
-            temp.images = [...images, ...images]
-            return temp
-          })
-        this.rotateItems = data.map(o => ({ id: o.id, slot: 'slot-' + o.id }))
       })
     },
 
@@ -358,12 +315,6 @@ export default {
           this.$router.push({
             name: 'personal',
             query: { uuid: this.yearPeots[0].id }
-          })
-          break
-        case 'latest-image':
-          this.$router.push({
-            name: 'peotry-detail',
-            params: { id: this.lastestImages[itemIndex].id }
           })
           break
         default:
@@ -488,45 +439,21 @@ export default {
     }
   }
 
+  .menus {
+    .menu-item {
+      display: inline-block;
+      width: 48%;
+      // height: 10rem;
+      box-sizing: border-box;
+      &:nth-child(2n) {
+        margin-left: 4%;
+      }
+    }
+  }
+
   .module-panel {
     padding: 0 1rem;
     box-sizing: border-box;
-  }
-
-  .album-item {
-    background-color: rgba(255, 255, 255, 0.8);
-    img {
-      display: inline-block;
-      box-sizing: border-box;
-      height: 100%;
-      object-fit: cover;
-    }
-    .album-image1 {
-      height: 100%;
-      img {
-        width: 100%;
-      }
-    }
-    .album-images3 {
-      height: 100%;
-      img {
-        float: left;
-        &:nth-child(1) {
-          width: 70%;
-          padding-right: 4px;
-        }
-        &:nth-child(2) {
-          width: 30%;
-          height: 50%;
-          padding-bottom: 2px;
-        }
-        &:nth-child(3) {
-          width: 30%;
-          height: 50%;
-          padding-top: 2px;
-        }
-      }
-    }
   }
 
   .content-wrapper {
