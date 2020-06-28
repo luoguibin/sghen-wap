@@ -86,13 +86,18 @@ export default {
           this.list.push(...list)
         }
         let yyyyMM = 0
+        const nowYear = new Date().getFullYear()
         this.list.forEach(o => {
           const d = new Date(o.time_create)
-          const yyyyMM_ = d.getFullYear() * 1000 + (d.getMonth() + 1)
+          const yyyyMM_ = d.getFullYear() * 100000 + (d.getMonth() + 1)
           if (yyyyMM !== yyyyMM_) {
             yyyyMM = yyyyMM_
             const divider = '' + yyyyMM_
-            o.timeDivider = divider.substr(0, 4) + '-' + divider.substr(5, 6)
+            if (nowYear === d.getFullYear()) {
+              o.timeDivider = '今年' + divider.substr(7, 8) + '月'
+            } else {
+              o.timeDivider = divider.substr(0, 4) + '年' + divider.substr(7, 8) + '月'
+            }
           }
         })
         this.isEnd = this.list.length >= this.total
@@ -143,25 +148,42 @@ export default {
 
 .peotry-images {
   height: 100%;
-  padding: 0 $padding-normal;
 
   .images-item {
     margin-bottom: 2rem;
+    &:first-child {
+      .time-divider {
+        border-top: none;
+      }
+    }
 
     .time-divider {
-      margin-top: 2rem;
+      height: 5rem;
+      line-height: 5rem;
+      padding: 0 $padding-normal;
+      background-color: white;
       text-align: right;
+    }
+
+    .images {
+      padding: 0 $padding-normal;
     }
 
     img {
       width: 33%;
+      min-height: 3rem;
       padding: 0.5rem;
       box-sizing: border-box;
       vertical-align: top;
     }
 
     .divider {
-      border-top: 1px solid $color-theme-disabled;
+      width: 92%;
+      height: 1px;
+      padding: 0 $padding-normal;
+      margin: 0 auto;
+      box-sizing: border-box;
+      background-color: $color-theme-disabled;
     }
   }
 }
