@@ -225,8 +225,11 @@ export default {
 
           o.content = isOver ? lines.join('\n') : o.content
         })
-        this.sliderPoetries = list
-        this.sliderItems = list.map(o => ({ slot: o.id }))
+        const orderList = list.sort(function (o0, o1) {
+          return o0.praiseTotal > o1.praiseTotal ? -1 : 1
+        })
+        this.sliderPoetries = orderList
+        this.sliderItems = orderList.map(o => ({ slot: o.id }))
       })
     },
 
