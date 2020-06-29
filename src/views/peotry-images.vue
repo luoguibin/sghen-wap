@@ -15,7 +15,11 @@
             <h2>{{item.timeDivider}}</h2>
           </div>
           <div class="images">
-            <img v-for="src in item.smallImages" item-type="image" :key="src" :src="src" alt />
+            <div class="image-outter" v-for="src in item.smallImages" :key="src">
+              <div class="image-inner">
+                <img  item-type="image"  :src="src" alt />
+              </div>
+            </div>
           </div>
           <div class="divider"></div>
         </div>
@@ -149,6 +153,10 @@ export default {
 .peotry-images {
   height: 100%;
 
+  // .main {
+  //   background-color: white;
+  // }
+
   .images-item {
     margin-bottom: 2rem;
     &:first-child {
@@ -161,7 +169,6 @@ export default {
       height: 5rem;
       line-height: 5rem;
       padding: 0 $padding-normal;
-      background-color: white;
       text-align: right;
     }
 
@@ -169,12 +176,31 @@ export default {
       padding: 0 $padding-normal;
     }
 
-    img {
-      width: 33%;
-      min-height: 3rem;
+    .image-outter {
+      position: relative;
+      display: inline-block;
+      width: 33.33%;
+      height: 0;
+      padding-bottom: 33.33%;
+    }
+    .image-inner {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       padding: 0.5rem;
       box-sizing: border-box;
-      vertical-align: top;
+      overflow: hidden;
+    }
+    img {
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 5px;
     }
 
     .divider {
@@ -183,7 +209,7 @@ export default {
       padding: 0 $padding-normal;
       margin: 0 auto;
       box-sizing: border-box;
-      background-color: $color-theme-disabled;
+      background-color: white;
     }
   }
 }
