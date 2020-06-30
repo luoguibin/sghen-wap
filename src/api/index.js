@@ -43,7 +43,7 @@ export const apiPostUpload = (url, data, params, call) =>
   })
 
 const preffix = '/sapi'
-const nodePreffix = '/napi'
+const nodePreffix = '/napi/dynamic-api'
 
 /**
  * @description 接口地址列表
@@ -70,7 +70,7 @@ export const apiURL = {
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
   // 诗词热门列表
-  peotryPopular: `${nodePreffix}/dynamic-api/peotry/popular`,
+  peotryPopular: `${nodePreffix}/peotry/popular`,
 
   // 诗词创建
   peotryCreate: `${preffix}/v1/peotry/create`,
@@ -81,7 +81,7 @@ export const apiURL = {
   // 诗词图片
   peotryImages: `${preffix}/v1/api/get/peotry/images`,
   // 诗词图片列表
-  peotryImageList: `${nodePreffix}/dynamic-api/peotry-image/list`,
+  peotryImageList: `${nodePreffix}/peotry-image/list`,
   // 诗词图片查询
   peotryImageQuery: `${preffix}/v1/api/get/peotry/images-query`,
   // 诗词选集查询
@@ -110,9 +110,9 @@ export const apiURL = {
   // 评论删除
   commentDelete: `${preffix}/v1/comment/delete`,
   // 点赞列表
-  commentPraise: `${preffix}/v1/api/get/peotry/praise-comments`,
+  commentPraise: `${nodePreffix}/comment/praise/list`,
   // 用户评论列表
-  commentWords: `${preffix}/v1/api/get/peotry/word-comments`,
+  commentContent: `${nodePreffix}/comment/content/list`,
   // 用户是否点赞诗词
-  commentPraises: `${preffix}/v1/api/get/peotry/is-praise`
+  commentPraiseCheck: `${nodePreffix}/peotry/praise/check`
 }

@@ -7,15 +7,14 @@
 
     <div class="main">
       <div ref="wrapper" class="main-wrapper" @click="onClickPoetry">
-        <peotry v-if="peotry" ref="peotry" :peotry="peotry" :isDetail="true">
-          <div></div>
-        </peotry>
+        <peotry v-if="peotry" ref="peotry" :peotry="peotry" :isDetail="true"></peotry>
       </div>
     </div>
 
-    <image-viewer :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+    <image-viewer v-if="peotry" :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
     <comment-input
+      v-if="peotry"
       :visible.sync="commentVisible"
       :id="commentID"
       :toId="commentToID"
@@ -62,6 +61,7 @@
 import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
+import { arrayToMap } from '@/utils/sgData'
 import Cache from '@/common/cache-center'
 import { PEOTRY } from '@/const'
 
@@ -196,52 +196,71 @@ export default {
           o.user = Object.freeze(o.user)
         }
         this.peotry = o
-        this.getPeotryPraise()
-        this.getWordComments()
+        this.checkPraisePeotry()
+        this.getContentComments()
         this.getPraiseComments()
       })
     },
 
-    getPeotryPraise () {
+    checkPraisePeotry () {
       if (!this.userID) {
         return
       }
       this.praiseRequesting = true
-      apiGetData(apiURL.commentPraises, {
+      apiGetData(apiURL.commentPraiseCheck, {
         id: this.peotryID,
-        datas: [this.userID].toString()
+        userId: this.userID
       })
         .then(resp => {
-          this.myPraiseComment = this.formatComments(resp.data || [])[0]
+          const { list = [], users } = resp.data
+          if (!list.length) {
+            return
+          }
+          list[0].fromPeot = users[0] || {}
+          list[0].toPeot = {}
+          this.myPraiseComment = this.formatComments(list)[0]
         })
         .finally(() => {
           this.praiseRequesting = false
         })
     },
 
-    getWordComments (isReset) {
+    getContentComments (isReset) {
       if (isReset) {
         this.commentOffset = 0
       }
-      apiGetData(apiURL.commentWords, {
+      apiGetData(apiURL.commentContent, {
         id: this.peotryID,
         limit: this.pageLimit,
         offset: this.commentOffset
       }).then(resp => {
-        const data = resp.data
-        if (!data || data.length < 2) {
-          return
-        }
-        const total = +data[0][0].count || 0
-        const comments = this.formatComments(data[1] || [])
-        this.commentOffset += this.pageLimit
+        const { list = [], fromUsers = [], toUsers = [], count } = resp.data
+        const userMap = { ...arrayToMap(fromUsers), ...arrayToMap(toUsers) }
+        const comments = this.formatComments(list)
+        comments.forEach(o => {
+          const fromInfo = userMap[o.fromId]
+          o.fromPeot = {
+            id: fromInfo.id,
+            username: fromInfo.user_name,
+            avatar: fromInfo.avatar
+          }
+          const toInfo = userMap[o.toId]
+          o.toPeot = {
+            id: toInfo.id,
+            username: toInfo.user_name,
+            avatar: toInfo.avatar
+          }
+        })
+
+        const peotry = this.peotry
         if (isReset) {
-          this.peotry.realComments = comments
+          peotry.realComments = comments
         } else {
-          this.peotry.realComments.push(...comments)
+          peotry.realComments.push(...comments)
         }
-        this.peotry.commentTotal = total
-        this.checkComments(comments)
+        peotry.commentTotal = count
+
+        this.commentOffset += this.pageLimit
       })
     },
     getPraiseComments (isReset) {
@@ -257,16 +276,28 @@ export default {
         if (!data || data.length < 2) {
           return
         }
-        const total = +data[0][0].count || 0
-        const comments = this.formatComments(data[1] || [])
-        this.praiseOffset += this.pageLimit
-        this.peotry.praiseTotal = total
+        const { list = [], users = [], count } = resp.data
+        const userMap = arrayToMap(users)
+        const comments = this.formatComments(list)
+        comments.forEach(o => {
+          const info = userMap[o.fromId]
+          o.fromPeot = {
+            id: info.id,
+            username: info.user_name,
+            avatar: info.avatar
+          }
+          o.toPeot = {}
+        })
+
+        const peotry = this.peotry
         if (isReset) {
-          this.peotry.praiseComments = comments
+          peotry.praiseComments = comments
         } else {
-          this.peotry.praiseComments.push(...comments)
+          peotry.praiseComments.push(...comments)
         }
-        this.checkComments(comments)
+        peotry.praiseTotal = count
+
+        this.praiseOffset += this.pageLimit
       })
     },
     formatComments (comments = []) {
@@ -280,78 +311,6 @@ export default {
           type: o.type,
           typeId: o.type_id
         }
-      })
-    },
-    checkComments (comments) {
-      if (!comments) {
-        return
-      }
-      const userCache = Cache.UserCache
-      const peotIdMap = {}
-      // const timeFunc = function (o0, o1) {
-      //   // 按时间排序评论列表
-      //   const time0 = new Date(o0.createTime).getTime()
-      //   const time1 = new Date(o1.createTime).getTime()
-      //   return time0 < time1 ? -1 : 1
-      // }
-
-      comments.forEach(o => {
-        // 判断评论的创建者
-        if (userCache.getData(o.fromId)) {
-          o.fromPeot = Object.freeze(userCache.getData(o.fromId))
-        } else {
-          peotIdMap[o.fromId] = true
-        }
-
-        if (o.toId > 0) {
-          if (userCache.getData(o.toId)) {
-            o.toPeot = Object.freeze(userCache.getData(o.toId))
-          } else {
-            peotIdMap[o.toId] = true
-          }
-        }
-      })
-      const peotIds = Object.keys(peotIdMap)
-      if (!peotIds.length) {
-        return
-      }
-      this.getUsersInfo(peotIds).then(data => {
-        const userCache = Cache.UserCache
-        data.forEach(o => {
-          userCache.setData(+o.id, o)
-        })
-        this.buildPeotryComments(comments)
-      })
-    },
-    buildPeotryComments (comments) {
-      const userCache = Cache.UserCache
-      comments.forEach(o => {
-        if (!o.fromPeot) {
-          this.$set(o, 'fromPeot', Object.freeze(userCache.getData(o.fromId)))
-        }
-        if (o.toId > 0 && !o.toPeot) {
-          this.$set(o, 'toPeot', Object.freeze(userCache.getData(o.toId)))
-        }
-      })
-    },
-
-    getUsersInfo (ids) {
-      const reqs = []
-      const max = 100
-      const len = Math.ceil(ids.length / max)
-      for (let i = 0; i < len; i++) {
-        reqs.push(
-          apiGetData(apiURL.userInfoList, {
-            datas: ids.slice(i * max, i * max + max).toString()
-          })
-        )
-      }
-      return Promise.all(reqs).then(results => {
-        let data = []
-        results.forEach(o => {
-          data = data.concat(o.data)
-        })
-        return data
       })
     },
 
@@ -430,7 +389,7 @@ export default {
         id: comment.id,
         fromId: comment.fromId
       }).then(data => {
-        this.getWordComments(true)
+        this.getContentComments(true)
       })
     },
 
@@ -446,7 +405,10 @@ export default {
             end: peotry.end
           }
           sessionStorage.setItem(PEOTRY.EDIT_DATA, JSON.stringify(editPeotry))
-          this.$router.push({ name: 'peotry-edit', params: { id: editPeotry.id } })
+          this.$router.push({
+            name: 'peotry-edit',
+            params: { id: editPeotry.id }
+          })
           break
         case 'comment':
           this.openCommentInput(peotry.id, this.userID, '请输入评论')
@@ -540,7 +502,7 @@ export default {
           this.getPraiseComments()
           break
         case 'comments-more':
-          this.getWordComments()
+          this.getContentComments()
           break
         default:
           this.menusVisible = !this.menusVisible
