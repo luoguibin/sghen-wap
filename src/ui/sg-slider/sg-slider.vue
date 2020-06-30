@@ -84,7 +84,7 @@ export default {
 
   methods: {
     onTouchStart (e) {
-      e.preventDefault()
+      // e.preventDefault()
       this.stop()
       this.isTouching = true
       this.canSlide = true
@@ -151,7 +151,7 @@ export default {
       this.preClientX = touch.clientX
     },
     onTouchEnd (e) {
-      e.preventDefault()
+      // e.preventDefault()
       this.isTouching = false
 
       const index = this.activeIndex
