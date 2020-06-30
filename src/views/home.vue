@@ -21,7 +21,7 @@
     <div class="home-body">
       <div class="scroll">
         <!-- 热门诗词TOP10 -->
-        <div style="height: 15rem;">
+        <div style="height: 15rem; background-color: white;">
           <sg-slider
             v-if="sliderItems.length"
             ref="sgSlider"

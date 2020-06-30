@@ -7,9 +7,9 @@
       <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
         <sg-slider
           v-if="visible"
-          ref="swipper"
+          ref="slider"
           :index="index"
-          :items="swipperItems"
+          :items="sliderItems"
           @change="hanleChange"
           @click="handleClick"
         >
@@ -59,7 +59,7 @@ export default {
   },
 
   computed: {
-    swipperItems () {
+    sliderItems () {
       return this.images.map((o, i) => {
         return {
           slot: 'img-' + i
@@ -195,14 +195,7 @@ export default {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .sg-swipper {
-    height: 100%;
-    .sg-swipper-item {
-      position: relative;
-      background-color: transparent;
-    }
-  }
-  .image-view-origin .sg-swipper-item_active,
+
   .image-view-origin .card-item__active {
     .image-wrapper {
       img {

@@ -69,15 +69,6 @@
     </div>
 
     <div class="item">
-      <div class="label">滑动组件</div>
-      <div class="component">
-        <SgSwipper :items="swipperItems">
-          <div v-for="item in swipperItems" :key="item.slot" :slot="item.slot">{{item.slot}}</div>
-        </SgSwipper>
-      </div>
-    </div>
-
-    <div class="item">
       <div class="label">滑动卡片</div>
       <div class="component" style="height: 20rem;">
         <sg-slider :items="sliderItems" @change="onSlideChange">
@@ -169,12 +160,6 @@ export default {
 
       isEnd: false,
       scrollItems: [],
-
-      swipperItems: [
-        { slot: 'slot-0' },
-        { slot: 'slot-1' },
-        { slot: 'slot-2' }
-      ],
 
       dropdownOptions: [
         { label: '红色', value: 'red' },
