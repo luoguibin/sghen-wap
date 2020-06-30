@@ -1,7 +1,7 @@
 <template>
   <div class="sg-mask image-viewer-mask" v-show="visible">
     <div class="image-viewer">
-      <sg-header @back="$emit('update:visible', false)" :centerStatus="''" :rightStatus="''">
+      <sg-header v-show="optionsVisible" @back="$emit('update:visible', false)" :centerStatus="''" :rightStatus="''">
         <span slot="left">{{currentName}}</span>
       </sg-header>
       <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
@@ -11,6 +11,7 @@
           :index="index"
           :items="swipperItems"
           @change="hanleChange"
+          @click="handleClick"
         >
           <div
             v-for="(item, index) in imageOptions"
@@ -22,8 +23,8 @@
           </div>
         </sg-slider>
       </div>
-      <div class="image-viewer-footer">
-        <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button>
+      <div v-show="optionsVisible" class="image-viewer-footer">
+        <!-- <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button> -->
       </div>
     </div>
   </div>
@@ -52,7 +53,8 @@ export default {
     return {
       currentIndex: 0,
       imageOptions: [],
-      isShowNatural: false
+      isShowNatural: false,
+      optionsVisible: true
     }
   },
 
@@ -107,6 +109,26 @@ export default {
       for (let i = min; i <= max; i++) {
         this.imageOptions[i].visible = true
       }
+    },
+    handleClick () {
+      if (!this.clickTime) {
+        this.clickTime = 0
+      }
+      if (this.clickTimer) {
+        clearTimeout(this.clickTimer)
+        this.clickTimer = null
+      }
+      const nowTime = Date.now()
+      const clickDelayTime = 250
+      if (nowTime - this.clickTime < clickDelayTime) {
+        this.isShowNatural = !this.isShowNatural
+      } else {
+        this.clickTimer = setTimeout(() => {
+          this.clickTimer = null
+          this.optionsVisible = !this.optionsVisible
+        }, clickDelayTime)
+      }
+      this.clickTime = nowTime
     }
   }
 }
