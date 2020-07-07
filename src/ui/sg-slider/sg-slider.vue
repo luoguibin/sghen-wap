@@ -1,20 +1,22 @@
 <template>
-  <div
-    :class="{'sg-slider': true, 'slide-anime': !isTouching}"
-    @touchstart="onTouchStart"
-    @touchmove="onTouchMove"
-    @touchend="onTouchEnd"
-    @click="$emit('click', $event)"
-  >
+  <div style="height: 100%" sg-scroll="horizontal_stop">
     <div
-      v-for="item in slideItems"
-      ref="items"
-      :key="item.id"
-      :class="{'slider-item': true, 'card-item__active': item.id === activeId}"
-      :style="item.itemStyle"
-      :item-type="itemType"
+      :class="{'sg-slider': true, 'slide-anime': !isTouching}"
+      @touchstart="onTouchStart"
+      @touchmove="onTouchMove"
+      @touchend="onTouchEnd"
+      @click="$emit('click', $event)"
     >
-      <slot :name="item.slot"></slot>
+      <div
+        v-for="item in slideItems"
+        ref="items"
+        :key="item.id"
+        :class="{'slider-item': true, 'card-item__active': item.id === activeId}"
+        :style="item.itemStyle"
+        :item-type="itemType"
+      >
+        <slot :name="item.slot"></slot>
+      </div>
     </div>
   </div>
 </template>

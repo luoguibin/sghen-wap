@@ -6,7 +6,7 @@
     </sg-header>
     <!-- 选集列表 -->
     <div class="sg-flex-one" style="overflow: hidden;">
-      <div class="scroll">
+      <div class="scroll" sg-scroll="vertical_stop">
         <div class="wrapper">
           <div
             v-for="item in sets"

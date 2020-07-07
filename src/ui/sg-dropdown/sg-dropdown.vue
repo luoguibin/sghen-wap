@@ -14,7 +14,7 @@
       v-show="optionsVisible"
       :class="[optionType !== 'center' ? '' : 'sg-mask', 'dropdown-' + optionType, 'align-' + optionAlign]"
     >
-      <div class="sg-options">
+      <div class="sg-options" sg-scroll="vertical_stop">
         <div class="options-inner">
           <div
             v-for="item in options"

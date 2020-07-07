@@ -5,7 +5,7 @@
         <sg-header @back="onBack">诗词{{formData.id ? '更新':'创建'}}</sg-header>
 
         <div class="main">
-          <div class="main-wrapper">
+          <div class="main-wrapper" sg-scroll="vertical_stop">
             <sg-form v-if="isFormInit" ref="form" :formData="formData" :formRules="formRules">
               <div slot="setId" class="set-item">
                 <span

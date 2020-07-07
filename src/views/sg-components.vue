@@ -1,5 +1,5 @@
 <template>
-  <div class="sg-components">
+  <div class="sg-components" sg-scroll="vertical_stop">
     <div class="item">
       <div class="label">标题栏</div>
       <div class="component">

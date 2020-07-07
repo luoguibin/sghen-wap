@@ -36,7 +36,7 @@
       <div class="sg-flex-column">
         <sg-header @back="onCancel">API{{formData.id ? '编辑' :'创建'}}</sg-header>
         <div class="sg-flex-one">
-          <sg-form ref="form" :formData="formData" :formRules="formRules">
+          <sg-form ref="form" :formData="formData" :formRules="formRules" sg-scroll="vertical_stop">
             <div slot="status">
               <sg-dropdown
                 ref="statusDropdown"

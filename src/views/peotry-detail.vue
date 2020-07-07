@@ -6,7 +6,7 @@
     </sg-header>
 
     <div class="main">
-      <div ref="wrapper" class="main-wrapper" @click="onClickPoetry">
+      <div ref="wrapper" class="main-wrapper" @click="onClickPoetry" sg-scroll="vertical_stop">
         <peotry v-if="peotry" ref="peotry" :peotry="peotry" :isDetail="true"></peotry>
       </div>
     </div>

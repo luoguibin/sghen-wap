@@ -16,6 +16,7 @@
           v-if="item.type === 'textarea'"
           v-model="formData[item.key]"
           :style="item.style"
+          sg-scroll
           v-focus-within
         ></textarea>
         <input

@@ -7,7 +7,7 @@
           <template v-else-if="isPullHanding">{{isLoading ? '加载中...' : '松开后刷新'}}</template>
           <template v-else>下拉刷新</template>
         </div>
-        <div ref="scrollEl" :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" @scroll="handleScroll">
+        <div ref="scrollEl" sg-scroll="vertical_stop" :class="{'sg-scroll-content': true, 'sg-scroll-hidden': false}" @scroll="handleScroll">
           <div>
             <slot></slot>
           </div>
