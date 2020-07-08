@@ -55,13 +55,13 @@
           诗词概况
           <i>:</i>
         </span>
-        <div>
+        <div class="statistics">
           <template v-if="peotryCount !== 0 || peotSetCount !== 0">
-            {{isSelf ? '我' : 'TA'}}共创建{{peotSetCount | numFilter}}个选集，
+            {{isSelf ? '我' : 'TA'}}共创建<i>{{peotSetCount | numFilter}}</i>个选集，
             <br />
-            共{{peotryCount | numFilter}}首诗词，
+            共<i>{{peotryCount | numFilter}}</i>首诗词，
             <br />
-            收获了{{praiseCount | numFilter}}赞
+            收获了<i>{{praiseCount | numFilter}}</i>赞
           </template>
           <template v-else>Opps，{{isSelf ? '我' : 'TA'}}暂未有选集和诗词</template>
         </div>
@@ -342,6 +342,13 @@ export default {
     }
     .sg-button {
       margin-left: 2rem;
+    }
+  }
+  .statistics {
+    i {
+      margin: 0 0.3rem;
+      font-weight: bold;
+      color: $color-theme;
     }
   }
   .logout-item {
