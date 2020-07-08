@@ -28,7 +28,7 @@
             :items="sliderItems"
             :itemType="'slider-peotry'"
             :duration="sliderDuration"
-            :loopTotal="-1"
+            :loopTotal="99"
             @click="onClickItemType"
           >
             <div
