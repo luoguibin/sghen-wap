@@ -183,13 +183,17 @@ export default {
 
           // 判断添加时间线
           let currentYearMonth = 999911
+          const nowYear = new Date().getFullYear()
           list.forEach(o => {
             const createDate = new Date(o.time)
             const tempYearMonth =
               createDate.getFullYear() * 100 + createDate.getMonth()
             if (tempYearMonth < currentYearMonth) {
-              o.timeLine = `${createDate.getFullYear()}年 ${createDate.getMonth() +
-                1}月`
+              o.timeLine = `${
+                createDate.getFullYear() === nowYear
+                  ? '今'
+                  : createDate.getFullYear()
+              }年 ${createDate.getMonth() + 1}月`
             }
             currentYearMonth = tempYearMonth
           })
