@@ -214,6 +214,7 @@ export default {
         .then(resp => {
           const { list = [], users } = resp.data
           if (!list.length) {
+            this.myPraiseComment = undefined
             return
           }
           list[0].fromPeot = users[0] || {}
