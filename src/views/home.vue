@@ -28,7 +28,7 @@
             :items="sliderItems"
             :itemType="'slider-peotry'"
             :duration="sliderDuration"
-            :loopTotal="99"
+            :loopTotal="-1"
             @click="onClickItemType"
           >
             <div
@@ -38,7 +38,10 @@
               class="item-panel"
             >
               <img class="item-bg" v-if="item.images && item.images.length" :src="item.images[0]" />
-              <span class="praise-total">共{{item.praiseTotal | numFilter}}赞</span>
+              <div class="praise-total">
+                <i class="iconfont icon-like"></i>
+                <span>{{item.praiseTotal | numFilter}}</span>
+              </div>
               <h2>
                 <span>{{item.set.name}}</span>
                 <span v-if="item.title" style="padding: 0 5px;">*</span>
@@ -389,7 +392,19 @@ export default {
       position: absolute;
       bottom: 1rem;
       right: 0.5rem;
-      color: $color-tip;
+      color: $color-theme;
+      font-size: $size-text;
+      .icon-like {
+        font-size: $size-text * 1.5;
+      }
+      i, span {
+        display: inline-block;
+        height: $size-text * 1.5;
+        vertical-align: top;
+      }
+      span {
+        line-height: $size-text * 1.8;
+      }
     }
   }
   .info-panel {
