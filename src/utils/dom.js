@@ -1,3 +1,7 @@
+/**
+ * @description 获取元素位置下标
+ * @param {HTMLElement} el
+ */
 export const getItemIndex = function (el) {
   let index = -1
   while (el) {
@@ -7,6 +11,10 @@ export const getItemIndex = function (el) {
   return index
 }
 
+/**
+ * @description 通过当前元素获取指定itemType元素的位置下标
+ * @param {HTMLElement} el
+ */
 export const getItemTypeIndex = function (el, itemType) {
   let tempEl = el
   while (tempEl) {
@@ -19,6 +27,10 @@ export const getItemTypeIndex = function (el, itemType) {
   return getItemIndex(tempEl)
 }
 
+/**
+ * @description 获取元素的类型对象
+ * @param {HTMLElement} el
+ */
 export const getItemTypeObj = function (el) {
   let tempEl = el
   while (tempEl) {

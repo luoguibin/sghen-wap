@@ -33,7 +33,7 @@
 <script>
 import { mapState } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
-import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
+import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
 import Cache from '@/common/cache-center'
 
 const CACHE_ROOT_ID = 'peotry_list_root'

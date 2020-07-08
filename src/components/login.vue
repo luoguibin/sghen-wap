@@ -47,7 +47,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import { sgIsPhone } from '@/utils/sgRegExp'
+import { isPhone } from '@/utils/verification'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 
 export default {
@@ -73,7 +73,7 @@ export default {
             if (this.isNormalLogin) {
               return v ? '' : '请输入' + rule.label
             }
-            return sgIsPhone(v) ? '' : '请输入' + rule.label
+            return isPhone(v) ? '' : '请输入' + rule.label
           },
           _error: ''
         },

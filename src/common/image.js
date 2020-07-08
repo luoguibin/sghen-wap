@@ -1,4 +1,23 @@
 /**
+ * 定义可使用的图片文件后缀
+ */
+export const IMAGE_SUFFIXS = ['.png', '.jpg', '.jpeg']
+
+/**
+ * 获取缩略图
+ * @param {String} v
+ */
+export const getSmallImage = function (v) {
+  const suffix = IMAGE_SUFFIXS.find(v_ => v.endsWith(v_))
+  if (suffix) {
+    v = v.replace(new RegExp(suffix + '$'), '_100' + suffix)
+  } else {
+    v += '_100.jpg'
+  }
+  return v
+}
+
+/**
  *
  * @param {*} src
  * @param {*} maxSize

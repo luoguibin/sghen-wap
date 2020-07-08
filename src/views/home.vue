@@ -102,8 +102,9 @@
 import Vue from 'vue'
 import { mapState, mapGetters, mapActions } from 'vuex'
 import { apiURL, apiGetData } from '@/api'
-import { getItemIndex, getItemTypeObj } from '@/utils/sgDom'
-import { arrayToMap, getSmallImage } from '@/utils/sgData'
+import { getItemIndex, getItemTypeObj } from '@/utils/dom'
+import { arrayToMap } from '@/utils/data'
+import { getSmallImage } from '@/common/image'
 import Cache from '@/common/cache-center'
 
 const HOME_ID = 'home'

@@ -38,8 +38,8 @@
 <script>
 import Vue from 'vue'
 import { apiURL, apiGetData } from '@/api'
-import { getSmallImage } from '@/utils/sgData'
-import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
+import { getSmallImage } from '@/common/image'
+import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
 
 export default {
   name: 'PeotryImages',

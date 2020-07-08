@@ -28,7 +28,7 @@
 
 <script>
 import { apiURL, apiPostUpload } from '@/api'
-import { resizeImage, base64ToFile } from '@/common/image'
+import { IMAGE_SUFFIXS, resizeImage, base64ToFile } from '@/common/image'
 
 export default {
   name: 'ImageUploader',
@@ -55,7 +55,7 @@ export default {
   methods: {
     handleChange (e) {
       const files = [...e.target.files].filter(o => {
-        return ['jpg', 'png', 'jpeg'].some(v => o.name.endsWith(o.name))
+        return IMAGE_SUFFIXS.some(v => o.name.endsWith(o.name))
       })
       if (files.length + this.imageDatas.length > this.max) {
         this.$toast(`最多只能上传${this.max}张图片`)

@@ -60,8 +60,8 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
-import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/sgDom'
-import { arrayToMap } from '@/utils/sgData'
+import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
+import { arrayToMap } from '@/utils/data'
 import Cache from '@/common/cache-center'
 import { PEOTRY } from '@/const'
 
