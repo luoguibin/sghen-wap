@@ -526,6 +526,7 @@ export default {
         })
         return
       }
+      Cache.UserCache.setData(comment.fromId, comment.fromPeot)
       this.openCommentInput(
         comment.typeId,
         comment.fromId,
