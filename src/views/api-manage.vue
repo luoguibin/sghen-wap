@@ -65,7 +65,7 @@
       <div class="sg-flex-column">
         <sg-header @back="onCancel">API测试</sg-header>
         <div class="sg-flex-one">
-          <div class="scroll-vertical">
+          <div class="scroll-vertical" sg-scroll="vertical_stop">
             <div class="test-item api-name">
               <span>
                 名称
@@ -94,10 +94,8 @@
                 结果
                 <i>:</i>
               </span>
-              <div>
-                <!-- <div class="scroll-vertical" style="height: 15rem; white-space: pre-wrap;"> -->
+              <div class="scroll-vertical" sg-scroll="vertical_stop" style="height: 15rem;">
                 <json-viewer :value="testResult" :expand-depth="10" copyable boxed sort></json-viewer>
-                <!-- </div> -->
               </div>
             </div>
           </div>
