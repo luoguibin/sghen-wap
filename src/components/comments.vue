@@ -1,5 +1,5 @@
 <template>
-  <div class="comments" v-show="currentPraises.length || comments.length">
+  <div class="comments" v-show="currentPraises.length || textComments.length">
     <!-- 已点赞的用户头像 -->
     <div ref="avatars" class="avatars" v-show="currentPraises.length">
       <img
@@ -13,11 +13,11 @@
       <div v-if="hasAvatarsMore" class="more" item-type="avatars-more">...</div>
     </div>
 
-    <div v-show="currentPraises.length && comments.length" style="border-bottom: 1px solid white;"></div>
+    <div v-show="currentPraises.length && textComments.length" style="border-bottom: 1px solid white;"></div>
 
     <!-- 评论列表 -->
-    <div class="contents" v-show="comments.length">
-      <div v-for="comment in comments" class="comment" :key="comment.id" item-type="comment">
+    <div class="contents" v-show="textComments.length">
+      <div v-for="comment in textComments" class="comment" :key="comment.id" item-type="comment">
         <span class="names">
           <span
             class="name"
@@ -31,7 +31,7 @@
           >{{comment.toPeot ? comment.toPeot.username : comment.toId}}</span>
           <i>:</i>
         </span>
-        <p item-type="comment-content">{{comment.content}}</p>
+        <p item-type="comment-content" v-html="comment.content0"></p>
       </div>
 
       <div v-if="hasCommentsMore" class="more">
@@ -44,6 +44,12 @@
 <script>
 import Vue from 'vue'
 import { defaultImgSrc } from '@/common/const'
+
+const toEmotionURL = function(v = '') {
+  return v.replace(/#emotion-[0-9]{3}/, function(a) {
+    return `<img src="/sapi/file/emotions/${a.substr(9, 3)}.gif" />`
+  })
+}
 
 export default {
   name: 'Comments',
@@ -93,7 +99,15 @@ export default {
       if (this.commentTotal < 0) {
         return false
       }
-      return this.comments.length < this.commentTotal
+      return this.textComments.length < this.commentTotal
+    },
+    textComments() {
+      return this.comments.map(o => {
+        return {
+          ...o,
+          content0: toEmotionURL(o.content)
+        }
+      })
     },
     currentPraises () {
       const srcFilter = Vue.filter('imgSrcFilter')
