@@ -69,3 +69,14 @@ export const base64ToFile = function (base64Data, fileName) {
     type: fileType
   })
 }
+
+
+/**
+ * @description 将表情指令代码转化为表情图片地址
+ * @param {String} v 
+ */
+export const toEmotionImages = function(v = '') {
+  return v.replace(/#EM[0-9]{3}/, function(a) {
+    return `<img src="/sapi/file/emotions/${a.substr(3, 3)}.gif" />`
+  })
+}

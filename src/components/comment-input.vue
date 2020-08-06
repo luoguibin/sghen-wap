@@ -1,6 +1,10 @@
 <template>
   <div class="sg-mask comment-input-mask" v-show="visible" @click="onClose">
     <div class="comment-input" @click.stop="onNothing">
+      <div v-show="emotionVisible" class="emotions" @click="onClickEmotion">
+        <img v-for="key in emotions" :key="key" :src="key | emotionURL" />
+        <span class="iconfont icon-down" @click="getNextEmotions()"></span>
+      </div>
       <textarea ref="textarea" v-model="content" :placeholder="placeholder"></textarea>
       <sg-button
         type="primary"
@@ -40,6 +44,8 @@ export default {
 
   data () {
     return {
+      emotionVisible: false,
+      emotions: [],
       content: '',
       isLoading: false
     }
@@ -49,10 +55,17 @@ export default {
     visible (v) {
       if (v) {
         this.content = ''
+        this.resetEmotions()
         this.$nextTick(() => {
           this.$refs.textarea.focus()
         })
       }
+    },
+    /**
+     * @param {String} v
+     */
+    content (v = '') {
+      this.emotionVisible = v.endsWith('#')
     }
   },
 
@@ -62,11 +75,67 @@ export default {
     })
   },
 
+  filters: {
+    emotionURL(v = '') {
+      if (v.length !== 6) {
+        return v
+      }
+      return `/sapi/file/emotions/${v.substr(3, 3)}.gif`
+    }
+  },
+
   created () {
     window.commentInput = this
   },
 
   methods: {
+    resetEmotions() {
+      this.getNextEmotions(true)
+    },
+    getNextEmotions(isRefresh) {
+      if (this.emotionPage === undefined) {
+        this.emotionPage = 0
+      }
+      const MAX_COUNT = 105
+      const PAGE_SIZE = 8
+      if (isRefresh) {
+        this.emotionPage = 0
+      } else {
+        this.emotionPage++
+        if (this.emotionPage > MAX_COUNT / PAGE_SIZE) {
+          this.emotionPage = 0
+        }
+      }
+      const emotions = []
+      for (let i = this.emotionPage * PAGE_SIZE, len = Math.min(i + PAGE_SIZE, MAX_COUNT); i < len; i++) {
+        let indexStr = '' + i
+        if (indexStr.length === 1) {
+          indexStr = '00' + indexStr
+        } else if (indexStr.length === 2) {
+          indexStr = '0' + indexStr
+        }
+        emotions.push(`#EM${indexStr}`)
+      }
+      this.emotions = emotions
+    },
+    /**
+     * @param {Event} e
+     */
+    onClickEmotion(e) {
+      this.$refs.textarea.focus()
+      let el = e.target
+      if (el.tagName !== 'IMG') {
+        return
+      }
+      let index = -1
+      while(el) {
+        index++
+        el = el.previousElementSibling
+      }
+      const str = this.emotions[index] || ''
+      this.content = this.content.substr(0, this.content.length - 1) + str
+    },
+
     onClose () {
       this.isLoading = false
       this.$emit('update:visible', false)
@@ -105,6 +174,29 @@ export default {
   padding: 8px 5px;
   box-sizing: border-box;
   background-color: white;
+
+  .emotions {
+    height: 2.5rem;
+    line-height: 2.5rem;
+    margin-bottom: 0.5rem;
+
+    span {
+      display: inline-block;
+      vertical-align: middle;
+      padding: 0 0.5rem;
+      font-size: 1.6rem;
+      transform: rotate(-90deg);
+      border-radius: 5px;;
+      background-color: rgb(245, 245, 245);
+    }
+
+    img {
+      width: 2rem;
+      height: 2rem;
+      vertical-align: middle;
+      margin-right: 0.5rem;
+    }
+  }
 
   textarea {
     display: block;

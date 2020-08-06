@@ -44,12 +44,7 @@
 <script>
 import Vue from 'vue'
 import { defaultImgSrc } from '@/common/const'
-
-const toEmotionURL = function(v = '') {
-  return v.replace(/#emotion-[0-9]{3}/, function(a) {
-    return `<img src="/sapi/file/emotions/${a.substr(9, 3)}.gif" />`
-  })
-}
+import { toEmotionImages } from '@/common/image'
 
 export default {
   name: 'Comments',
@@ -105,7 +100,7 @@ export default {
       return this.comments.map(o => {
         return {
           ...o,
-          content0: toEmotionURL(o.content)
+          content0: toEmotionImages(o.content)
         }
       })
     },
@@ -207,7 +202,7 @@ $background: rgba(0, 0, 0, 0.03);
       white-space: pre-line;
       word-break: break-all;
       line-height: 2rem;
-      font-size: 1.2rem;
+      font-size: 1.2rem; 
     }
   }
 }
@@ -232,5 +227,11 @@ $background: rgba(0, 0, 0, 0.03);
     font-size: 1.1rem;
     color: #555555;
   }
+}
+</style>
+
+<style lang="scss">
+.comments .comment p img {
+  vertical-align: middle;
 }
 </style>
