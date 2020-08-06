@@ -47,6 +47,8 @@ Wap端：https://www.sghen.cn/sghen-wap/index.html
 
 ### 更新记录
 ```
+2020-08
+	[+]诗词评论表情，输入#触发
 2020-06
 	[+]诗词图集列表
 	[*]优化sg-toast组件
