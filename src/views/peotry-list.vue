@@ -20,7 +20,7 @@
         @scroll="handleScroll"
       >
         <template v-for="item in peotries">
-          <div v-if="item.timeLine" :key="item.id + '-time'" class="time-line sg-sticky-item">{{item.timeLine}}</div>
+          <div v-if="item.timeLine" :key="item.id + '-time'" class="time-line sg-sticky-item" item-empty>{{item.timeLine}}</div>
           <peotry :key="item.id" :peotry="item" ref="peotries"></peotry>
         </template>
       </sg-scroll>

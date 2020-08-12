@@ -6,6 +6,10 @@ export const getItemIndex = function (el) {
   let index = -1
   while (el) {
     index++
+    if (el.hasAttribute('item-empty')) {
+      console.log('getItemIndex item-empty');
+      index--
+    }
     el = el.previousElementSibling
   }
   return index

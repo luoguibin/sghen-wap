@@ -11,17 +11,17 @@
         @refresh="handleRefresh"
       >
         <template v-for="item in list" >
-          <div :key="item.id + '-time'" v-if="item.timeLine" class="time-line sg-sticky-item">
+          <div :key="item.id + '-time'" v-if="item.timeLine" class="time-line sg-sticky-item" item-empty>
             {{item.timeLine}}
           </div>
           <div :key="item.id" class="images-item" item-type="images-item">
-            <div class="image-outter" v-for="src in item.smallImages" :key="src">
+            <div class="image-outter" v-for="src in item.smallImages" :key="src" item-type="image">
               <div class="image-inner">
-                <img  item-type="image"  :src="src" alt />
+                <img :src="src" alt />
               </div>
             </div>
           </div>
-          <div :key="item.id + '-divider'" class="divider"></div>
+          <div :key="item.id + '-divider'" class="divider" item-empty></div>
         </template>
       </sg-scroll>
     </div>
