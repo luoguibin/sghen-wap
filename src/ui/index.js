@@ -27,3 +27,4 @@ Vue.use(SgSlider)
 Vue.use(SgTable)
 
 sgScroll.sgScrollInit()
+sgScroll.sgStickyInit()
