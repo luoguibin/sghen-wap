@@ -190,7 +190,7 @@ export default {
           // 判断添加时间线
           let currentYearMonth = 999911
           const nowYear = new Date().getFullYear()
-          this.peotrieslist.forEach(o => {
+          this.peotries.forEach(o => {
             const createDate = new Date(o.time)
             const tempYearMonth =
               createDate.getFullYear() * 100 + createDate.getMonth()
