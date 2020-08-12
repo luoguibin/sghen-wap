@@ -19,9 +19,10 @@
         @refresh="handleRefresh"
         @scroll="handleScroll"
       >
-        <peotry v-for="item in peotries" :key="item.id" :peotry="item" ref="peotries">
-          <div v-if="item.timeLine" :key="item.id" slot="header" class="time-line">{{item.timeLine}}</div>
-        </peotry>
+        <template v-for="item in peotries">
+          <div v-if="item.timeLine" :key="item.id + '-time'" class="time-line sg-sticky-item">{{item.timeLine}}</div>
+          <peotry :key="item.id" :peotry="item" ref="peotries"></peotry>
+        </template>
       </sg-scroll>
       <div v-show="isEmpty" class="empty">暂未有诗词</div>
     </div>
@@ -181,10 +182,15 @@ export default {
         .then(data => {
           const list = data.data
 
+          if (isRefresh) {
+            this.peotries = list
+          } else {
+            this.peotries.push(...list)
+          }
           // 判断添加时间线
           let currentYearMonth = 999911
           const nowYear = new Date().getFullYear()
-          list.forEach(o => {
+          this.peotrieslist.forEach(o => {
             const createDate = new Date(o.time)
             const tempYearMonth =
               createDate.getFullYear() * 100 + createDate.getMonth()
@@ -197,12 +203,6 @@ export default {
             }
             currentYearMonth = tempYearMonth
           })
-
-          if (isRefresh) {
-            this.peotries = list
-          } else {
-            this.peotries.push(...list)
-          }
           this.isDataReady = true
           this.isEnd = this.peotries.length === data.totalCount
 
@@ -310,11 +310,15 @@ export default {
 
   .time-line {
     padding: 1rem;
-    margin-top: 2rem;
     border-top: 1px solid white;
     font-size: 1.4rem;
     font-weight: bold;
     text-align: right;
+    box-sizing: border-box;
+    background-color: #f6f6f6;
+  }
+  .sg-sticking {
+    z-index: 99;
   }
 
   .empty {

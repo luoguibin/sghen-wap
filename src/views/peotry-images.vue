@@ -10,19 +10,19 @@
         @load="handleLoad"
         @refresh="handleRefresh"
       >
-        <div v-for="item in list" :key="item.id" class="images-item" item-type="images-item">
-          <div v-if="item.timeDivider" class="time-divider">
-            <h2>{{item.timeDivider}}</h2>
+        <template v-for="item in list" >
+          <div :key="item.id + '-time'" v-if="item.timeLine" class="time-line sg-sticky-item">
+            {{item.timeLine}}
           </div>
-          <div class="images">
+          <div :key="item.id" class="images-item" item-type="images-item">
             <div class="image-outter" v-for="src in item.smallImages" :key="src">
               <div class="image-inner">
                 <img  item-type="image"  :src="src" alt />
               </div>
             </div>
           </div>
-          <div class="divider"></div>
-        </div>
+          <div :key="item.id + '-divider'" class="divider"></div>
+        </template>
       </sg-scroll>
     </div>
 
@@ -98,9 +98,9 @@ export default {
             yyyyMM = yyyyMM_
             const divider = '' + yyyyMM_
             if (nowYear === d.getFullYear()) {
-              o.timeDivider = '今年' + divider.substr(7, 8) + '月'
+              o.timeLine = '今年' + divider.substr(7, 8) + '月'
             } else {
-              o.timeDivider = divider.substr(0, 4) + '年' + divider.substr(7, 8) + '月'
+              o.timeLine = divider.substr(0, 4) + '年' + divider.substr(7, 8) + '月'
             }
           }
         })
@@ -153,28 +153,22 @@ export default {
 .peotry-images {
   height: 100%;
 
-  // .main {
-  //   background-color: white;
-  // }
+  .time-line {
+    padding: 1rem;
+    border-top: 1px solid white;
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: right;
+    box-sizing: border-box;
+    background-color: #f6f6f6;
+  }
+  .sg-sticking {
+    z-index: 99;
+  }
 
   .images-item {
-    margin-bottom: 2rem;
-    &:first-child {
-      .time-divider {
-        border-top: none;
-      }
-    }
-
-    .time-divider {
-      height: 5rem;
-      line-height: 5rem;
-      padding: 0 $padding-normal;
-      text-align: right;
-    }
-
-    .images {
-      padding: 0 $padding-normal;
-    }
+    padding: 0 $padding-normal;
+    // margin-bottom: 2rem;
 
     .image-outter {
       position: relative;
@@ -202,15 +196,14 @@ export default {
       object-fit: cover;
       border-radius: 5px;
     }
-
-    .divider {
-      width: 92%;
-      height: 1px;
-      padding: 0 $padding-normal;
-      margin: 0 auto;
-      box-sizing: border-box;
-      background-color: white;
-    }
+  }
+  .divider {
+    width: 92%;
+    height: 1px;
+    padding: 0 $padding-normal;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: white;
   }
 }
 </style>
