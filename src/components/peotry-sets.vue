@@ -1,7 +1,7 @@
 <template>
   <div class="peotry-sets sg-flex-column">
     <sg-header @back="$emit('back')" :centerStatus="''" :backVisible="false">
-      <span slot="left">我的选集</span>
+      <span slot="left">我的选集（{{sets.length ? sets.length : '?'}}）</span>
       <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
     </sg-header>
     <!-- 选集列表 -->
