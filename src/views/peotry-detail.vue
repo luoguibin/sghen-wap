@@ -186,8 +186,7 @@ export default {
     },
 
     getPeotryDetail () {
-      apiGetData(apiURL.peotryList, { id: this.peotryID }).then(data => {
-        const o = data.data
+      const setSimplePeotry = o => {
         o.praiseTotal = -1
         o.praiseComments = []
         o.commentTotal = -1
@@ -199,6 +198,20 @@ export default {
         this.checkPraisePeotry()
         this.getContentComments()
         this.getPraiseComments()
+      }
+
+      const temp = sessionStorage.getItem('peotry-detail')
+      if (temp) {
+        const o = JSON.parse(temp)
+        if (this.peotryID === o.id) {
+          setSimplePeotry(o)
+          return
+        }
+        sessionStorage.removeItem('peotry-detail')
+      }
+
+      apiGetData(apiURL.peotryList, { id: this.peotryID }).then(data => {
+        setSimplePeotry(data.data)
       })
     },
 

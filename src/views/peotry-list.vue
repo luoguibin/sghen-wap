@@ -255,6 +255,7 @@ export default {
       const instance = this.$refs.peotries[index]
       switch (itemType) {
         case 'peotry-content':
+          sessionStorage.setItem('peotry-detail', JSON.stringify(peotry))
           this.$router.push({
             name: 'peotry-detail',
             params: { id: peotry.id }
