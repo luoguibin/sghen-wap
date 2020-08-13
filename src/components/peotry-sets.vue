@@ -1,7 +1,7 @@
 <template>
   <div class="peotry-sets sg-flex-column">
-    <sg-header @back="$emit('back')">
-      我的选集
+    <sg-header @back="$emit('back')" :centerStatus="''" :backVisible="false">
+      <span slot="left">我的选集</span>
       <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
     </sg-header>
     <!-- 选集列表 -->
@@ -143,6 +143,7 @@ export default {
 $set-item-height: $height-text * 2;
 $set-item-size: $size-text * 1.2;
 .peotry-sets {
+  background-color: $color-bg;
   .wrapper {
     padding: $padding-normal;
   }

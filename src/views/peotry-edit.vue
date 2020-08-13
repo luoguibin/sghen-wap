@@ -32,13 +32,15 @@
     </div>
 
     <!-- 选集选择 -->
-    <div v-if="isFormInit" v-show="peotrySetsVisible" class="peotry-sets-wrapper">
-      <peotry-sets
-        :defId="formData.setId"
-        @back="peotrySetsVisible = false"
-        @select="handleSetSelect"
-      ></peotry-sets>
-    </div>
+    <transition name="drawer">
+      <div v-if="isFormInit" v-show="peotrySetsVisible" class="sg-mask" @click="onCloseSets">
+        <peotry-sets
+          :defId="formData.setId"
+          @close="onCloseSets()"
+          @select="handleSetSelect"
+        ></peotry-sets>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -194,6 +196,15 @@ export default {
     onOpenSetChoice () {
       this.peotrySetsVisible = true
     },
+    onCloseSets (e) {
+      if (e) {
+        const classList = e.target.classList
+        if (!classList.contains('sg-mask')) {
+          return
+        }
+      }
+      this.peotrySetsVisible = false
+    },
     handleSetSelect ({ id, name }) {
       this.formData.setId = id
       this.setName = name
@@ -279,16 +290,30 @@ export default {
     overflow: hidden;
   }
 
-  .peotry-sets-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+  .sg-mask {
+    padding-left: 30%;
+    box-sizing: border-box;
     overflow: hidden;
-    background-color: white;
   }
 }
+
+.drawer-enter,
+.drawer-leave-to {
+  background-color: transparent;
+}
+.drawer-enter .peotry-sets,
+.drawer-leave-to .peotry-sets {
+  transform: translate(100%, 0);
+}
+.drawer-enter-active,
+.drawer-leave-active {
+  transition: background-color 0.3s ease;
+}
+.drawer-enter-active .peotry-sets,
+.drawer-leave-active .peotry-sets {
+  transition: transform 0.3s ease;
+}
+
 
 .peotry-edit {
   display: flex;
