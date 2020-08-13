@@ -322,6 +322,7 @@ export default {
 
   .sg-scroll-content {
     height: 100%;
+    box-sizing: border-box;
     overflow: auto;
   }
 
