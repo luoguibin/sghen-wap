@@ -20,7 +20,7 @@
       <!-- 诗词作者及创建时间 -->
       <div class="peot--time">
         <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-        <span>——{{peotry.time | timeFilter}}</span>
+        <span><i class="iconfont icon-history"></i>{{peotry.time | timeFilter}}</span>
       </div>
 
       <!-- 诗词内容 -->
@@ -237,6 +237,10 @@ export default {
     color: #888888;
     span + span {
       margin-left: 8px;
+    }
+    .icon-history {
+      font-size: 16px;
+      vertical-align: text-top;
     }
   }
 
