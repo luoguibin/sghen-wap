@@ -115,7 +115,7 @@ export default {
 
     onClickImage (e) {
       const { el, itemType } = getItemTypeObj(e.target) || {}
-      if (!itemType) {
+      if (!itemType || itemType !== 'image') {
         return
       }
 

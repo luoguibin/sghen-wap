@@ -1,33 +1,35 @@
 <template>
-  <div class="sg-mask image-viewer-mask" v-show="visible">
-    <div class="image-viewer">
-      <sg-header v-show="optionsVisible" @back="$emit('update:visible', false)" :centerStatus="''" :rightStatus="''">
-        <span slot="left">{{currentName}}</span>
-      </sg-header>
-      <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
-        <sg-slider
-          v-if="visible"
-          ref="slider"
-          :index="index"
-          :items="sliderItems"
-          @change="hanleChange"
-          @click="handleClick"
-        >
-          <div
-            v-for="(item, index) in imageOptions"
-            :key="index"
-            :slot="'img-' + index"
-            class="image-wrapper"
+  <transition name="viewer">
+    <div class="sg-mask image-viewer-mask" v-show="visible">
+      <div class="image-viewer">
+        <sg-header v-show="optionsVisible" @back="$emit('update:visible', false)" :centerStatus="''" :rightStatus="''">
+          <span slot="left">图片详情</span>
+        </sg-header>
+        <div :class="{'image-viewer-wrapper': true, 'image-view-origin': isShowNatural}">
+          <sg-slider
+            v-if="visible"
+            ref="slider"
+            :index="index"
+            :items="sliderItems"
+            @change="hanleChange"
+            @click="handleClick"
           >
-            <img v-if="item.visible" :src="item.src" />
-          </div>
-        </sg-slider>
-      </div>
-      <div v-show="optionsVisible" class="image-viewer-footer">
-        <!-- <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button> -->
+            <div
+              v-for="(item, index) in imageOptions"
+              :key="index"
+              :slot="'img-' + index"
+              class="image-wrapper"
+            >
+              <img v-if="item.visible" :src="item.src" />
+            </div>
+          </sg-slider>
+        </div>
+        <div v-show="optionsVisible" class="image-viewer-footer">
+          <!-- <sg-button @click="isShowNatural = !isShowNatural">{{isShowNatural ? '自适应' : '原图'}}</sg-button> -->
+        </div>
       </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
@@ -65,14 +67,6 @@ export default {
           slot: 'img-' + i
         }
       })
-    },
-    currentName () {
-      if (!this.images.length) {
-        return ''
-      }
-      const name = this.images[this.currentIndex]
-      const index = name.lastIndexOf('/') + 1
-      return name.substr(index)
     }
   },
 
@@ -162,15 +156,9 @@ export default {
     }
   }
   .image-viewer-wrapper {
-    // width: 100%;
     height: 100%;
-    // overflow: auto;
   }
   .image-wrapper {
-    // position: absolute;
-    // top: 50%;
-    // transform: translate(0, -50%);
-    // height: 100%;
     box-sizing: border-box;
     padding: 1rem;
     width: 100%;
@@ -184,6 +172,14 @@ export default {
       object-fit: contain;
     }
   }
+}
+.viewer-enter,
+.viewer-leave-to {
+  background-color: transparent;
+}
+.viewer-enter-active,
+.viewer-leave-active {
+  transition: background-color 0.3s ease;
 }
 </style>
 
