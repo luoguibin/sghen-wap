@@ -467,8 +467,8 @@ export default {
     onEdit () {
       this.saveVisible = true
       this.setDropdownsValue({
-        status: this.formData.status,
-        method: this.formData.method
+        statusVal: this.formData.status,
+        methodVal: this.formData.method
       })
     },
 
