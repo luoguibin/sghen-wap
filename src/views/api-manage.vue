@@ -481,13 +481,13 @@ export default {
       }
       this.setDropdownsValue()
     },
-    setDropdownsValue () {
+    setDropdownsValue ({statusVal, methodVal}) {
       this.$nextTick(() => {
-        const statusOption = this.statusOptions[1]
+        const statusOption = this.statusOptions.find(o => o.value === statusVal) || this.statusOptions[1]
         this.$refs.statusDropdown.setSelectOption(statusOption)
         this.handleStatusChange(statusOption.value)
 
-        const methodOption = this.methodOptions[0]
+        const methodOption = this.methodOptions.find(o => o.value === methodVal) || this.methodOptions[0]
         this.$refs.methodDropdown.setSelectOption(methodOption)
         this.handleMethodChange(methodOption.value)
       })
