@@ -9,7 +9,7 @@
           <span></span>
         </div>
       </div>
-      <div>{{msg}}</div>
+      <div class="toast-msg" @click="onClickBtnText" v-html="msgHTML"></div>
     </div>
   </transition>
 </template>
@@ -24,6 +24,15 @@ export default {
       msg: '',
       visible: false,
       loading: false
+    }
+  },
+
+  computed: {
+    msgHTML() {
+      // eg:  请#{登陆}
+      return this.$xss(this.msg || '').replace(/#{.*}/g, function(s) {
+        return `<span>${s.substring(2, s.length - 1)}</span>`
+      })
     }
   },
 
@@ -47,6 +56,7 @@ export default {
       this.direction = params.direction || 'bottom'
       this.duration = params.duration || 3000
       this.loading = params.loading
+      this.btnCall = params.btnCall
       this.visible = true
 
       if (this.duration > 0) {
@@ -60,6 +70,26 @@ export default {
       this.visible = false
       if (this.timer) {
         clearTimeout(this.timer)
+      }
+    },
+
+    /**
+     * @param {Event} e
+     */
+    onClickBtnText (e) {
+      let el = e.target
+      if (el.tagName !== 'SPAN') {
+        return
+      }
+      let index = 0
+      while(el = el.previousElementSibling) {
+        index++
+      }
+
+      if (this.btnCall) {
+        this.btnCall(index)
+        this.btnCall = null
+        this.hide()
       }
     }
   },
@@ -192,7 +222,13 @@ export default {
 }
 </style>
 
-<style>
+<style lang="scss">
+@import "../style/const.scss";
+.sg-toast {
+  .toast-msg span {
+    color: $color-theme;
+  }
+}
 /* @import "//at.alicdn.com/t/font_1730652_96vm5rfm5q.css";
 * {
   margin: 0;
