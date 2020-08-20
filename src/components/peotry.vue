@@ -25,7 +25,7 @@
 
       <!-- 诗词内容 -->
       <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
-        <div item-type="peotry-content" class="content" v-html="peotry.content"></div>
+        <div item-type="peotry-content" class="content" v-html="safeContent"></div>
         <div class="end" v-if="peotry.end">{{peotry.end}}</div>
       </div>
 
@@ -121,6 +121,9 @@ export default {
   },
   filters: {},
   computed: {
+    safeContent () {
+      return this.$xss(this.peotry ? this.peotry.content : '')
+    },
     /**
      * @returns {Array} 返回诗词的直接可用图片列表
      */

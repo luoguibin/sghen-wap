@@ -31,7 +31,7 @@
           >{{comment.toPeot ? comment.toPeot.username : comment.toId}}</span>
           <i>:</i>
         </span>
-        <p item-type="comment-content" v-html="comment.content0"></p>
+        <p item-type="comment-content" v-html="$xss(comment.content0)"></p>
       </div>
 
       <div v-if="hasCommentsMore" class="more">
