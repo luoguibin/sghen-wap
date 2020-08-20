@@ -50,6 +50,8 @@ export default {
 
   created () {
     window.imageUploader = this
+    this.imageDatas = window.imageUploader_ImageDatas || []
+    window.imageUploader_ImageDatas = undefined
   },
 
   methods: {
@@ -101,6 +103,13 @@ export default {
         }
         reader.readAsDataURL(o.file)
       })
+    },
+
+    /**
+     * 临时挂载数据到全局变量
+     */
+    saveImages () {
+      window.imageUploader_ImageDatas = this.imageDatas
     },
     /**
      * 上传图片

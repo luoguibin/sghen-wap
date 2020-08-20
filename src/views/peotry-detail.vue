@@ -330,7 +330,7 @@ export default {
 
     openCommentInput (typeId, fromId, tip) {
       if (!this.userID) {
-        this.$toast('请登陆后再操作')
+        this.$toastLogin()
         return
       }
       this.commentVisible = true
@@ -340,7 +340,7 @@ export default {
     },
     onCheckPraisePeotry (e) {
       if (!this.userID) {
-        this.$toast('请登陆后再操作')
+        this.$toastLogin()
         return
       }
       // null判断表示没请求到是否点赞该诗词数据
@@ -525,7 +525,7 @@ export default {
     },
     onClickComment (peotry, comment) {
       if (!this.userID) {
-        this.$toast('请登陆后再操作')
+        this.$toastLogin()
         return
       }
       if ('' + this.userID === '' + comment.fromId) {

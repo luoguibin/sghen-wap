@@ -150,6 +150,14 @@ export default {
         const { setId, setName } = this.$route.query
         this.formData.setId = +setId || ''
         this.setName = setName
+
+        const tempFormData = window.peotryEdit_formData
+        if (tempFormData) {
+          this.setName = tempFormData.setName
+          tempFormData.setName = undefined
+          this.formData = tempFormData
+          window.peotryEdit_formData = undefined
+        }
         this.isFormInit = true
         return
       }
@@ -228,11 +236,18 @@ export default {
         if (error) {
           return
         }
+        if (this.userID < 2) {
+          // 添加非表单数据进入缓存，重置后删除
+          this.formData.setName = this.setName
+          window.peotryEdit_formData = this.formData
+          this.$refs.uploader.saveImages()
+          this.$toastLogin()
+          return
+        }
         if (this.isSaveing) {
           return
         }
         this.isSaveing = true
-
         if (!this.formData.id) {
           // 调用上传，产生回调事件
           this.$refs.uploader.start()

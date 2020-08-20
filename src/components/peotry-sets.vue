@@ -1,7 +1,7 @@
 <template>
   <div class="peotry-sets sg-flex-column">
     <sg-header @back="$emit('back')" :centerStatus="''" :backVisible="false">
-      <span slot="left">我的选集（{{sets.length ? sets.length : '?'}}）</span>
+      <span slot="left">{{userID > 1 ? '我的' : '公开'}}选集（{{sets.length ? sets.length : '?'}}）</span>
       <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
     </sg-header>
     <!-- 选集列表 -->
@@ -47,7 +47,9 @@ export default {
 
   computed: {
     ...mapState({
-      userID: state => state.auth.userID
+      // todo: 埋藏一小bug，公开选集对应的userId=0，但后端校验非0值；
+      // 改之需同步头部标题，及是否为自己的选集字段isOwn重置
+      userID: state => state.auth.userID || 1
     })
   },
 
@@ -106,6 +108,10 @@ export default {
     },
 
     onNewSet () {
+      if (!this.userID) {
+        this.$toastLogin()
+        return
+      }
       this.$confirm({
         title: '创建选集',
         type: 'input',
