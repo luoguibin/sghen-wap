@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import sgScroll from 'sg-scroll'
+import { sgScroll, sgSticky } from 'sg-scroll'
 
 import './config'
 import './style/index.scss'
@@ -26,5 +26,5 @@ Vue.use(SgHeader)
 Vue.use(SgSlider)
 Vue.use(SgTable)
 
-sgScroll.sgScrollInit()
-sgScroll.sgStickyInit()
+sgScroll.init()
+sgSticky.init()

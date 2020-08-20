@@ -19,7 +19,7 @@
 
     <!-- 内容 -->
     <div class="home-body">
-      <div class="scroll" sg-scroll>
+      <div class="scroll" sg-scroll sg-edge>
         <!-- 热门诗词TOP10 -->
         <div style="height: 15rem; background-color: white;">
           <sg-slider
