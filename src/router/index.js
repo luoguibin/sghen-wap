@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
+// import storeAuth from '../store/auth'
 Vue.use(VueRouter)
 
 const routes = [
@@ -37,12 +37,18 @@ const routes = [
   {
     path: '/personal',
     name: 'personal',
-    component: () => import(/* webpackChunkName: 'personal' */'@/views/personal')
+    component: () => import(/* webpackChunkName: 'personal' */'@/views/personal'),
+    meta: {
+      auth: true
+    }
   },
   {
     path: '/api-manage',
     name: 'api-manage',
-    component: () => import(/* webpackChunkName: 'api-manage' */'@/views/api-manage')
+    component: () => import(/* webpackChunkName: 'api-manage' */'@/views/api-manage'),
+    meta: {
+      auth: true
+    }
   },
   {
     path: '/sg-components',
@@ -57,6 +63,21 @@ const routes = [
 
 const router = new VueRouter({
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const app = router.app
+  // 第一次调用路由拦截时app.$store未自动挂载，需要在main.js中手动提前挂载
+  if (to.meta.auth && !app.$store.getters['auth/isLogin']) {
+    app.$toastLogin()
+    if (!from.name) {
+      next({ name: 'login', query: { redirect: to.fullPath } })
+    } else {
+      next(false)
+    }
+    return
+  }
+  next()
 })
 
 // 优化路由返回上一级不存在的情况

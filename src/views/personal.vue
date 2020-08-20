@@ -156,8 +156,9 @@ export default {
 
   methods: {
     initData () {
-      const uuid = this.$route.query.uuid
+      const uuid = this.$route.query.uuid || this.userID
       if (!uuid) {
+        this.$toastLogin()
         return
       }
 

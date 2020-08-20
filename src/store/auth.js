@@ -1,6 +1,6 @@
 import { apiURL, apiPostData } from '@/api'
 
-export default {
+const storeAuth = {
   namespaced: true,
   state: {
     userID: '',
@@ -36,22 +36,6 @@ export default {
     }
   },
   actions: {
-    checkStorage (context) {
-      const temp = localStorage.getItem('sghen_user_info')
-      if (!temp) {
-        return
-      }
-
-      const userInfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
-      const expireDuration = userInfo.expireDuration || 0
-      const timeLogin = userInfo.timeLogin || 0
-      const duration = Date.now() / 1000 - timeLogin
-      if (duration > expireDuration * 0.95) {
-        // 取个0.95阈值，超过则认为已过有效期
-        return
-      }
-      context.commit('setUserInfo', userInfo)
-    },
     createUser ({ dispatch }, data) {
       data.isCreateUser = true
       return dispatch('login', data)
@@ -102,4 +86,25 @@ export default {
       context.commit('setUserInfo')
     }
   }
-}
+};
+
+// 自执行方法，上一行需要添加分号，不然运行时报错：{(intermediate value)(intermediate value)(intermediate value)(intermediate value)(intermediate value)} is not a function
+(function() {
+  const temp = localStorage.getItem('sghen_user_info')
+  if (!temp) {
+    return
+  }
+
+  const userInfo = JSON.parse(window.decodeURIComponent(window.atob(temp)))
+  const expireDuration = userInfo.expireDuration || 0
+  const timeLogin = userInfo.timeLogin || 0
+  const duration = Date.now() / 1000 - timeLogin
+  if (duration > expireDuration * 0.95) {
+    // 取个0.95阈值，超过则认为已过有效期
+    return
+  }
+  storeAuth.mutations.setUserInfo(storeAuth.state, userInfo)
+  return
+})()
+
+export default storeAuth

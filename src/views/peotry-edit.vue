@@ -236,7 +236,7 @@ export default {
         if (error) {
           return
         }
-        if (this.userID < 2) {
+        if (!this.userID) {
           // 添加非表单数据进入缓存，重置后删除
           this.formData.setName = this.setName
           window.peotryEdit_formData = this.formData

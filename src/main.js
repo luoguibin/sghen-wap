@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
-import router from './router'
 import store from './store'
+import router from './router'
 import Xss from "xss"
 import './ui/index'
 import './directives'
@@ -10,6 +10,7 @@ import './style/index.scss'
 
 Vue.config.productionTip = false
 Vue.prototype.$xss = Xss
+Vue.prototype.$store = store // 为了让路由第一次拦截时能使用$store
 Vue.prototype.$toastLogin = function(msg = '请#{ 登陆 }后再操作', params) {
   if (this.$store.getters['auth/isLogin']) {
     return
@@ -22,8 +23,5 @@ Vue.prototype.$toastLogin = function(msg = '请#{ 登陆 }后再操作', params)
 new Vue({
   router,
   store,
-  created () {
-    this.$store.dispatch('auth/checkStorage')
-  },
   render: h => h(App)
 }).$mount('#app')
