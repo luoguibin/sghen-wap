@@ -1,24 +1,27 @@
 <template>
-  <div class="sg-mask comment-input-mask" v-show="visible" @click="onClose">
-    <div class="comment-input" @click.stop="onNothing">
-      <div v-show="emotionVisible" class="emotions" @click="onClickEmotion">
-        <img v-for="key in emotions" :key="key" :src="key | emotionURL" />
-        <span class="iconfont icon-down" @click="getNextEmotions()"></span>
+  <transition name="slide">
+    <div class="sg-mask comment-input-mask" v-show="visible" @click="onClose">
+      <div class="comment-input" @click.stop="onNothing">
+        <div ref="emotionWrapper" v-show="emotionVisible" class="emotions" @click="onClickEmotion">
+          <img v-for="key in emotions" :key="key" :src="key | emotionURL" />
+          <span ref="pageEl" class="iconfont icon-down" @click="getNextEmotions()"></span>
+        </div>
+        <div ref="inputarea" class="inputarea" contenteditable="true" @input="onContentInput"></div>
+        <sg-button
+          type="primary"
+          @click.stop="onComfirm"
+          :disabled="!contentHTML"
+          :isLoading="isLoading"
+        >确定</sg-button>
       </div>
-      <textarea ref="textarea" v-model="content" :placeholder="placeholder"></textarea>
-      <sg-button
-        type="primary"
-        @click.stop="onComfirm"
-        :disabled="!content"
-        :isLoading="isLoading"
-      >确定</sg-button>
     </div>
-  </div>
+  </transition>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import { apiURL, apiPostData } from '@/api'
+import { toEmotionImages, toEmotionCodes } from '@/common/image'
 
 export default {
   name: 'CommentInput',
@@ -44,28 +47,25 @@ export default {
 
   data () {
     return {
-      emotionVisible: false,
+      emotionVisible: true,
       emotions: [],
-      content: '',
-      isLoading: false
+      contentHTML: '',
+      isLoading: false,
+      pageSize: 8
     }
   },
 
   watch: {
     visible (v) {
       if (v) {
-        this.content = ''
-        this.resetEmotions()
         this.$nextTick(() => {
-          this.$refs.textarea.focus()
+          this.resetEmotions()
+          const inputarea = this.$refs.inputarea
+          inputarea.innerHTML = ''
+          this.onContentInput({ target: inputarea })
+          inputarea.focus()
         })
       }
-    },
-    /**
-     * @param {String} v
-     */
-    content (v = '') {
-      this.emotionVisible = v.endsWith('#')
     }
   },
 
@@ -90,6 +90,10 @@ export default {
 
   methods: {
     resetEmotions() {
+      const rootFontSize = parseInt(getComputedStyle(document.documentElement).fontSize)
+      const { emotionWrapper, pageEl } = this.$refs
+      const width = emotionWrapper.clientWidth - pageEl.clientWidth
+      this.pageSize = Math.floor(width / (2.5 * rootFontSize))
       this.getNextEmotions(true)
     },
     getNextEmotions(isRefresh) {
@@ -97,7 +101,7 @@ export default {
         this.emotionPage = 0
       }
       const MAX_COUNT = 105
-      const PAGE_SIZE = 8
+      const PAGE_SIZE = this.pageSize
       if (isRefresh) {
         this.emotionPage = 0
       } else {
@@ -122,8 +126,10 @@ export default {
      * @param {Event} e
      */
     onClickEmotion(e) {
-      this.$refs.textarea.focus()
+      e.stopPropagation()
+      e.preventDefault()
       let el = e.target
+      this.$refs.inputarea.focus()
       if (el.tagName !== 'IMG') {
         return
       }
@@ -132,8 +138,50 @@ export default {
         index++
         el = el.previousElementSibling
       }
-      const str = this.emotions[index] || ''
-      this.content = this.content.substr(0, this.content.length - 1) + str
+      this.insertEmotion(toEmotionImages(this.emotions[index] || ''))
+    },
+    insertEmotion(html) {
+      if (!html) {
+        return
+      }
+      // todo
+      if (window.getSelection) {
+        const sel = window.getSelection()
+        if (sel.getRangeAt && sel.rangeCount) {
+          let range = sel.getRangeAt(0)
+          range.deleteContents()
+          const el = document.createElement("div");
+          el.innerHTML = html;
+
+          const frag = document.createDocumentFragment()
+          let node
+          let lastNode
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }
+        }
+      } else {
+        const selection = document.selection
+        if (selection && selection.type !== "Control") {
+          // IE9以下
+          selection.createRange().pasteHTML(html);
+        }
+      }
+
+      this.onContentInput({ target: this.$refs.inputarea })
+    },
+
+    onContentInput (e) {
+      this.contentHTML = e.target.innerHTML
     },
 
     onClose () {
@@ -142,10 +190,11 @@ export default {
     },
     onComfirm (e) {
       this.isLoading = true
+      const content = toEmotionCodes(this.contentHTML)
       apiPostData(apiURL.commentCreate, {
         type: 1,
         typeId: this.id,
-        content: this.content,
+        content,
         fromId: this.userID,
         toId: this.toId
       })
@@ -164,6 +213,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import '@/ui/style/const.scss';
+
 .comment-input-mask {
   position: absolute;
 }
@@ -190,23 +241,51 @@ export default {
       background-color: rgb(245, 245, 245);
     }
 
+    // 更改大小后需要改变单行个数
     img {
       width: 2rem;
       height: 2rem;
       vertical-align: middle;
       margin-right: 0.5rem;
+      user-select: none;
     }
   }
 
-  textarea {
+  .inputarea {
     display: block;
     width: 100%;
     height: 8rem;
+    padding: 0.5rem;
     margin-bottom: 0.5rem;
     font-size: 1.4rem;
     line-height: 1.6rem;
     box-sizing: border-box;
     resize: none;
+    outline: none;
+    border: 1px solid $color-theme-disabled;
   }
+}
+
+.slide-enter,
+.slide-leave-to {
+  background-color: transparent;
+}
+.slide-enter .comment-input,
+.slide-leave-to .comment-input {
+  transform: translate(0, 100%);
+}
+.slide-enter-active,
+.slide-leave-active {
+  transition: background-color 0.3s ease;
+}
+.slide-enter-active .comment-input,
+.slide-leave-active .comment-input {
+  transition: transform 0.3s ease;
+}
+</style>
+
+<style lang="scss">
+.comment-input .inputarea img {
+  vertical-align: middle;
 }
 </style>

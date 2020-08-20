@@ -80,3 +80,14 @@ export const toEmotionImages = function(v = '') {
     return `<img src="/sapi/file/emotions/${a.substr(3, 3)}.gif" />`
   })
 }
+/**
+ * @description 将表情图片地址转化为表情指令代码
+ * @param {String} v 
+ */
+export const toEmotionCodes = function(v = '') {
+  return v.replace(/<img.*?>/g, function(a) {
+    const index = a.length - (a.indexOf('.gif') - 3)
+    const code = a.substr(-index, 3)
+    return `#EM${code}`
+  })
+}
