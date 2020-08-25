@@ -272,7 +272,11 @@ export default {
             this.$toast('登录成功')
             const redirect = this.$route.query.redirect
             if (redirect) {
-              this.$router.push({ path: redirect })
+              if (redirect.startsWith('http')) {
+                window.location.href = redirect
+              } else {
+                this.$router.push({ path: redirect })
+              }
             } else {
               this.$router.push({ name: 'home' })
             }
