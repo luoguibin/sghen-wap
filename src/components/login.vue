@@ -163,7 +163,7 @@ export default {
   created () {
     window.login = this
     if (this.isLogin) {
-      this.$router.push({ name: 'home' })
+      this.afterLogin()
     }
     this.isNormalLogin = this.$route.query.mode === 'normal'
   },
@@ -178,6 +178,19 @@ export default {
   },
 
   methods: {
+    afterLogin () {
+      const redirect = this.$route.query.redirect
+      if (redirect) {
+        if (redirect.startsWith('http')) {
+          window.location.href = decodeURIComponent(redirect)
+        } else {
+          this.$router.push({ path: redirect })
+        }
+      } else {
+        this.$router.push({ name: 'home' })
+      }
+    },
+
     onChangeLoginType (otherType) {
       const type = this.formData.loginType === 'pw' ? otherType : 'pw'
       const isPwType = type === 'pw'
@@ -270,16 +283,7 @@ export default {
         method(params)
           .then(() => {
             this.$toast('登录成功')
-            const redirect = this.$route.query.redirect
-            if (redirect) {
-              if (redirect.startsWith('http')) {
-                window.location.href = decodeURIComponent(redirect)
-              } else {
-                this.$router.push({ path: redirect })
-              }
-            } else {
-              this.$router.push({ name: 'home' })
-            }
+            this.afterLogin()
           })
           .finally(() => {
             this.isRequesting = false
