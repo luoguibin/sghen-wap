@@ -1,6 +1,7 @@
 <template>
   <div class="home">
-    <sg-header :backVisible="false">
+    <sg-header :backVisible="false" :centerStatus="''">
+      <sghen-logo slot="left"></sghen-logo>
       <div slot="right">
         <sg-dropdown
           v-if="isLogin"
@@ -25,10 +26,12 @@
           <sg-slider
             v-if="sliderItems.length"
             ref="sgSlider"
+            :index="sliderIndex"
             :items="sliderItems"
             :itemType="'slider-peotry'"
             :duration="sliderDuration"
             :loopTotal="99"
+            @change="onSliderChange"
             @click="onClickItemType"
           >
             <div
@@ -113,7 +116,8 @@ export default {
   name: 'Home',
 
   components: {
-    SiteInstruction: () => import('@/components/site-instruction')
+    SiteInstruction: () => import('@/components/site-instruction'),
+    SghenLogo: () => import('@/components/sghen-logo')
   },
 
   data () {
@@ -124,6 +128,7 @@ export default {
       popularPeotrySets: [],
 
       sliderItems: [],
+      sliderIndex: 0,
       sliderPoetries: [],
       sliderDuration: 5000,
 
@@ -159,6 +164,7 @@ export default {
       const data = {
         sliderPoetries: this.sliderPoetries,
         sliderItems: this.sliderItems,
+        sliderIndex: this.sliderIndex,
         yearPoetrySets: this.yearPoetrySets,
         yearPeots: this.yearPeots,
         popularPeotrySets: this.popularPeotrySets
@@ -170,6 +176,7 @@ export default {
       if (pageData) {
         this.sliderPoetries = pageData.sliderPoetries
         this.sliderItems = pageData.sliderItems
+        this.sliderIndex = pageData.sliderIndex
         this.yearPoetrySets = pageData.yearPoetrySets
         this.yearPeots = pageData.yearPeots
         this.popularPeotrySets = pageData.popularPeotrySets
@@ -234,6 +241,7 @@ export default {
         })
         this.sliderPoetries = orderList
         this.sliderItems = orderList.map(o => ({ slot: o.id }))
+        this.sliderIndex = 0
       })
     },
 
@@ -263,6 +271,15 @@ export default {
           break
         default:
           break
+      }
+    },
+
+    /**
+     * 轮播器当前页改变
+     */
+    onSliderChange (index) {
+      if (index >= 0) {
+        this.sliderIndex = index
       }
     },
 
@@ -479,6 +496,11 @@ export default {
 </style>
 
 <style>
+.home .sg-header .left {
+  height: 100%;
+  padding: 0.3rem 0;
+  box-sizing: border-box;
+}
 @keyframes frames-opacity {
   0% {
     opacity: 1;
