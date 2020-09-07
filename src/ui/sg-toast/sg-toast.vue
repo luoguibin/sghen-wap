@@ -28,9 +28,9 @@ export default {
   },
 
   computed: {
-    msgHTML() {
+    msgHTML () {
       // eg:  请#{登陆}
-      return this.$xss(this.msg || '').replace(/#{.*}/g, function(s) {
+      return this.$xss(this.msg || '').replace(/#{.*}/g, function (s) {
         return `<span>${s.substring(2, s.length - 1)}</span>`
       })
     }
@@ -82,7 +82,7 @@ export default {
         return
       }
       let index = 0
-      while(el = el.previousElementSibling) {
+      while (el = el.previousElementSibling) {
         index++
       }
 
@@ -225,8 +225,11 @@ export default {
 <style lang="scss">
 @import "../style/const.scss";
 .sg-toast {
-  .toast-msg span {
-    color: $color-theme;
+  .toast-msg {
+    white-space: nowrap;
+    span {
+      color: $color-theme;
+    }
   }
 }
 /* @import "//at.alicdn.com/t/font_1730652_96vm5rfm5q.css";
