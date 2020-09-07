@@ -90,6 +90,7 @@
             <div
               v-for="item in popularPeotrySets"
               :key="item.id"
+              class="popular-set"
               item-type="popular-set"
             >{{item.name}}({{item.count}}首)</div>
           </div>
@@ -448,17 +449,23 @@ export default {
   }
 
   .popular-sets {
-    margin: -1.2rem -1.2rem 0 0;
-    overflow: hidden;
-    > div {
+    margin: 0 -0.6rem;
+    line-height: $height-text * 1.2 * 1.5;
+    .popular-set {
       display: inline-block;
-      margin: 1.2rem 1.2rem 0 0;
       padding: 0 1rem;
+      margin: 0 0.6rem;
       color: $color-theme;
       font-size: $size-text;
       line-height: $height-text * 1.2;
       border-radius: 1rem;
       background-color: mix($color-theme, white, 25%);
+      box-shadow: 0 5px 5px mix($color-theme, white, 50%);
+      &:active {
+        background-color: mix($color-theme, white, 50%);
+        box-shadow: 0 0 5px mix($color-theme, white, 50%);
+        transform: translate(0, 2px);
+      }
     }
   }
 
