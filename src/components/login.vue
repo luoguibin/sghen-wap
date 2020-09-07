@@ -182,12 +182,12 @@ export default {
       const redirect = this.$route.query.redirect
       if (redirect) {
         if (redirect.startsWith('http')) {
-          window.location.href = decodeURIComponent(redirect)
+          window.location.replace(decodeURIComponent(redirect))
         } else {
-          this.$router.push({ path: redirect })
+          this.$router.replace({ path: redirect })
         }
       } else {
-        this.$router.push({ name: 'home' })
+        this.$router.replace({ name: 'home' })
       }
     },
 
