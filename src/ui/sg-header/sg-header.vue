@@ -4,10 +4,8 @@
       <span v-show="backVisible" class="back iconfont icon-down" @click="onBack"></span>
       <slot name="left"></slot>
     </div>
-    <div v-if="centerStatus" class="center">
-      <div v-show="centerStatus === 'visible'">
-        <slot></slot>
-      </div>
+    <div v-if="centerStatus" v-show="centerStatus === 'visible'" class="center">
+      <slot></slot>
     </div>
     <div v-if="rightStatus" v-show="rightStatus === 'visible'" class="right">
       <slot name="right"></slot>
