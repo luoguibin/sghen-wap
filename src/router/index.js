@@ -80,6 +80,17 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+router.onError(function (e) {
+  const { name } = e || {}
+  switch (name) {
+    case 'ChunkLoadError':
+      window._sgGlobal.$toast('资源文件加载失败，请重试')
+      break
+    default:
+      break
+  }
+})
+
 // 优化路由返回上一级不存在的情况
 router._go = router.go
 router.go = function (num) {
