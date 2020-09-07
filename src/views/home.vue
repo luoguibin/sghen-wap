@@ -354,6 +354,8 @@ export default {
   overflow: hidden;
 
   .sg-header {
+    box-shadow: 0 0 5px mix($color-theme, white, 30%);
+    z-index: 1;
     .sg-dropdown {
       display: inline-block;
       padding: 0;
