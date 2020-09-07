@@ -9,10 +9,8 @@
         <slot></slot>
       </div>
     </div>
-    <div v-if="rightStatus" class="right">
-      <div v-show="rightStatus === 'visible'">
-        <slot name="right"></slot>
-      </div>
+    <div v-if="rightStatus" v-show="rightStatus === 'visible'" class="right">
+      <slot name="right"></slot>
     </div>
   </header>
 </template>
