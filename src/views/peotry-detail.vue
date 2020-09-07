@@ -22,30 +22,32 @@
       @ok="handleCommentOk"
     ></comment-input>
 
-    <div v-if="peotry" v-show="menusVisible" class="right-menus">
-      <div class="menu-item" @click="handleDropdown('praise', $event)">
-        <div :class="{'is-praise': isPraise}">
-          <i class="iconfont icon-like"></i>
+    <transition name="slide">
+      <div v-if="peotry"  v-show="menusVisible" class="right-menus">
+        <div class="menu-item" @click="handleDropdown('praise', $event)">
+          <div :class="{'is-praise': isPraise}">
+            <i class="iconfont icon-like"></i>
+          </div>
+          <span>{{peotry.praiseTotal | numFilter}}</span>
         </div>
-        <span>{{peotry.praiseTotal | numFilter}}</span>
-      </div>
-      <div class="menu-item" @click="handleDropdown('comment', $event)">
-        <div>
-          <i class="iconfont icon-message"></i>
+        <div class="menu-item" @click="handleDropdown('comment', $event)">
+          <div>
+            <i class="iconfont icon-message"></i>
+          </div>
+          <span>{{peotry.commentTotal | numFilter}}</span>
         </div>
-        <span>{{peotry.commentTotal | numFilter}}</span>
-      </div>
-      <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
-        <div>
-          <i class="iconfont icon-edit"></i>
+        <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
+          <div>
+            <i class="iconfont icon-edit"></i>
+          </div>
+        </div>
+        <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('delete', $event)">
+          <div>
+            <i class="iconfont icon-delete"></i>
+          </div>
         </div>
       </div>
-      <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('delete', $event)">
-        <div>
-          <i class="iconfont icon-delete"></i>
-        </div>
-      </div>
-    </div>
+    </transition>
 
     <praise-anime
       v-if="praiseVisible"
@@ -633,6 +635,8 @@ export default {
     top: 11rem;
     padding: 1rem;
     background-color: rgba($color-theme, 0.5);
+    opacity: 1;
+    border-radius: 1rem 0 0 1rem/1rem 0 0 1rem;
     .menu-item {
       text-align: center;
       color: white;
@@ -646,6 +650,15 @@ export default {
     .is-praise .icon-like {
       color: $color-theme;
     }
+  }
+  .slide-enter,
+  .slide-leave-to {
+    right: -5rem;
+    opacity: 0;
+  }
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: opacity 0.3s ease, right 0.3s ease;
   }
 }
 </style>
