@@ -70,22 +70,21 @@ export const base64ToFile = function (base64Data, fileName) {
   })
 }
 
-
 /**
  * @description 将表情指令代码转化为表情图片地址
- * @param {String} v 
+ * @param {String} v
  */
-export const toEmotionImages = function(v = '') {
-  return v.replace(/#EM[0-9]{3}/g, function(a) {
+export const toEmotionImages = function (v = '') {
+  return v.replace(/#EM[0-9]{3}/g, function (a) {
     return `<img src="/sapi/file/emotions/${a.substr(3, 3)}.gif" />`
   })
 }
 /**
  * @description 将表情图片地址转化为表情指令代码
- * @param {String} v 
+ * @param {String} v
  */
-export const toEmotionCodes = function(v = '') {
-  return v.replace(/<img.*?>/g, function(a) {
+export const toEmotionCodes = function (v = '') {
+  return v.replace(/<img.*?>/g, function (a) {
     const index = a.length - (a.indexOf('.gif') - 3)
     const code = a.substr(-index, 3)
     return `#EM${code}`

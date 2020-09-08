@@ -106,7 +106,7 @@ export default {
         })
         this.isEnd = this.list.length >= this.total
         this.$refs.sgScroll.success()
-      }) .catch(() => {
+      }).catch(() => {
         this.$refs.sgScroll.fail()
       })
     },

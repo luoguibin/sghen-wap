@@ -81,8 +81,9 @@ export default {
       if (el.tagName !== 'SPAN') {
         return
       }
-      let index = 0
-      while (el = el.previousElementSibling) {
+      let index = -1
+      while (el) {
+        el = el.previousElementSibling
         index++
       }
 

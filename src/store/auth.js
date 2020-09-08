@@ -89,7 +89,7 @@ const storeAuth = {
 };
 
 // 自执行方法，上一行需要添加分号，不然运行时报错：{(intermediate value)(intermediate value)(intermediate value)(intermediate value)(intermediate value)} is not a function
-(function() {
+(function () {
   const temp = localStorage.getItem('sghen_user_info')
   if (!temp) {
     return
@@ -104,7 +104,6 @@ const storeAuth = {
     return
   }
   storeAuth.mutations.setUserInfo(storeAuth.state, userInfo)
-  return
 })()
 
 export default storeAuth

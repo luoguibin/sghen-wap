@@ -329,7 +329,6 @@ export default {
   transition: transform 0.3s ease;
 }
 
-
 .peotry-edit {
   display: flex;
   flex-direction: column;

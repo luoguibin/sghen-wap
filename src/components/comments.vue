@@ -96,7 +96,7 @@ export default {
       }
       return this.textComments.length < this.commentTotal
     },
-    textComments() {
+    textComments () {
       return this.comments.map(o => {
         return {
           ...o,
@@ -202,7 +202,7 @@ $background: rgba(0, 0, 0, 0.03);
       white-space: pre-line;
       word-break: break-all;
       line-height: 2rem;
-      font-size: 1.2rem; 
+      font-size: 1.2rem;
     }
   }
 }
