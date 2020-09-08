@@ -6,7 +6,15 @@
           <img v-for="key in emotions" :key="key" :src="key | emotionURL" />
           <span ref="pageEl" class="iconfont icon-down" @click="getNextEmotions()"></span>
         </div>
-        <div ref="inputarea" class="inputarea" contenteditable="true" @input="onContentInput"></div>
+        <div
+          ref="inputarea"
+          class="inputarea"
+          contenteditable="true"
+          :toPlacehoder="toPlacehoder"
+          @input="onContentInput"
+          @focus="onFocus"
+          @blur="onBlur"
+        ></div>
         <sg-button
           type="primary"
           @click.stop="onComfirm"
@@ -47,6 +55,7 @@ export default {
 
   data () {
     return {
+      isFocus: false,
       emotionVisible: true,
       emotions: [],
       contentHTML: '',
@@ -70,13 +79,16 @@ export default {
   },
 
   computed: {
+    toPlacehoder () {
+      return this.contentHTML.length ? '' : this.placeholder
+    },
     ...mapState({
-      userID: state => state.auth.userID
+      userID: (state) => state.auth.userID
     })
   },
 
   filters: {
-    emotionURL(v = '') {
+    emotionURL (v = '') {
       if (v.length !== 6) {
         return v
       }
@@ -89,14 +101,16 @@ export default {
   },
 
   methods: {
-    resetEmotions() {
-      const rootFontSize = parseInt(getComputedStyle(document.documentElement).fontSize)
+    resetEmotions () {
+      const rootFontSize = parseInt(
+        getComputedStyle(document.documentElement).fontSize
+      )
       const { emotionWrapper, pageEl } = this.$refs
       const width = emotionWrapper.clientWidth - pageEl.clientWidth
       this.pageSize = Math.floor(width / (2.5 * rootFontSize))
       this.getNextEmotions(true)
     },
-    getNextEmotions(isRefresh) {
+    getNextEmotions (isRefresh) {
       if (this.emotionPage === undefined) {
         this.emotionPage = 0
       }
@@ -111,7 +125,12 @@ export default {
         }
       }
       const emotions = []
-      for (let i = this.emotionPage * PAGE_SIZE, len = Math.min(i + PAGE_SIZE, MAX_COUNT); i < len; i++) {
+      for (
+        let i = this.emotionPage * PAGE_SIZE,
+          len = Math.min(i + PAGE_SIZE, MAX_COUNT);
+        i < len;
+        i++
+      ) {
         let indexStr = '' + i
         if (indexStr.length === 1) {
           indexStr = '00' + indexStr
@@ -125,7 +144,7 @@ export default {
     /**
      * @param {Event} e
      */
-    onClickEmotion(e) {
+    onClickEmotion (e) {
       e.stopPropagation()
       e.preventDefault()
       let el = e.target
@@ -134,13 +153,13 @@ export default {
         return
       }
       let index = -1
-      while(el) {
+      while (el) {
         index++
         el = el.previousElementSibling
       }
       this.insertEmotion(toEmotionImages(this.emotions[index] || ''))
     },
-    insertEmotion(html) {
+    insertEmotion (html) {
       if (!html) {
         return
       }
@@ -150,30 +169,30 @@ export default {
         if (sel.getRangeAt && sel.rangeCount) {
           let range = sel.getRangeAt(0)
           range.deleteContents()
-          const el = document.createElement("div");
-          el.innerHTML = html;
+          const el = document.createElement('div')
+          el.innerHTML = html
 
           const frag = document.createDocumentFragment()
           let node
           let lastNode
           while ((node = el.firstChild)) {
-            lastNode = frag.appendChild(node);
+            lastNode = frag.appendChild(node)
           }
-          range.insertNode(frag);
+          range.insertNode(frag)
 
           if (lastNode) {
-            range = range.cloneRange();
-            range.setStartAfter(lastNode);
-            range.collapse(true);
-            sel.removeAllRanges();
-            sel.addRange(range);
+            range = range.cloneRange()
+            range.setStartAfter(lastNode)
+            range.collapse(true)
+            sel.removeAllRanges()
+            sel.addRange(range)
           }
         }
       } else {
         const selection = document.selection
-        if (selection && selection.type !== "Control") {
+        if (selection && selection.type !== 'Control') {
           // IE9以下
-          selection.createRange().pasteHTML(html);
+          selection.createRange().pasteHTML(html)
         }
       }
 
@@ -182,6 +201,12 @@ export default {
 
     onContentInput (e) {
       this.contentHTML = e.target.innerHTML
+    },
+    onFocus () {
+      this.isFocus = true
+    },
+    onBlur () {
+      this.isFocus = false
     },
 
     onClose () {
@@ -198,7 +223,7 @@ export default {
         fromId: this.userID,
         toId: this.toId
       })
-        .then(data => {
+        .then((data) => {
           this.$emit('ok', data.data)
           this.onClose()
         })
@@ -213,7 +238,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
 .comment-input-mask {
   position: absolute;
@@ -237,7 +262,7 @@ export default {
       padding: 0 0.5rem;
       font-size: 1.6rem;
       transform: rotate(-90deg);
-      border-radius: 5px;;
+      border-radius: 5px;
       background-color: rgb(245, 245, 245);
     }
 
@@ -252,6 +277,7 @@ export default {
   }
 
   .inputarea {
+    position: relative;
     display: block;
     width: 100%;
     height: 8rem;
@@ -263,6 +289,17 @@ export default {
     resize: none;
     outline: none;
     border: 1px solid $color-theme-disabled;
+    &::before {
+      content: attr(toPlacehoder);
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: inherit;
+      display: inline-block;
+      font-size: $size-text;
+      color: $color-tip;
+      pointer-events: none;
+    }
   }
 }
 
