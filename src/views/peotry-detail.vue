@@ -17,6 +17,7 @@
       v-if="peotry"
       :visible.sync="commentVisible"
       :id="commentID"
+      :typeUserID="commentTypeUserID"
       :toId="commentToID"
       :placeholder="commentTip"
       @ok="handleCommentOk"
@@ -91,6 +92,7 @@ export default {
       myPraiseComment: null,
       commentVisible: false,
       commentID: 0,
+      commentTypeUserID: 0,
       commentToID: 0,
       commentTip: '请输入',
 
@@ -337,6 +339,7 @@ export default {
       }
       this.commentVisible = true
       this.commentID = typeId
+      this.commentTypeUserID = this.peotry.user.id
       this.commentToID = +fromId
       this.commentTip = tip
     },
@@ -374,6 +377,7 @@ export default {
         apiPostData(apiURL.commentCreate, {
           type: 1,
           typeId: this.peotry.id,
+          typeUserId: this.peotry.user.id,
           content: 'praise',
           fromId: this.userID,
           toId: -1

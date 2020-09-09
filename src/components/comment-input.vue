@@ -47,6 +47,10 @@ export default {
       type: [Number, String],
       default: 0
     },
+    typeUserId: {
+      type: [Number, String],
+      default: 0
+    },
     placeholder: {
       type: String,
       default: '请输入'
@@ -219,6 +223,7 @@ export default {
       apiPostData(apiURL.commentCreate, {
         type: 1,
         typeId: this.id,
+        typeUserId: this.typeUserId,
         content,
         fromId: this.userID,
         toId: this.toId
