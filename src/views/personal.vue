@@ -194,7 +194,7 @@ export default {
       apiGetData(apiURL.userPoetryCount, params).then(resp => {
         this.peotryCount = resp.data[0].count
       })
-      apiGetData(apiURL.userPraiseCount, params).then(resp => {
+      apiGetData(apiURL.userPraiseCount, { userId: params.id }).then(resp => {
         this.praiseCount = resp.data[0].count
       })
       apiGetData(apiURL.peotSets, { userId: this.personalID }).then(resp => {
