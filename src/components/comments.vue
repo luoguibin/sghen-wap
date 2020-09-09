@@ -43,7 +43,7 @@
 
 <script>
 import Vue from 'vue'
-import { defaultImgSrc } from '@/common/const'
+import { defaultAvatarSrc } from '@/common/const'
 import { toEmotionImages } from '@/common/image'
 
 export default {
@@ -78,7 +78,7 @@ export default {
 
   data () {
     return {
-      defaultImgSrc,
+      defaultAvatarSrc,
       isIntoView: false
     }
   },
@@ -108,7 +108,7 @@ export default {
       const srcFilter = Vue.filter('imgSrcFilter')
       return this.praises.map(o => {
         const temp = { ...o }
-        temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar) : this.defaultImgSrc
+        temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar, 'avatar') : this.defaultAvatarSrc
         return temp
       })
     }

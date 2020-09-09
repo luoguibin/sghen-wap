@@ -11,7 +11,7 @@
         >
           <div class="user">
             <span>{{userName}}</span>
-            <img :src="userAvatar | imgSrcFilter" />
+            <img :src="userAvatar | imgSrcFilter('avatar')" />
           </div>
         </sg-dropdown>
         <sg-button v-else type="text" @click="onGoLogin">登陆~</sg-button>

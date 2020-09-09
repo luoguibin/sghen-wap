@@ -28,7 +28,7 @@
         </span>
         <div>
           <img v-if="isAvatarBase64" :src="personalAvatar" />
-          <img v-else :src="personalAvatar | imgSrcFilter" />
+          <img v-else :src="personalAvatar | imgSrcFilter('avatar')" />
           <sg-button v-if="isEditing" type="text" @click="onOpenChangeAvatar">更换</sg-button>
         </div>
       </div>

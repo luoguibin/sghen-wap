@@ -13,7 +13,7 @@
           v-if="showAvatar"
           class="avatar"
           item-type="peot-avatar"
-          :src="(peotry.user && peotry.user.avatar) | imgSrcFilter"
+          :src="(peotry.user && peotry.user.avatar) | imgSrcFilter('avatar')"
         />
       </div>
 

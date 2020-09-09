@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { defaultImgSrc } from '@/common/const'
+import { defaultImgSrc, defaultAvatarSrc } from '@/common/const'
 
 const numFormat = function (num, len) {
   if (String(num).length > len) return num
@@ -55,9 +55,9 @@ export const timeFilter = function (s) {
   return output
 }
 
-export const imgSrcFilter = function (v) {
+export const imgSrcFilter = function (v, type) {
   if (!v) {
-    return defaultImgSrc
+    return type === 'avatar' ? defaultAvatarSrc : defaultImgSrc
   }
   let path
   if (v.indexOf('.') === 0) {
