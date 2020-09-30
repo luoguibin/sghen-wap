@@ -1,5 +1,5 @@
 <template>
-  <svg class="sghen-logo letters letters--effect-1" viewBox="0 0 500 100" width="500" height="100">
+  <svg class="sghen-logo letters letters--effect-1" viewBox="0 0 500 100" width="500" height="100" @click="onRobotPeotry">
     <g v-for="(p, i) in pathItems" :key="i" class="letter letter-s">
       <g class="letter-part">
         <path class="letter-layer color-bg" :d="p" />
@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+import { apiURL, apiPostData } from '@/api'
 import anime from 'animejs'
 
 /**
@@ -69,6 +71,53 @@ export default {
       loop: true,
       direction: 'alternate'
     })
+  },
+
+  computed: {
+    ...mapGetters({
+      isLogin: 'auth/isLogin'
+    })
+  },
+
+  methods: {
+    onRobotPeotry () {
+      if (!this.isLogin) {
+        return
+      }
+      const nowTime = Date.now()
+      if (!this.robotTime) {
+        this.robotTime = nowTime
+        return
+      }
+      if (nowTime - this.robotTime < 300) {
+        this.$confirm({
+          title: '机器作诗词',
+          type: 'input',
+          placeholder: '请输入关键词',
+          validator: v => {
+            if (!v) {
+              this.$toast('请输入关键词')
+              return '请输入关键词'
+            }
+            if (v.length > 8) {
+              this.$toast('关键词长度不能超过8个字符')
+              return '关键词长度不能超过8个字符'
+            }
+            return ''
+          },
+          confirm: v => {
+            apiPostData(apiURL.servicesUrl, {
+              serviceName: 'peotry',
+              type: 'auto-create-peotry',
+              keyWords: v
+            }).then(resp => {
+              this.$toast('需自行在一段时间后刷新列表，查看是否创建成功')
+            })
+          }
+        })
+      }
+      this.robotTime = nowTime
+    }
   }
 }
 </script>

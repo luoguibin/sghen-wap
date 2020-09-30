@@ -114,5 +114,8 @@ export const apiURL = {
   // 用户评论列表
   commentContent: `${nodePreffix}/comment/content/list`,
   // 用户是否点赞诗词
-  commentPraiseCheck: `${nodePreffix}/peotry/praise/check`
+  commentPraiseCheck: `${nodePreffix}/peotry/praise/check`,
+
+  // 微服务
+  servicesUrl: `/napi/services`
 }
