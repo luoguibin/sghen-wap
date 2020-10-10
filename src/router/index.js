@@ -43,6 +43,14 @@ const routes = [
     }
   },
   {
+    path: '/my-resume',
+    name: 'myResume',
+    component: () => import(/* webpackChunkName: 'my-resume' */'@/views/my-resume'),
+    meta: {
+      auth: true
+    }
+  },
+  {
     path: '/api-manage',
     name: 'api-manage',
     component: () => import(/* webpackChunkName: 'api-manage' */'@/views/api-manage'),
