@@ -1,5 +1,5 @@
 <template>
-  <div class="my-resume">
+  <div class="my-resume" sg-scroll>
     <!-- 个人基本信息 -->
     <section class="personal-info sg-flex">
       <img src="favicon.ico" alt="个人头像" />
