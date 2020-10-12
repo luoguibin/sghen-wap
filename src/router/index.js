@@ -39,7 +39,7 @@ const routes = [
     name: 'personal',
     component: () => import(/* webpackChunkName: 'personal' */'@/views/personal'),
     meta: {
-      auth: true
+      auth: false // 查看个人诗词概况不需要鉴权
     }
   },
   {
