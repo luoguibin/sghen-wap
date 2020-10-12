@@ -1,167 +1,418 @@
 <template>
-  <div class="my-resume" sg-scroll>
-    <!-- 个人基本信息 -->
-    <section class="personal-info sg-flex">
-      <img src="favicon.ico" alt="个人头像" />
-      <div class="sg-flex-one infos">
-        <div><strong>罗**</strong> 男（汉族）</div>
-        <div>3年工作经验 | 本科 | 27岁</div>
-        <div>156****5984 94****877@qq.com</div>
-      </div>
-    </section>
-
-    <!-- 职位与技能 -->
-    <section>
-      <h2>技以谋职</h2>
-      <div class="sg-flex">
-        <div class="sg-flex-one">职位：web前端开发工程师</div>
-        <div class="sg-flex-one">地点：广州、深圳</div>
-      </div>
-      <div>
-        <div>掌握：HTML5/CSS、JavaScript、vue.js、git</div>
-        <div>了解：beego、docker、jenkins、angular.js、webpack4</div>
-      </div>
-    </section>
-
-    <!-- 教育经历 -->
-    <section class="sg-flex educations">
-      <h2>教育经历</h2>
-      <div class="sg-flex-one education">
-        <img :src="eduLogo" />
-        <span>华南师范大学 </span>
-        <span>（本科 / 网络工程2012-09至2016-09）</span>
-      </div>
-    </section>
-
-    <!-- 工作经历  -->
-    <section>
-      <h2>工作经历</h2>
-      <div class="sg-flex content-padding">
-        <div class="sg-flex-two">
-          <strong>珠海读书郎网络教育有限公司</strong>
-        </div>
-        <div class="sg-flex-one">软件工程师</div>
-        <div class="sg-flex-one">2016.06-2019.03</div>
-      </div>
-      <div class="sg-flex content-padding">
-        <div class="sg-flex-two">
-          <strong>软通动力 (广州) 科技有限公司</strong>
-        </div>
-        <div class="sg-flex-one">前端工程师</div>
-        <div class="sg-flex-one">2019.04-至今</div>
-      </div>
-      <p class="content" style="margin-top: 2rem">
-        前期从事Android平板端教育应用开发工作，其后至今专注于web前端开发，运用过vue、angularjs等框架；熟练运用vue，开发多种类型项目，掌握了一定开发技巧；同时用beego框架开发web后端数据接口，形成了一套相对熟练的前后端开发流程。
-      </p>
-    </section>
-
-    <!-- 项目经验  -->
-    <section class="projects">
-      <h2>项目经验</h2>
-      <div
-        v-for="item in projects"
-        :key="item.id"
-        class="project content-padding"
+  <div class="my-resume iconfont" sg-scroll @click="onClick">
+    <template v-if="resumeId">
+      <!-- 个人基本信息 -->
+      <section
+        v-if="personalInfos"
+        item-type="personalInfos"
+        class="personal-info"
       >
-        <div class="sg-flex">
-          <h4 class="sg-flex-one">
-            {{ item.name }}
-          </h4>
-          <div>
-            <span>{{ item.time }}</span>
+        <img :src="personalInfos.avatarUrl" alt="个人头像" />
+        <div class="infos">
+          <div class="line-height">
+            <span>
+              <strong>{{ personalInfos.userName }}</strong>
+            </span>
+            <span class="icon-male">{{ personalInfos.gender }}</span>
+          </div>
+          <div class="line-height">
+            <span>{{ personalInfos.age }}</span>
+            <span>{{ personalInfos.nation }}</span>
+            <span>{{ personalInfos.nativePlace }}</span>
+          </div>
+          <div class="line-height">
+            <span class="icon-project">{{ personalInfos.workYear }}</span>
+            <span class="icon-mobilephone">{{
+              personalInfos.mobilePhone
+            }}</span>
           </div>
         </div>
 
-        <div>
-          <p
-            v-for="(item_, index_) in item.contents"
-            :key="index_"
-            class="content"
-          >
-            {{ item_ }}
-          </p>
+        <!-- 编辑模块信息 -->
+        <div v-if="editItemType" class="sg-mask">
+          <!-- <div>
+            <sg-button type="text" @click="onSelectAvatar">上传头像</sg-button>
+          </div>
+          <div>
+            <span>姓名:</span><input v-model="personalInfos.userName"/>
+          </div>
+          <div>
+            <span>性别:</span><input v-model="personalInfos.gender"/>
+          </div>
+          <div>
+            <span>性别:</span><input v-model="personalInfos.gender"/>
+          </div> -->
+          <sg-button @click="onSave">保存</sg-button>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <!-- 自我描述 -->
-    <section>
-      <h2>自我描述 <span>（个人能力、责任心、团队精神）</span></h2>
-      <p class="content">
-        已工作三年，仍需加强个人的沟通和学习这两方面。能主动与他人沟通，这起码能代表着积极态度和责任心；在沟通中熟习、把握事情的发展状态，借鉴好的经验。始终贯穿5W1H，不断学习、思考，然后在环境中检验、解决，最后才能善其事。希望在工作生活中不断与人沟通、学习，进而磨砺自己，去完善人生价值。
-      </p>
-    </section>
+      <!-- 职位与技能 -->
+      <section v-if="skillJob" item-type="skillJob" class="skill-job">
+        <h2>技以谋职</h2>
+        <div class="sg-flex line-height">
+          <div class="sg-flex-one">
+            <span>职位：</span>{{ skillJob.jobName }}
+          </div>
+          <div class="sg-flex-one">
+            <span>城市：</span>{{ skillJob.workPlace }}
+          </div>
+        </div>
+        <div class="line-height">
+          <span>掌握：</span>{{ skillJob.masterSkill }}
+        </div>
+        <div class="line-height">
+          <span>了解：</span>{{ skillJob.knowSkill }}
+        </div>
+      </section>
 
-    <!-- 个人兴趣 -->
-    <section>
-      <h2>个人兴趣</h2>
-      乒乓球、创诗词、慢跑、电影、旅游
-    </section>
+      <!-- 教育经历 -->
+      <section
+        v-if="educations"
+        item-type="educations"
+        class="sg-flex educations"
+      >
+        <h2>教育经历</h2>
+        <div
+          v-for="(item, index) in educations"
+          :key="index"
+          class="sg-flex-one education"
+        >
+          <img v-if="item.logoUrl" :src="item.logoUrl" />
+          <span>{{ item.collegeName }}</span>
+          <span>{{ item.major }}</span>
+          <span>{{ item.majorTime }}</span>
+        </div>
+      </section>
+
+      <!-- 工作经历  -->
+      <section v-if="experiences" item-type="experiences">
+        <h2>工作经历</h2>
+        <div
+          v-for="(item, index) in experiences.items"
+          :key="index"
+          class="sg-flex content-padding line-height"
+        >
+          <div class="sg-flex-two">
+            <strong>{{ item.companyName }}</strong>
+          </div>
+          <div class="sg-flex-one">{{ item.jobName }}</div>
+          <div class="sg-flex-one">{{ item.workTime }}</div>
+        </div>
+
+        <p class="content" style="margin-top: 2rem">
+          {{ experiences.content }}
+        </p>
+      </section>
+
+      <!-- 项目经验  -->
+      <section class="projects" item-type="projects">
+        <h2><span class="icon-project"></span>项目经验</h2>
+        <div
+          v-for="item in latestProjects"
+          :key="item.id"
+          class="project content-padding"
+        >
+          <div class="sg-flex">
+            <h4 class="sg-flex-one">
+              {{ item.name }}
+            </h4>
+            <div>
+              <span>{{ item.time }}</span>
+            </div>
+          </div>
+
+          <div>
+            <p
+              v-for="(item_, index_) in item.contents"
+              :key="index_"
+              class="content"
+            >
+              {{ item_ }}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 自我描述 -->
+      <section v-if="descriptions" item-type="descriptions" class="self-desc">
+        <h2>
+          自我描述 <span>{{ descriptions.keywords }}</span>
+        </h2>
+        <p class="content">
+          {{ descriptions.content }}
+        </p>
+      </section>
+
+      <!-- 个人兴趣 -->
+      <section class="hobby" item-type="hobby">
+        <h2><span class="icon-hobby"></span>个人兴趣</h2>
+        <div v-html="hobbyHTML"></div>
+      </section>
+    </template>
+
+    <template v-else>
+      <sg-button @click="createResume()" type="primary"
+        >自动创建简历模板</sg-button
+      >
+      <sg-button class="upload">
+        上传模板创建简历
+        <input type="file" accept=".txt,.json" @change="handleFileChange" />
+      </sg-button>
+    </template>
   </div>
 </template>
 
 <script>
+import { apiURL, apiGetData, apiPostData, apiPostUpload } from '@/api'
+import { getItemTypeObj } from '@/utils/dom'
+
+const tempDate = {
+  personalInfos: {
+    avatarUrl: '',
+    userName: 'LiMing',
+    gender: '男',
+    age: '23岁',
+    nativePlace: '广东广州',
+    nation: '汉族',
+    workYear: '2年工作经验',
+    mobilePhone: ''
+  },
+  skillJob: {
+    jobName: '高级工程师',
+    workPlace: '广州、深圳',
+    masterSkill: 'HTML5/CSS、JavaScript',
+    knowSkill: 'Java'
+  },
+  educations: [
+    {
+      collegeName: '毕业的大学',
+      major: '本科 / 计算机类',
+      majorTime: '2016-09至2020-09'
+    }
+  ],
+  experiences: {
+    items: [
+      {
+        companyName: '小黄花志愿者协会',
+        jobName: '志愿者',
+        workTime: '2020.06 - 至今'
+      }
+    ],
+    content: '志愿帮助、打扫大街、协助交通导流'
+  },
+  projects: [
+    {
+      name: '项目名字',
+      time: '项目时间',
+      contents: ['项目简介、概要', '主要负责内容']
+    }
+  ],
+  descriptions: {
+    keywords: '（关键词）',
+    content: '一些自我描述'
+  },
+  hobby: [
+    {
+      content: '跑步'
+    }
+  ]
+}
+
 export default {
   name: 'MyResume',
 
   data () {
     return {
-      eduLogo: require('img/logo-scnu.png'),
+      tempKeys: Object.freeze([
+        'personalInfos',
+        'skillJob',
+        'educations',
+        'experiences',
+        'projects',
+        'descriptions',
+        'hobby'
+      ]),
+      // tempResume: {},
+      editItemType: '',
 
-      projects: [
-        {
-          name: '中移和彩云(wap)',
-          time: '2020-03~2020-10',
-          contents: [
-            '和彩云是中国移动的统一云产品入口，融合个人云与家庭云，面向用户提供安全、智能、便捷、不限速的云存储服务，满足用户手机相册、微信文件、通讯录等数字资产的备份同步、在线管理、共享等需求。',
-            '负责保险箱、帮助与反馈、回收站和家庭云四个模块；音视频播放；'
-          ]
-        },
-        {
-          name: '天智大数据平台',
-          time: '2019.10-2019.12',
-          contents: [
-            '以人工智能技术，对场景进行预测、分析等，提供关联信息，开展无人智能化等工作提供信息化支撑。',
-            '项目中负责开发数据中心、管理中心模块，以antd-design-vue为组件库，开发业务中数据模型的算子组件，进行封装、重构项目可复用的业务组件；引入codemirror开发sql算子，配置业务所需的sql代码编辑配置；运用过富文本编辑ckeditor、拖拽组件等；优化组件库的table，设置自适应高度的表格样式；设计、编辑项目中的数据字典，控制关键的按钮操作权限；探究并配置组件多实例缓存等。'
-          ]
-        },
-        {
-          name: '数据工厂、数据超市2.0',
-          time: '2019.05-2019.10',
-          contents: [
-            '前者为任务调度中心，对任务进行分组控制、调度。通过websocket通信拉取运行数据后利用echart图形库展示；后者为各种榜单列表展示，通过vuex对榜单之间进行同步操作状态。',
-            '通过配置axios请求拦截处理各种异常、设置验证参数；控制路由权限跳转，分角色配置路由；以element-ui为组件库，动态打包视图模块；引入iconfont作为功能按钮图标'
-          ]
-        },
-        {
-          name: '初中仿真实验室',
-          time: '2018.08-2019-03',
-          contents: [
-            '通过分析实验操作流程来设计实验结构，整体分为实验元素与实验步骤。由于不涉及负责复杂动画，则采用animejs制作基本动画；编写实验基本元素动作模板，继承vue实验组件，并异步加载不同实验组件。熟习h5的canvas2d编程，绘制血液效果。api数据接口则采用beego+mysql来搭建。'
-          ]
-        },
-        {
-          name: '互动探究题',
-          role: '前端负责人、开发人员',
-          time: '2018.05-2018.07',
-          contents: [
-            '采用vue.js+webpack4框架搭建项目结构，围绕拖动、填空、连线三大题型来设计相应的操作类。设置编辑模式以区分编辑与预览做题，编写典型题目元素基类、供各个题目继承，也提供公共组件调用。同时也开发、维护相应后端数据接口。'
-          ]
-        },
-        {
-          name: '（其他）',
-          time: '2016.06-至今',
-          contents: [
-            '前期进行Android开发，开发过广告拦截、重构应用代码、迭代应用各种功能，也接触过系统主界面源码。在java使用过box2d物理引擎，在gwt框架下编译成web项目。',
-            '后期则不断深入web前端开发，学习使用各种框架、库，有axios、iconfont、threejs，pixijs，phaser等。'
-          ]
-        }
-      ]
+      resumeId: 0,
+      personalInfos: null,
+      skillJob: null,
+      educations: null,
+      experiences: null,
+      projects: null,
+      descriptions: null,
+      hobby: null
+    }
+  },
+
+  computed: {
+    /**
+     * 最新项目经验及总结
+     */
+    latestProjects () {
+      if (!this.projects) {
+        return []
+      }
+      const lastIndex = this.projects.length - 1
+      return this.projects.filter((_, i) => {
+        return i < 3 || i >= lastIndex
+      })
+    },
+    hobbyHTML () {
+      /** @type{Array} */
+      const items = this.hobby || []
+      return items
+        .map((o) => {
+          return o.href ? `<a href="${o.href}">${o.content}</a>` : o.content
+        })
+        .join('、')
     }
   },
 
   created () {
     window.myResume = this
+    this.getResumeDetail()
+  },
+
+  methods: {
+    /**
+     * 界面点击事件
+     */
+    onClick (e) {
+      const nowTime = Date.now()
+      if (!this.clickTime || this.editItemType) {
+        this.clickTime = nowTime
+        return
+      }
+      if (nowTime - this.clickTime < 300 * 1000) {
+        const { itemType } = getItemTypeObj(e.target) || {}
+        this.editItemType = itemType || ''
+      }
+      this.clickTime = nowTime
+    },
+    onSave () {
+      this.editItemType = ''
+    },
+
+    /**
+     * 获取当前用户的简历
+     */
+    getResumeDetail () {
+      this.tempResume = {}
+      this.editItemType = ''
+      apiGetData(apiURL.resumeDetail)
+        .then((resp) => {
+          const data = resp.data
+          this.resumeId = data.id || 0
+          this.tempKeys.forEach((key) => {
+            if (data[key]) {
+              try {
+                this[key] = JSON.parse(data[key])
+                this.tempResume[key] = data[key]
+              } catch (error) {
+                this[key] = null
+              }
+            }
+          })
+        })
+        .catch(() => {
+          this.resumeId = 0
+          this.tempKeys.forEach((key) => {
+            this[key] = null
+          })
+        })
+    },
+
+    /**
+     * 监听文件本地上传
+     */
+    handleFileChange (e) {
+      const file = e.target.files[0]
+      if (!file) {
+        return
+      }
+
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const text = e.target.result
+        try {
+          const data = JSON.parse(text)
+          this.createResume(data)
+        } catch (error) {
+          this.$toast('文件解析失败，请检查')
+        }
+      }
+      reader.readAsText(file)
+    },
+
+    /**
+     * 创建简历
+     */
+    createResume (userData) {
+      const data = {}
+      const object = userData || tempDate
+      for (const key in object) {
+        if (object.hasOwnProperty(key)) {
+          data[key] = JSON.stringify(object[key])
+        }
+      }
+      apiPostData(apiURL.resumeCreate, data).then((resp) => {
+        this.getResumeDetail()
+      })
+    },
+
+    /**
+     * 更新简历
+     */
+    updateResume () {
+      const data = {}
+      const object = this.tempResume
+      for (const key in object) {
+        if (object.hasOwnProperty(key)) {
+          if (object[key] !== JSON.stringify(this[key])) {
+            data[key] = object[key]
+          }
+        }
+      }
+
+      if (!Object.keys(data).length) {
+        return
+      }
+      apiPostData(apiURL.resumeUpdate, data).then((resp) => {
+        this.getResumeDetail()
+      })
+    },
+
+    /**
+     * 删除简历
+     */
+    deleteResume () {
+      this.$confirm({
+        title: '提示',
+        content: '删除后将无法找回，是否继续？',
+        confirm: () => {
+          this.$toast('删除中...', {
+            direction: 'middle',
+            duration: -1,
+            loading: true
+          })
+          apiPostData(apiURL.resumeDelete)
+            .then((resp) => {
+              this.$toast('删除成功', {
+                replace: true
+              })
+              this.getResumeDetail()
+            })
+            .catch(() => {
+              this.$toast('', {
+                duration: 0,
+                replace: true
+              })
+            })
+        }
+      })
+    }
   }
 }
 </script>
@@ -173,6 +424,11 @@ export default {
   box-sizing: border-box;
   padding: 1rem;
   font-size: 1.2rem;
+  color: #111111;
+
+  .line-height {
+    line-height: 1.8;
+  }
 
   section {
     margin-bottom: 3rem;
@@ -180,6 +436,7 @@ export default {
 
   .content {
     text-indent: 2em;
+    line-height: 1.5;
   }
   .content-padding {
     padding-left: 2em;
@@ -187,20 +444,57 @@ export default {
 
   h2 {
     margin: 1rem 0;
+    color: #333333;
   }
   h4 {
     margin: 0.5rem 0;
   }
+
+  .upload {
+    position: relative;
+    margin-top: 3rem;
+    input {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      display: inline-block;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+  }
+}
+
+.iconfont span[class^="icon"]::before {
+  color: #148acf;
+  margin-right: 0.3rem;
 }
 
 .personal-info {
-  align-items: center;
+  text-align: center;
+  line-height: 15rem;
   img {
-    width: 10rem;
-    height: 15rem;
+    display: inline-block;
+    vertical-align: middle;
+    width: 8rem;
+    height: 11rem;
+    border: 1px solid gray;
+    margin-right: 2rem;
   }
   .infos {
-    padding: 0 3rem;
+    display: inline-block;
+    vertical-align: middle;
+    span + span {
+      margin-left: 2rem;
+    }
+  }
+}
+
+.skill-job {
+  span {
+    font-weight: bold;
   }
 }
 
@@ -210,7 +504,8 @@ export default {
     width: 4rem;
     height: 4.45rem;
   }
-  span, img {
+  span,
+  img {
     display: inline-block;
     vertical-align: middle;
     margin-right: 1rem;
@@ -224,6 +519,18 @@ export default {
   .project {
     margin-bottom: 2rem;
     border-left: 2px solid steelblue;
+  }
+}
+
+.self-desc {
+  span {
+    font-size: initial;
+  }
+}
+
+.hobby {
+  a {
+    text-decoration: none;
   }
 }
 </style>

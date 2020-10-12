@@ -116,6 +116,12 @@ export const apiURL = {
   // 用户是否点赞诗词
   commentPraiseCheck: `${nodePreffix}/peotry/praise/check`,
 
+  // 简历API
+  resumeCreate: `${preffix}/v1/auth/resume/create`,
+  resumeDetail: `${preffix}/v1/auth/resume/detail`,
+  resumeUpdate: `${preffix}/v1/auth/resume/update`,
+  resumeDelete: `${preffix}/v1/auth/resume/delete`,
+
   // 微服务
   servicesUrl: `/napi/services`
 }
