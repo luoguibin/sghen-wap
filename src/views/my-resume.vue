@@ -224,6 +224,7 @@
               <textarea
                 v-model="experiences.content"
                 placeholder="工作经历总结"
+                sg-scroll
               ></textarea>
             </div>
           </template>
@@ -244,6 +245,7 @@
                   v-if="item_.type === 'textarea'"
                   v-model="item[item_.key]"
                   :placeholder="item_.placeholder"
+                  sg-scroll
                 ></textarea>
                 <input
                   v-else
@@ -266,6 +268,7 @@
                 v-if="item.type === 'textarea'"
                 v-model="descriptions[item.key]"
                 :placeholder="item.placeholder"
+                sg-scroll
               ></textarea>
               <input
                 v-else
