@@ -55,15 +55,17 @@
         class="sg-flex educations"
       >
         <h2>教育经历</h2>
-        <div
-          v-for="(item, index) in educations"
-          :key="index"
-          class="sg-flex-one education"
-        >
-          <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
-          <span>{{ item.collegeName }}</span>
-          <span>{{ item.major }}</span>
-          <span>{{ item.majorTime }}</span>
+        <div class="sg-flex-one">
+          <div
+            v-for="(item, index) in educations"
+            :key="index"
+            class="education"
+          >
+            <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
+            <span>{{ item.collegeName }}</span>
+            <span>{{ item.major }}</span>
+            <span>{{ item.majorTime }}</span>
+          </div>
         </div>
       </section>
 
@@ -179,6 +181,11 @@
               :key="index"
               class="input-items"
             >
+              <div class="input-items-header">
+                <sg-button type="text" @click="onDeleteLine(index)"
+                  >删除</sg-button
+                >
+              </div>
               <div
                 v-for="item_ in educationKeys"
                 :key="item_.key"
@@ -197,6 +204,9 @@
                   :placeholder="item_.placeholder"
                 />
               </div>
+              <div style="margin-bottom: 2rem">
+                <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+              </div>
             </div>
           </template>
 
@@ -206,6 +216,11 @@
               :key="index"
               class="input-items"
             >
+              <div class="input-items-header">
+                <sg-button type="text" @click="onDeleteLine(index)"
+                  >删除</sg-button
+                >
+              </div>
               <div
                 v-for="item_ in experienceKeys"
                 :key="item_.key"
@@ -218,7 +233,9 @@
                 />
               </div>
             </div>
-            <div style="margin-bottom: 2rem;"><sg-button type="text">添加一段</sg-button></div>
+            <div style="margin-bottom: 2rem">
+              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+            </div>
             <div class="input-item">
               <span>总结:</span>
               <textarea
@@ -235,6 +252,11 @@
               :key="index"
               class="input-items"
             >
+              <div class="input-items-header">
+                <sg-button type="text" @click="onDeleteLine(index)"
+                  >删除</sg-button
+                >
+              </div>
               <div
                 v-for="item_ in projectKeys"
                 :key="item_.key"
@@ -254,7 +276,9 @@
                 />
               </div>
             </div>
-            <div><sg-button type="text">添加一段</sg-button></div>
+            <div>
+              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+            </div>
           </template>
 
           <template v-else-if="editItemType === 'descriptions'">
@@ -284,6 +308,11 @@
               :key="index"
               class="input-items"
             >
+              <div class="input-items-header">
+                <sg-button type="text" @click="onDeleteLine(index)"
+                  >删除</sg-button
+                >
+              </div>
               <div
                 v-for="item_ in hobbyKeys"
                 :key="item_.key"
@@ -296,7 +325,9 @@
                 />
               </div>
             </div>
-            <div><sg-button type="text">添加一段</sg-button></div>
+            <div>
+              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+            </div>
           </template>
 
           <sg-button type="primary" style="margin-top: 2rem" @click="onSave"
@@ -569,6 +600,59 @@ export default {
           })
       })
     },
+    /**
+     * 添加数据行
+     */
+    onAddLine () {
+      switch (this.editItemType) {
+        case 'educations':
+          this.educations.push({
+            collegeName: '',
+            major: '',
+            majorTime: ''
+          })
+          break
+        case 'experiences':
+          this.experiences.items.push({
+            companyName: '',
+            jobName: '',
+            workTime: ''
+          })
+          break
+        case 'projects':
+          this.projects.push({
+            name: '',
+            time: '',
+            content: ''
+          })
+          break
+        case 'hobby':
+          this.hobby.push({
+            content: '',
+            siteUrl: ''
+          })
+          break
+      }
+    },
+    /**
+     * 删除数据行
+     */
+    onDeleteLine (index) {
+      switch (this.editItemType) {
+        case 'educations':
+          this.educations.splice(index, 1)
+          break
+        case 'experiences':
+          this.experiences.items.splice(index, 1)
+          break
+        case 'projects':
+          this.projects.splice(index, 1)
+          break
+        case 'hobby':
+          this.hobby.splice(index, 1)
+          break
+      }
+    },
     onSave () {
       this.editItemType = ''
       this.updateResume()
@@ -835,9 +919,17 @@ export default {
 .resume-edit {
   .input-items {
     padding-left: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
     border-left: 2px solid steelblue;
     box-sizing: border-box;
+  }
+  .input-items-header {
+    text-align: right;
+    margin-bottom: 0.5rem;
+    background-color: rgba(70, 131, 180, 0.2);
+    .sg-button {
+      padding: 0.2rem 0.5rem
+    }
   }
   .input-item {
     display: flex;
