@@ -7,13 +7,13 @@
         item-type="personalInfos"
         class="personal-info"
       >
-        <img :src="personalInfos.avatarUrl" alt="个人头像" />
+        <img :src="personalInfos.avatarUrl | imgSrcFilter" alt="个人头像" />
         <div class="infos">
           <div class="line-height">
             <span>
               <strong>{{ personalInfos.userName }}</strong>
             </span>
-            <span class="icon-male">{{ personalInfos.gender }}</span>
+            <span :class="genderClass">{{ personalInfos.gender }}</span>
           </div>
           <div class="line-height">
             <span>{{ personalInfos.age }}</span>
@@ -26,23 +26,6 @@
               personalInfos.mobilePhone
             }}</span>
           </div>
-        </div>
-
-        <!-- 编辑模块信息 -->
-        <div v-if="editItemType" class="sg-mask">
-          <!-- <div>
-            <sg-button type="text" @click="onSelectAvatar">上传头像</sg-button>
-          </div>
-          <div>
-            <span>姓名:</span><input v-model="personalInfos.userName"/>
-          </div>
-          <div>
-            <span>性别:</span><input v-model="personalInfos.gender"/>
-          </div>
-          <div>
-            <span>性别:</span><input v-model="personalInfos.gender"/>
-          </div> -->
-          <sg-button @click="onSave">保存</sg-button>
         </div>
       </section>
 
@@ -77,7 +60,7 @@
           :key="index"
           class="sg-flex-one education"
         >
-          <img v-if="item.logoUrl" :src="item.logoUrl" />
+          <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
           <span>{{ item.collegeName }}</span>
           <span>{{ item.major }}</span>
           <span>{{ item.majorTime }}</span>
@@ -123,7 +106,7 @@
 
           <div>
             <p
-              v-for="(item_, index_) in item.contents"
+              v-for="(item_, index_) in item.content.split('\n')"
               :key="index_"
               class="content"
             >
@@ -148,6 +131,194 @@
         <h2><span class="icon-hobby"></span>个人兴趣</h2>
         <div v-html="hobbyHTML"></div>
       </section>
+
+      <!-- 编辑模块信息 -->
+      <div v-if="editItemType" class="sg-mask">
+        <div class="scroll-wrapper resume-edit" sg-scroll>
+          <template v-if="editItemType === 'personalInfos'">
+            <div
+              v-for="item in personalInfoKeys"
+              :key="item.key"
+              class="input-item"
+            >
+              <span>{{ item.label }}:</span>
+              <div v-if="item.type === 'image'">
+                <img
+                  :src="personalInfos[item.key] | imgSrcFilter"
+                  alt="个人头像"
+                />
+                <sg-button type="text" @click="onSelectImage(-1)"
+                  >上传{{ item.label }}</sg-button
+                >
+              </div>
+              <input
+                v-else
+                v-model="personalInfos[item.key]"
+                :placeholder="item.placeholder"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="editItemType === 'skillJob'">
+            <div
+              v-for="item in skillJobKeys"
+              :key="item.key"
+              class="input-item"
+            >
+              <span>{{ item.label }}:</span>
+              <input
+                v-model="skillJob[item.key]"
+                :placeholder="item.placeholder"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="editItemType === 'educations'">
+            <div
+              v-for="(item, index) in educations"
+              :key="index"
+              class="input-items"
+            >
+              <div
+                v-for="item_ in educationKeys"
+                :key="item_.key"
+                class="input-item"
+              >
+                <span>{{ item_.label }}:</span>
+                <div v-if="item_.type === 'image'">
+                  <img :src="item[item_.key] | imgSrcFilter" alt="图片" />
+                  <sg-button type="text" @click="onSelectImage(index)"
+                    >上传{{ item_.label }}</sg-button
+                  >
+                </div>
+                <input
+                  v-else
+                  v-model="item[item_.key]"
+                  :placeholder="item_.placeholder"
+                />
+              </div>
+            </div>
+          </template>
+
+          <template v-else-if="editItemType === 'experiences'">
+            <div
+              v-for="(item, index) in experiences.items"
+              :key="index"
+              class="input-items"
+            >
+              <div
+                v-for="item_ in experienceKeys"
+                :key="item_.key"
+                class="input-item"
+              >
+                <span>{{ item_.label }}:</span>
+                <input
+                  v-model="item[item_.key]"
+                  :placeholder="item_.placeholder"
+                />
+              </div>
+            </div>
+            <div style="margin-bottom: 2rem;"><sg-button type="text">添加一段</sg-button></div>
+            <div class="input-item">
+              <span>总结:</span>
+              <textarea
+                v-model="experiences.content"
+                placeholder="工作经历总结"
+              ></textarea>
+            </div>
+          </template>
+
+          <template v-else-if="editItemType === 'projects'">
+            <div
+              v-for="(item, index) in projects"
+              :key="index"
+              class="input-items"
+            >
+              <div
+                v-for="item_ in projectKeys"
+                :key="item_.key"
+                class="input-item"
+              >
+                <span>{{ item_.label }}:</span>
+                <textarea
+                  v-if="item_.type === 'textarea'"
+                  v-model="item[item_.key]"
+                  :placeholder="item_.placeholder"
+                ></textarea>
+                <input
+                  v-else
+                  v-model="item[item_.key]"
+                  :placeholder="item_.placeholder"
+                />
+              </div>
+            </div>
+            <div><sg-button type="text">添加一段</sg-button></div>
+          </template>
+
+          <template v-else-if="editItemType === 'descriptions'">
+            <div
+              v-for="item in descriptionKeys"
+              :key="item.key"
+              class="input-item"
+            >
+              <span>{{ item.label }}:</span>
+              <textarea
+                v-if="item.type === 'textarea'"
+                v-model="descriptions[item.key]"
+                :placeholder="item.placeholder"
+              ></textarea>
+              <input
+                v-else
+                v-model="descriptions[item.key]"
+                :placeholder="item.placeholder"
+              />
+            </div>
+          </template>
+
+          <template v-else-if="editItemType === 'hobby'">
+            <div
+              v-for="(item, index) in hobby"
+              :key="index"
+              class="input-items"
+            >
+              <div
+                v-for="item_ in hobbyKeys"
+                :key="item_.key"
+                class="input-item"
+              >
+                <span>{{ item_.label }}:</span>
+                <input
+                  v-model="item[item_.key]"
+                  :placeholder="item_.placeholder"
+                />
+              </div>
+            </div>
+            <div><sg-button type="text">添加一段</sg-button></div>
+          </template>
+
+          <sg-button type="primary" style="margin-top: 2rem" @click="onSave"
+            >保存</sg-button
+          >
+          <sg-button style="margin-top: 1rem" @click="onCancel">取消</sg-button>
+        </div>
+      </div>
+
+      <!-- 图片选择、编辑上传 -->
+      <div v-if="editItemType && imageEditorVisible" class="sg-mask">
+        <image-editor ref="imageEditor" :autoOpen="true"></image-editor>
+        <sg-button
+          type="text"
+          style="position: absolute; top: 0; left: 0; padding: 0.5rem 1rem"
+          @click="imageEditorVisible = false"
+          >取消</sg-button
+        >
+        <sg-button
+          type="text"
+          style="position: absolute; top: 0; right: 0; padding: 0.5rem 1rem"
+          @click="onUploadImage"
+          >上传</sg-button
+        >
+      </div>
     </template>
 
     <template v-else>
@@ -165,6 +336,7 @@
 <script>
 import { apiURL, apiGetData, apiPostData, apiPostUpload } from '@/api'
 import { getItemTypeObj } from '@/utils/dom'
+import { base64ToFile } from '@/common/image'
 
 const tempDate = {
   personalInfos: {
@@ -204,7 +376,7 @@ const tempDate = {
     {
       name: '项目名字',
       time: '项目时间',
-      contents: ['项目简介、概要', '主要负责内容']
+      content: '项目简介、概要\n主要负责内容'
     }
   ],
   descriptions: {
@@ -218,8 +390,17 @@ const tempDate = {
   ]
 }
 
+/**
+ * TODO:
+ * 1、在线编辑
+ * 2、时效共享
+ */
 export default {
   name: 'MyResume',
+
+  components: {
+    ImageEditor: () => import('@/components/image-editor')
+  },
 
   data () {
     return {
@@ -232,8 +413,50 @@ export default {
         'descriptions',
         'hobby'
       ]),
+      personalInfoKeys: Object.freeze([
+        { key: 'avatarUrl', label: '头像', type: 'image' },
+        { key: 'userName', label: '姓名' },
+        { key: 'gender', label: '性别', placeholder: '男、女' },
+        { key: 'age', label: '年龄' },
+        { key: 'nation', label: '民族' },
+        { key: 'nativePlace', label: '籍贯' },
+        { key: 'workYear', label: '工龄' },
+        { key: 'mobilePhone', label: '手机' }
+      ]),
+      skillJobKeys: Object.freeze([
+        { key: 'jobName', label: '职能岗位' },
+        { key: 'workPlace', label: '工作地点' },
+        { key: 'masterSkill', label: '掌握技能' },
+        { key: 'knowSkill', label: '了解技能' }
+      ]),
+      educationKeys: Object.freeze([
+        { key: 'logoUrl', label: '图标', type: 'image' },
+        { key: 'collegeName', label: '校名' },
+        { key: 'major', label: '专业' },
+        { key: 'majorTime', label: '时间' }
+      ]),
+      experienceKeys: Object.freeze([
+        { key: 'companyName', label: '公司' },
+        { key: 'jobName', label: '职位' },
+        { key: 'workTime', label: '时间' }
+      ]),
+      projectKeys: Object.freeze([
+        { key: 'name', label: '项目名字' },
+        { key: 'time', label: '项目时长' },
+        { key: 'content', label: '项目内容', type: 'textarea' }
+      ]),
+      descriptionKeys: Object.freeze([
+        { key: 'keywords', label: '关键词' },
+        { key: 'content', label: '自描述', type: 'textarea' }
+      ]),
+      hobbyKeys: Object.freeze([
+        { key: 'content', label: '标签' },
+        { key: 'siteUrl', label: '链接' }
+      ]),
       // tempResume: {},
       editItemType: '',
+
+      imageEditorVisible: false,
 
       resumeId: 0,
       personalInfos: null,
@@ -259,14 +482,32 @@ export default {
         return i < 3 || i >= lastIndex
       })
     },
+    /**
+     * 兴趣html
+     */
     hobbyHTML () {
       /** @type{Array} */
       const items = this.hobby || []
       return items
         .map((o) => {
-          return o.href ? `<a href="${o.href}">${o.content}</a>` : o.content
+          return o.siteUrl
+            ? `<a href="${o.siteUrl}">${o.content}</a>`
+            : o.content
         })
         .join('、')
+    },
+    /**
+     * 性别icon类
+     */
+    genderClass () {
+      const { gender } = this.personalInfos || {}
+      if (gender === '男') {
+        return ['icon-male ']
+      } else if (gender === '女') {
+        return ['icon-female']
+      } else {
+        return []
+      }
     }
   },
 
@@ -281,18 +522,74 @@ export default {
      */
     onClick (e) {
       const nowTime = Date.now()
-      if (!this.clickTime || this.editItemType) {
+      if (this.editItemType) {
+        return
+      }
+      if (!this.clickTime) {
         this.clickTime = nowTime
         return
       }
-      if (nowTime - this.clickTime < 300 * 1000) {
+      if (nowTime - this.clickTime < 300) {
         const { itemType } = getItemTypeObj(e.target) || {}
         this.editItemType = itemType || ''
       }
       this.clickTime = nowTime
     },
+    /**
+     * 上传图片
+     */
+    onUploadImage () {
+      if (this.isImageUploading) {
+        return
+      }
+      this.isImageUploading = true
+      this.$refs.imageEditor.getImage((base64) => {
+        const formData = new FormData()
+        formData.append(
+          'file',
+          base64ToFile(base64, `resume-${this.resumeId}-avatar.png`)
+        )
+        const pathType =
+          this.editItemType === 'personalInfos' ? 'icon' : 'normal'
+        apiPostUpload(apiURL.upload, formData, { pathType })
+          .then((resp) => {
+            const url = resp.data[0]
+            if (this.editItemType === 'personalInfos') {
+              this.personalInfos.avatarUrl = url
+            } else if (this.editItemType === 'educations') {
+              this.educations[0].logoUrl = url
+            }
+          })
+          .finally(() => {
+            this.imageEditorVisible = false
+            this.isImageUploading = false
+          })
+      })
+    },
     onSave () {
       this.editItemType = ''
+      this.updateResume()
+    },
+    onCancel () {
+      this.setResumeData(this.tempResume)
+      this.editItemType = ''
+    },
+
+    onSelectImage (index) {
+      this.imageEditorVisible = true
+    },
+
+    setResumeData (data = {}) {
+      this.tempKeys.forEach((key) => {
+        if (data[key]) {
+          try {
+            this[key] = JSON.parse(data[key])
+            this.tempResume[key] = data[key]
+          } catch (error) {
+            this[key] = null
+          }
+        }
+      })
     },
 
     /**
@@ -305,16 +602,7 @@ export default {
         .then((resp) => {
           const data = resp.data
           this.resumeId = data.id || 0
-          this.tempKeys.forEach((key) => {
-            if (data[key]) {
-              try {
-                this[key] = JSON.parse(data[key])
-                this.tempResume[key] = data[key]
-              } catch (error) {
-                this[key] = null
-              }
-            }
-          })
+          this.setResumeData(data)
         })
         .catch(() => {
           this.resumeId = 0
@@ -370,8 +658,9 @@ export default {
       const object = this.tempResume
       for (const key in object) {
         if (object.hasOwnProperty(key)) {
-          if (object[key] !== JSON.stringify(this[key])) {
-            data[key] = object[key]
+          const tempStr = JSON.stringify(this[key])
+          if (object[key] !== tempStr) {
+            data[key] = tempStr
           }
         }
       }
@@ -450,6 +739,13 @@ export default {
     margin: 0.5rem 0;
   }
 
+  .scroll-wrapper {
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
   .upload {
     position: relative;
     margin-top: 3rem;
@@ -479,8 +775,7 @@ export default {
     display: inline-block;
     vertical-align: middle;
     width: 8rem;
-    height: 11rem;
-    border: 1px solid gray;
+    // border: 1px solid gray;
     margin-right: 2rem;
   }
   .infos {
@@ -531,6 +826,45 @@ export default {
 .hobby {
   a {
     text-decoration: none;
+  }
+}
+
+.resume-edit {
+  .input-items {
+    padding-left: 1rem;
+    margin-bottom: 2rem;
+    border-left: 2px solid steelblue;
+    box-sizing: border-box;
+  }
+  .input-item {
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 1rem;
+    align-items: center;
+    span {
+      display: inline-block;
+      padding-right: 1rem;
+      color: white;
+    }
+    img {
+      max-width: 3rem;
+      vertical-align: middle;
+    }
+    > div,
+    input,
+    textarea {
+      display: inline-block;
+      flex: 1;
+      width: 100%;
+      padding: 0.5rem;
+      box-sizing: border-box;
+      font-size: 1.2rem;
+      line-height: 1.5;
+    }
+    textarea {
+      height: 12rem;
+      resize: none;
+    }
   }
 }
 </style>
