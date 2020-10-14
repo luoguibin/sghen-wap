@@ -49,42 +49,38 @@
       </section>
 
       <!-- 教育经历 -->
-      <section
-        v-if="educations"
-        item-type="educations"
-        class="sg-flex educations"
-      >
+      <section v-if="educations" item-type="educations" class="educations">
         <h2>教育经历</h2>
-        <div class="sg-flex-one">
-          <div
-            v-for="(item, index) in educations"
-            :key="index"
-            class="education"
-          >
-            <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
+        <div v-for="(item, index) in educations" :key="index" class="education sg-flex">
+          <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
+          <div class="sg-flex-one">
             <span>{{ item.collegeName }}</span>
-            <span>{{ item.major }}</span>
-            <span>{{ item.majorTime }}</span>
+            <span class="major">
+              <span>{{ item.major }}</span>
+              <span>{{ item.majorTime }}</span>
+            </span>
           </div>
         </div>
       </section>
 
       <!-- 工作经历  -->
-      <section v-if="experiences" item-type="experiences">
+      <section v-if="experiences" item-type="experiences" class="experiences">
         <h2>工作经历</h2>
         <div
           v-for="(item, index) in experiences.items"
           :key="index"
-          class="sg-flex content-padding line-height"
+          class="sg-flex content-padding line-height experience"
         >
-          <div class="sg-flex-two">
+          <div class="sg-flex-one">
             <strong>{{ item.companyName }}</strong>
           </div>
-          <div class="sg-flex-one">{{ item.jobName }}</div>
-          <div class="sg-flex-one">{{ item.workTime }}</div>
+          <div class="sg-flex-one job-infos">
+            <span>{{ item.jobName }}</span>
+            <span>{{ item.workTime }}</span>
+          </div>
         </div>
 
-        <p class="content" style="margin-top: 2rem">
+        <p class="content" style="margin-top: 1rem;">
           {{ experiences.content }}
         </p>
       </section>
@@ -893,7 +889,18 @@ export default {
     margin-right: 1rem;
   }
   .education {
-    padding: 0 2rem;
+    padding: 0 0 0 2rem;
+    margin-bottom: 1.6rem;
+    align-items: center;
+  }
+}
+
+.experiences {
+  .job-infos {
+    text-align: right;
+    span:last-child {
+      margin-left: 2rem;
+    }
   }
 }
 
@@ -928,7 +935,7 @@ export default {
     margin-bottom: 0.5rem;
     background-color: rgba(70, 131, 180, 0.2);
     .sg-button {
-      padding: 0.2rem 0.5rem
+      padding: 0.2rem 0.5rem;
     }
   }
   .input-item {
@@ -959,6 +966,45 @@ export default {
     textarea {
       height: 12rem;
       resize: none;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .personal-info {
+    img {
+      display: block;
+      margin: 0 auto;
+    }
+    .infos {
+      display: block;
+      margin-top: 2rem;
+    }
+  }
+  .skill-job {
+    .sg-flex {
+      flex-direction: column;
+    }
+  }
+  .educations {
+    .major {
+      display: block;
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .experiences {
+    .experience {
+      margin-bottom: 1rem;
+      border-left: 2px solid steelblue;
+    }
+    .sg-flex {
+      flex-direction: column;
+    }
+    .job-infos {
+      text-align: left;
     }
   }
 }
