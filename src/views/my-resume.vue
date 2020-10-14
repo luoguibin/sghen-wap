@@ -69,7 +69,7 @@
         <div
           v-for="(item, index) in experiences.items"
           :key="index"
-          class="sg-flex content-padding line-height experience"
+          class="sg-flex line-height experience"
         >
           <div class="sg-flex-one">
             <strong>{{ item.companyName }}</strong>
@@ -91,7 +91,7 @@
         <div
           v-for="item in latestProjects"
           :key="item.id"
-          class="project content-padding"
+          class="project"
         >
           <div class="sg-flex">
             <h4 class="sg-flex-one">
@@ -810,16 +810,13 @@ export default {
     text-indent: 2em;
     line-height: 1.5;
   }
-  .content-padding {
-    padding-left: 2em;
-  }
 
   h2 {
     margin: 1rem 0;
     color: #333333;
   }
   h4 {
-    margin: 0.5rem 0;
+    margin: 0;
   }
 
   .scroll-wrapper {
@@ -889,7 +886,6 @@ export default {
     margin-right: 1rem;
   }
   .education {
-    padding: 0 0 0 2rem;
     margin-bottom: 1.6rem;
     align-items: center;
   }
@@ -906,8 +902,24 @@ export default {
 
 .projects {
   .project {
+    position: relative;
+    padding-left: 1rem;
     margin-bottom: 2rem;
-    border-left: 2px solid steelblue;
+    border-left: 0.2rem solid steelblue;
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 0.4rem;
+      border-radius: 50%;
+      transform: translate(-0.5rem, 0);
+      background-color: steelblue;
+    }
+    .sg-flex {
+      margin: 0rem 0 0.5rem 0;
+      align-items: center;
+    }
   }
 }
 
@@ -927,7 +939,7 @@ export default {
   .input-items {
     padding-left: 1rem;
     margin-bottom: 3rem;
-    border-left: 2px solid steelblue;
+    border-left: 0.2rem solid steelblue;
     box-sizing: border-box;
   }
   .input-items-header {
@@ -990,6 +1002,10 @@ export default {
     .major {
       display: block;
       margin-top: 0.5rem;
+      margin-right: 0;
+      span:last-child {
+        margin-right: 0;
+      }
     }
   }
 }
@@ -997,8 +1013,9 @@ export default {
 @media screen and (max-width: 700px) {
   .experiences {
     .experience {
+      padding-left: 1rem;
       margin-bottom: 1rem;
-      border-left: 2px solid steelblue;
+      border-left: 0.2rem solid steelblue;
     }
     .sg-flex {
       flex-direction: column;
