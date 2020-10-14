@@ -1,13 +1,13 @@
 <template>
   <div class="my-resume iconfont" sg-scroll @click="onClick">
-    <template v-if="resumeId">
+    <template v-if="resumeId > 0">
       <!-- 个人基本信息 -->
       <section
         v-if="personalInfos"
         item-type="personalInfos"
         class="personal-info"
       >
-        <img :src="personalInfos.avatarUrl | imgSrcFilter" alt="个人头像" />
+        <img item-type="resume-print" :src="personalInfos.avatarUrl | imgSrcFilter" alt="个人头像" />
         <div class="infos">
           <div class="line-height">
             <span>
@@ -351,7 +351,7 @@
       </div>
     </template>
 
-    <template v-else>
+    <template v-else-if="resumeId === 0">
       <sg-button @click="createResume()" type="primary"
         >自动创建简历模板</sg-button
       >
@@ -485,10 +485,9 @@ export default {
       ]),
       // tempResume: {},
       editItemType: '',
-
       imageEditorVisible: false,
 
-      resumeId: 0,
+      resumeId: -1,
       personalInfos: null,
       skillJob: null,
       educations: null,
@@ -548,6 +547,21 @@ export default {
 
   methods: {
     /**
+     * 临时页面打印方法
+     */
+    onPrint () {
+      const el = this.$el
+      el.style.height = 'initial'
+      const parentEl = el.parentElement
+      parentEl.style.display = 'none'
+      this.$el.remove()
+      document.body.append(el)
+      window.print()
+      parentEl.style.display = ''
+      el.style.height = ''
+      parentEl.append(el)
+    },
+    /**
      * 界面点击事件
      */
     onClick (e) {
@@ -561,7 +575,11 @@ export default {
       }
       if (nowTime - this.clickTime < 300) {
         const { itemType } = getItemTypeObj(e.target) || {}
-        this.editItemType = itemType || ''
+        if (itemType === 'resume-print') {
+          this.onPrint()
+        } else {
+          this.editItemType = itemType || ''
+        }
       }
       this.clickTime = nowTime
     },
