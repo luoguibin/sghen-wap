@@ -71,6 +71,7 @@
           :key="index"
           class="sg-flex line-height experience"
         >
+          <div class="left-border"></div>
           <div class="sg-flex-one">
             <strong>{{ item.companyName }}</strong>
           </div>
@@ -93,6 +94,8 @@
           :key="item.id"
           class="project"
         >
+          <div class="left-dot"></div>
+          <div class="left-border"></div>
           <div class="sg-flex">
             <h4 class="sg-flex-one">
               {{ item.name }}
@@ -551,14 +554,17 @@ export default {
      */
     onPrint () {
       const el = this.$el
-      el.style.height = 'initial'
+      const elStyle = el.style
+      elStyle.height = 'initial'
+      elStyle.padding = '0'
       const parentEl = el.parentElement
       parentEl.style.display = 'none'
       this.$el.remove()
       document.body.append(el)
       window.print()
       parentEl.style.display = ''
-      el.style.height = ''
+      elStyle.height = ''
+      elStyle.padding = ''
       parentEl.append(el)
     },
     /**
@@ -821,7 +827,7 @@ export default {
   }
 
   section {
-    margin-bottom: 3rem;
+    margin-bottom: 3.5rem;
   }
 
   .content {
@@ -859,10 +865,28 @@ export default {
       opacity: 0;
     }
   }
+
+  .left-border {
+    position: absolute;
+    left: 2.5px;
+    top: 0.2rem;
+    bottom: 0.2rem;
+    width: 2px;
+    background-color: steelblue;
+  }
+  .left-dot {
+    position: absolute;
+    left: 0;
+    top: 0.2rem;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: steelblue;
+  }
 }
 
 .iconfont span[class^="icon"]::before {
-  color: #148acf;
+  color: steelblue;
   margin-right: 0.3rem;
 }
 
@@ -910,6 +934,12 @@ export default {
 }
 
 .experiences {
+  .experience {
+    position: relative;
+    .left-border {
+      display: none;
+    }
+  }
   .job-infos {
     text-align: right;
     span:last-child {
@@ -922,18 +952,7 @@ export default {
   .project {
     position: relative;
     padding-left: 1rem;
-    margin-bottom: 2rem;
-    border-left: 0.2rem solid steelblue;
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0;
-      padding: 0.4rem;
-      border-radius: 50%;
-      transform: translate(-0.5rem, 0);
-      background-color: steelblue;
-    }
+    margin-bottom: 2.55rem;
     .sg-flex {
       margin: 0rem 0 0.5rem 0;
       align-items: center;
@@ -957,7 +976,6 @@ export default {
   .input-items {
     padding-left: 1rem;
     margin-bottom: 3rem;
-    border-left: 0.2rem solid steelblue;
     box-sizing: border-box;
   }
   .input-items-header {
@@ -1033,7 +1051,9 @@ export default {
     .experience {
       padding-left: 1rem;
       margin-bottom: 1rem;
-      border-left: 0.2rem solid steelblue;
+      .left-border {
+        display: initial;
+      }
     }
     .sg-flex {
       flex-direction: column;
