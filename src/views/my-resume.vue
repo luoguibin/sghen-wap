@@ -7,7 +7,11 @@
         item-type="personalInfos"
         class="personal-info"
       >
-        <img item-type="resume-print" :src="personalInfos.avatarUrl | imgSrcFilter" alt="个人头像" />
+        <img
+          item-type="resume-print"
+          :src="personalInfos.avatarUrl | imgSrcFilter"
+          alt="个人头像"
+        />
         <div class="infos">
           <div class="line-height">
             <span>
@@ -40,18 +44,38 @@
             <span>城市：</span>{{ skillJob.workPlace }}
           </div>
         </div>
-        <div class="line-height">
-          <span>掌握：</span>{{ skillJob.masterSkill }}
+        <div style="margin-top: 1rem;">
+          <span>掌握技能：</span>
+          <p
+            v-for="(item, index) in skillJob.masterSkill.split('\n')"
+            :key="index"
+            class="content"
+          >
+            {{ item }}
+          </p>
+          <!-- {{ skillJob.masterSkill }} -->
         </div>
-        <div class="line-height">
-          <span>了解：</span>{{ skillJob.knowSkill }}
+        <div  style="margin-top: 1rem;">
+          <span>一般技能：</span>
+          <p
+            v-for="(item, index) in skillJob.knowSkill.split('\n')"
+            :key="index"
+            class="content"
+          >
+            {{ item }}
+          </p>
+          <!-- {{ skillJob.knowSkill }} -->
         </div>
       </section>
 
       <!-- 教育经历 -->
       <section v-if="educations" item-type="educations" class="educations">
         <h2>教育经历</h2>
-        <div v-for="(item, index) in educations" :key="index" class="education sg-flex">
+        <div
+          v-for="(item, index) in educations"
+          :key="index"
+          class="education sg-flex"
+        >
           <img v-if="item.logoUrl" :src="item.logoUrl | imgSrcFilter" />
           <div class="sg-flex-one">
             <span>{{ item.collegeName }}</span>
@@ -81,7 +105,7 @@
           </div>
         </div>
 
-        <p class="content" style="margin-top: 1rem;">
+        <p v-if="experiences.content" class="content" style="margin-top: 1rem">
           {{ experiences.content }}
         </p>
       </section>
@@ -89,11 +113,7 @@
       <!-- 项目经验  -->
       <section class="projects" item-type="projects">
         <h2><span class="icon-project"></span>项目经验</h2>
-        <div
-          v-for="item in latestProjects"
-          :key="item.id"
-          class="project"
-        >
+        <div v-for="item in latestProjects" :key="item.id" class="project">
           <div class="left-dot"></div>
           <div class="left-border"></div>
           <div class="sg-flex">
@@ -167,7 +187,13 @@
               class="input-item"
             >
               <span>{{ item.label }}:</span>
+              <textarea
+                v-if="item.type === 'textarea'"
+                v-model="skillJob[item.key]"
+                sg-scroll
+              ></textarea>
               <input
+                v-else
                 v-model="skillJob[item.key]"
                 :placeholder="item.placeholder"
               />
@@ -459,8 +485,8 @@ export default {
       skillJobKeys: Object.freeze([
         { key: 'jobName', label: '职能岗位' },
         { key: 'workPlace', label: '工作地点' },
-        { key: 'masterSkill', label: '掌握技能' },
-        { key: 'knowSkill', label: '了解技能' }
+        { key: 'masterSkill', label: '掌握技能', type: 'textarea' },
+        { key: 'knowSkill', label: '了解技能', type: 'textarea' }
       ]),
       educationKeys: Object.freeze([
         { key: 'logoUrl', label: '图标', type: 'image' },
