@@ -230,7 +230,7 @@
                 />
               </div>
               <div style="margin-bottom: 2rem">
-                <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+                <sg-button type="text" @click="onAddLine(-1)">添加一段</sg-button>
               </div>
             </div>
           </template>
@@ -259,7 +259,7 @@
               </div>
             </div>
             <div style="margin-bottom: 2rem">
-              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+              <sg-button type="text" @click="onAddLine(-1)">添加一段</sg-button>
             </div>
             <div class="input-item">
               <span>总结:</span>
@@ -272,6 +272,9 @@
           </template>
 
           <template v-else-if="editItemType === 'projects'">
+            <div style="margin-bottom: 2rem">
+              <sg-button type="text" @click="onAddLine(0)">添加一段</sg-button>
+            </div>
             <div
               v-for="(item, index) in projects"
               :key="index"
@@ -302,7 +305,7 @@
               </div>
             </div>
             <div>
-              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+              <sg-button type="text" @click="onAddLine(-1)">添加一段</sg-button>
             </div>
           </template>
 
@@ -351,7 +354,7 @@
               </div>
             </div>
             <div>
-              <sg-button type="text" @click="onAddLine">添加一段</sg-button>
+              <sg-button type="text" @click="onAddLine(-1)">添加一段</sg-button>
             </div>
           </template>
 
@@ -649,10 +652,10 @@ export default {
     /**
      * 添加数据行
      */
-    onAddLine () {
+    onAddLine (index) {
       switch (this.editItemType) {
         case 'educations':
-          this.educations.push({
+          this.educations.unshift({
             collegeName: '',
             major: '',
             majorTime: ''
@@ -666,11 +669,19 @@ export default {
           })
           break
         case 'projects':
-          this.projects.push({
-            name: '',
-            time: '',
-            content: ''
-          })
+          if (index < 0) {
+            this.projects.push({
+              name: '',
+              time: '',
+              content: ''
+            })
+          } else {
+            this.projects.unshift({
+              name: '',
+              time: '',
+              content: ''
+            })
+          }
           break
         case 'hobby':
           this.hobby.push({
