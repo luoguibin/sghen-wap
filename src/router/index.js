@@ -47,7 +47,7 @@ const routes = [
     name: 'myResume',
     component: () => import(/* webpackChunkName: 'my-resume' */'@/views/my-resume'),
     meta: {
-      auth: true
+      auth: false
     }
   },
   {

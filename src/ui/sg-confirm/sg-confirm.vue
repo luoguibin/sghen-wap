@@ -1,6 +1,6 @@
 <template>
   <transition name="confirm">
-    <div class="sg-mask" v-show="visible">
+    <div :class="['sg-mask', className || '']" v-show="visible">
       <div :class="{'sg-confirm': true, 'no-title': !title }">
         <div v-show="title" class="title">{{title}}</div>
         <div class="content">
@@ -29,6 +29,7 @@ export default {
   data () {
     return {
       visible: false,
+      className: '',
       cancelVisible: true,
       title: '',
       content: '',
@@ -42,6 +43,7 @@ export default {
 
   methods: {
     show (params = {}) {
+      this.className = params.className || ''
       this.title = params.title
       this.type = params.type
       this.content = params.content

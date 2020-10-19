@@ -1,5 +1,20 @@
 <template>
   <div class="my-resume iconfont" sg-scroll @click="onClick">
+    <sg-header @back="$router.go(-1)" ref="sgHeader">
+      个人简历<template v-if="shareCode">（来自分享）</template>
+      <template slot="right">
+        <sg-dropdown
+          v-show="resumeId > 0"
+          :options="dropdownOptions"
+          @change="handleDropdown"
+          :pointerVisible="false"
+          :optionActive="false"
+        >
+          <span class="icon-checkmore"></span>
+        </sg-dropdown>
+      </template>
+    </sg-header>
+
     <template v-if="resumeId > 0">
       <!-- 个人基本信息 -->
       <section
@@ -44,7 +59,7 @@
             <span>城市：</span>{{ skillJob.workPlace }}
           </div>
         </div>
-        <div style="margin-top: 1rem;">
+        <div style="margin-top: 1rem">
           <span>掌握技能：</span>
           <p
             v-for="(item, index) in skillJob.masterSkill.split('\n')"
@@ -55,7 +70,7 @@
           </p>
           <!-- {{ skillJob.masterSkill }} -->
         </div>
-        <div  style="margin-top: 1rem;">
+        <div style="margin-top: 1rem">
           <span>一般技能：</span>
           <p
             v-for="(item, index) in skillJob.knowSkill.split('\n')"
@@ -230,7 +245,9 @@
                 />
               </div>
               <div style="margin-bottom: 2rem">
-                <sg-button type="text" @click="onAddLine(-1)">添加一段</sg-button>
+                <sg-button type="text" @click="onAddLine(-1)"
+                  >添加一段</sg-button
+                >
               </div>
             </div>
           </template>
@@ -383,11 +400,11 @@
       </div>
     </template>
 
-    <template v-else-if="resumeId === 0">
-      <sg-button @click="createResume()" type="primary"
+    <template v-else-if="resumeId === 0 && !shareCode">
+      <sg-button style="margin-top: 5rem" @click="createResume()" type="primary"
         >自动创建简历模板</sg-button
       >
-      <sg-button class="upload">
+      <sg-button class="upload" v-show="false">
         上传模板创建简历
         <input type="file" accept=".txt,.json" @change="handleFileChange" />
       </sg-button>
@@ -399,6 +416,13 @@
 import { apiURL, apiGetData, apiPostData, apiPostUpload } from '@/api'
 import { getItemTypeObj } from '@/utils/dom'
 import { base64ToFile } from '@/common/image'
+
+const timeLimitFunc = function (seconds = 0) {
+  const h = Math.floor(seconds / 3600)
+  const hours = h % 24
+  const days = (h - hours) / 24
+  return `${days}天${hours}小时`
+}
 
 const tempDate = {
   personalInfos: {
@@ -466,6 +490,10 @@ export default {
 
   data () {
     return {
+      dropdownOptions: Object.freeze([
+        { label: '打印预览', value: 'preview' },
+        { label: '分享简历', value: 'share' }
+      ]),
       tempKeys: Object.freeze([
         'personalInfos',
         'skillJob',
@@ -520,6 +548,7 @@ export default {
       imageEditorVisible: false,
 
       resumeId: -1,
+      shareCode: '',
       personalInfos: null,
       skillJob: null,
       educations: null,
@@ -579,6 +608,42 @@ export default {
 
   methods: {
     /**
+     * 回调下拉选择
+     */
+    handleDropdown (key) {
+      switch (key) {
+        case 'preview':
+          this.onPrint()
+          break
+        case 'share':
+          if (this.shareCode) {
+            this.$toast('此简历链接已分享')
+            return
+          }
+          apiPostData(apiURL.shareCreate, {
+            shareId: this.resumeId,
+            shareModule: 'resume',
+            shareDuration: 24 * 60 * 60
+          }).then((resp) => {
+            const shareCode = window.btoa(resp.data.code)
+            const href =
+              window.location.origin +
+              this.$router.resolve({
+                name: 'myResume',
+                query: { shareCode }
+              }).href
+            this.$confirm({
+              className: 'share-confirm',
+              title: '分享链接',
+              content: `请复制：${href}`
+            })
+          })
+          break
+        default:
+          break
+      }
+    },
+    /**
      * 临时页面打印方法
      */
     onPrint () {
@@ -588,10 +653,13 @@ export default {
       elStyle.padding = '0'
       const parentEl = el.parentElement
       parentEl.style.display = 'none'
-      this.$el.remove()
+      const headerStyle = this.$refs.sgHeader.$el.style
+      headerStyle.display = 'none'
+      el.remove()
       document.body.append(el)
       window.print()
       parentEl.style.display = ''
+      headerStyle.display = ''
       elStyle.height = ''
       elStyle.padding = ''
       parentEl.append(el)
@@ -600,6 +668,9 @@ export default {
      * 界面点击事件
      */
     onClick (e) {
+      if (this.shareCode) {
+        return
+      }
       const nowTime = Date.now()
       if (this.editItemType) {
         return
@@ -742,9 +813,22 @@ export default {
     getResumeDetail () {
       this.tempResume = {}
       this.editItemType = ''
-      apiGetData(apiURL.resumeDetail)
+
+      const shareCode = this.$route.query.shareCode || ''
+      const url = shareCode ? apiURL.shareDetail : apiURL.resumeDetail
+      this.shareCode = shareCode
+      apiGetData(url, shareCode ? { shareCode: atob(shareCode) } : undefined)
         .then((resp) => {
           const data = resp.data
+          if (shareCode) {
+            data.personalInfos = data.personal_infos
+            data.skillJob = data.skill_job
+            data.userId = data.user_id
+            data.updateTime = data.update_time
+            data.createTime = data.create_time
+
+            this.$toast(`此链接将在${timeLimitFunc(resp.limitTime)}后失效`)
+          }
           this.resumeId = data.id || 0
           this.setResumeData(data)
         })
@@ -790,6 +874,7 @@ export default {
         }
       }
       apiPostData(apiURL.resumeCreate, data).then((resp) => {
+        this.$toast('双击模块内容进行编辑')
         this.getResumeDetail()
       })
     },
@@ -858,6 +943,19 @@ export default {
   padding: 1rem;
   font-size: 1.2rem;
   color: #111111;
+
+  .sg-header {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    z-index: 10;
+  }
+  .sg-dropdown {
+    display: inline-block;
+  }
 
   .line-height {
     line-height: 1.8;
@@ -1098,6 +1196,15 @@ export default {
     .job-infos {
       text-align: left;
     }
+  }
+}
+</style>
+
+<style lang="scss">
+.share-confirm {
+  .sg-confirm .content {
+    word-break: break-all;
+    text-align: left;
   }
 }
 </style>
