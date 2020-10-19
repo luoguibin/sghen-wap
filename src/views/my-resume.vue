@@ -1155,6 +1155,7 @@ export default {
 
 @media screen and (max-width: 500px) {
   .personal-info {
+    margin-top: 3.5rem;
     img {
       display: block;
       margin: 0 auto;
