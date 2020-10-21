@@ -626,8 +626,9 @@ export default {
             shareDuration: 24 * 60 * 60
           }).then((resp) => {
             const shareCode = window.btoa(resp.data.code)
+            const { origin, pathname } = window.location
             const href =
-              window.location.origin +
+              origin + pathname +
               this.$router.resolve({
                 name: 'myResume',
                 query: { shareCode }
