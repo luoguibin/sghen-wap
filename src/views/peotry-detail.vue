@@ -17,7 +17,7 @@
       v-if="peotry"
       :visible.sync="commentVisible"
       :id="commentID"
-      :typeUserID="commentTypeUserID"
+      :typeUserId="commentTypeUserID"
       :toId="commentToID"
       :placeholder="commentTip"
       @ok="handleCommentOk"
