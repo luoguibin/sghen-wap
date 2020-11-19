@@ -58,6 +58,10 @@ const storeAuth = {
           // todo: crypto-js的core中加载了所有crypto包。。。
           require(['crypto-js/enc-base64.js', 'crypto-js/md5.js'], function (Base64, MD5) {
             data.pw = Base64.stringify(MD5(data.pw))
+            if (!data.isCreateUser) {
+              data.random = '' + Date.now()
+              data.pw = Base64.stringify(MD5(data.pw + data.random))
+            }
             func(data, resolve, reject)
           }, function (err) {
             if (err) {
