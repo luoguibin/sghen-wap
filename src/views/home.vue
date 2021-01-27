@@ -10,7 +10,7 @@
           :pointerVisible="false"
         >
           <div class="user">
-            <span>{{userName}}</span>
+            <span>{{ userName }}</span>
             <img :src="userAvatar | imgSrcFilter('avatar')" />
           </div>
         </sg-dropdown>
@@ -22,7 +22,7 @@
     <div class="home-body">
       <div class="scroll" sg-scroll sg-edge>
         <!-- 热门诗词TOP10 -->
-        <div style="height: 15rem; background-color: white;">
+        <div style="height: 15rem; background-color: white">
           <sg-slider
             v-if="sliderItems.length"
             ref="sgSlider"
@@ -40,18 +40,22 @@
               :key="item.id"
               class="item-panel"
             >
-              <img class="item-bg" v-if="item.images && item.images.length" :src="item.images[0]" />
+              <img
+                class="item-bg"
+                v-if="item.images && item.images.length"
+                :src="item.images[0]"
+              />
               <div class="praise-total">
                 <i class="iconfont icon-like"></i>
-                <span>{{item.praiseTotal | numFilter}}</span>
+                <span>{{ item.praiseTotal | numFilter }}</span>
               </div>
               <h2>
-                <span>{{item.set.name}}</span>
-                <span v-if="item.title" style="padding: 0 5px;">*</span>
-                <span v-if="item.title">{{item.title}}</span>
+                <span>{{ item.set.name }}</span>
+                <span v-if="item.title" style="padding: 0 5px">*</span>
+                <span v-if="item.title">{{ item.title }}</span>
               </h2>
               <div class="content-wrapper">
-                <p>{{item.content}}</p>
+                <p>{{ item.content }}</p>
               </div>
             </div>
           </sg-slider>
@@ -60,25 +64,34 @@
         <!-- 界面功能按钮 -->
         <div class="info-panel menus">
           <div class="menu-item">
-            <sg-button type="primary" @click="$router.push({name: 'peotry-images'})">诗词图集~</sg-button>
+            <sg-button
+              type="primary"
+              @click="$router.push({ name: 'peotry-images' })"
+              >诗词图集~</sg-button
+            >
           </div>
           <div class="menu-item">
-            <sg-button type="primary" @click="$router.push({name: 'peotry-list'})">最新诗词~</sg-button>
+            <sg-button
+              type="primary"
+              @click="$router.push({ name: 'peotry-list' })"
+              >最新诗词~</sg-button
+            >
           </div>
         </div>
 
         <!-- 上一年年度诗词概况 -->
         <div class="info-panel year-info" v-if="yearPoetrySets.length">
-          <h2>{{year}}年度诗词概况</h2>
+          <h2>{{ year }}年度诗词概况</h2>
           <p @click="onClickItemType">
             本年度共创建
-            <span>{{yearPeotryCount}}</span>首诗词，其中以选集
-            <span item-type="year-set">《{{yearPoetrySets[0].name}}》</span>
-            {{yearPoetrySets[0].count}}首稳居榜首；
+            <span>{{ yearPeotryCount }}</span
+            >首诗词，其中以选集
+            <span item-type="year-set">《{{ yearPoetrySets[0].name }}》</span>
+            {{ yearPoetrySets[0].count }}首稳居榜首；
             <template v-if="yearPeots.length">
               诗词创建数量最多的是
-              <span item-type="year-poet">[{{yearPeots[0].username}}]</span>
-              ，共创建{{yearPeots[0].count}}首。
+              <span item-type="year-poet">[{{ yearPeots[0].username }}]</span>
+              ，共创建{{ yearPeots[0].count }}首。
             </template>
           </p>
         </div>
@@ -92,8 +105,16 @@
               :key="item.id"
               class="popular-set"
               item-type="popular-set"
-            >{{item.name}}({{item.count}}首)</div>
+            >
+              {{ item.name }}({{ item.count }}首)
+            </div>
           </div>
+        </div>
+
+        <!-- 诗词云库 -->
+        <div class="info-panel">
+          <h2 title="词频率：全部诗词中出现次数最高的名词，取前20个名词的出现次数总和为基准，进行计算的结果（每天更新）">诗词云库</h2>
+          <peotry-hot-word></peotry-hot-word>
         </div>
 
         <site-instruction></site-instruction>
@@ -118,7 +139,8 @@ export default {
 
   components: {
     SiteInstruction: () => import('@/components/site-instruction'),
-    SghenLogo: () => import('@/components/sghen-logo')
+    SghenLogo: () => import('@/components/sghen-logo'),
+    PeotryHotWord: () => import('./peotry-hot-word')
   },
 
   data () {
@@ -149,9 +171,9 @@ export default {
       isLogin: 'auth/isLogin'
     }),
     ...mapState({
-      userID: state => state.auth.userID,
-      userName: state => state.auth.userName,
-      userAvatar: state => state.auth.userAvatar
+      userID: (state) => state.auth.userID,
+      userName: (state) => state.auth.userName,
+      userAvatar: (state) => state.auth.userAvatar
     })
   },
 
@@ -197,31 +219,31 @@ export default {
         date0: `${this.year}-01-01 00:00:00`,
         date1: `${this.year + 1}-01-01 00:00:00`
       }
-      apiGetData(apiURL.peotrySetListYear, params).then(resp => {
+      apiGetData(apiURL.peotrySetListYear, params).then((resp) => {
         this.yearPoetrySets = resp.data
       })
-      apiGetData(apiURL.peotryUserListYear, params).then(resp => {
+      apiGetData(apiURL.peotryUserListYear, params).then((resp) => {
         this.yearPeots = resp.data
       })
-      apiGetData(apiURL.poetrySetPopular).then(resp => {
+      apiGetData(apiURL.poetrySetPopular).then((resp) => {
         this.popularPeotrySets = resp.data
       })
     },
     getPopularPeotries () {
-      apiGetData(apiURL.peotryPopular).then(resp => {
+      apiGetData(apiURL.peotryPopular).then((resp) => {
         const { comments, list = [], sets, users, images } = resp.data
         const commentMap = arrayToMap(comments, 'type_id')
         const setMap = arrayToMap(sets)
         const userMap = arrayToMap(users)
         const imageMap = arrayToMap(images)
         const imgSrcFunc = Vue.filter('imgSrcFilter')
-        list.forEach(o => {
+        list.forEach((o) => {
           o.praiseTotal = commentMap[o.id].count
           o.set = setMap[o.set_id]
           o.user = userMap[o.user_id]
 
           if (imageMap[o.id]) {
-            o.images = JSON.parse(imageMap[o.id].images).map(v =>
+            o.images = JSON.parse(imageMap[o.id].images).map((v) =>
               getSmallImage(imgSrcFunc(v))
             )
           } else {
@@ -241,7 +263,7 @@ export default {
           return o0.praiseTotal > o1.praiseTotal ? -1 : 1
         })
         this.sliderPoetries = orderList
-        this.sliderItems = orderList.map(o => ({ slot: o.id }))
+        this.sliderItems = orderList.map((o) => ({ slot: o.id }))
         this.sliderIndex = 0
       })
     },
@@ -418,7 +440,8 @@ export default {
       .icon-like {
         font-size: $size-text * 1.5;
       }
-      i, span {
+      i,
+      span {
         display: inline-block;
         height: $size-text * 1.5;
         vertical-align: top;

@@ -177,6 +177,10 @@ export default {
       if (this.setId) {
         params.setId = this.setId
       }
+      const keyword = this.$route.query.keyword
+      if (keyword) {
+        params.content = keyword
+      }
 
       apiGetData(apiURL.peotryList, params)
         .then(data => {

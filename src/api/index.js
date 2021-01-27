@@ -95,7 +95,7 @@ export const apiURL = {
   peotSetDelete: `${preffix}/v1/peotry-set/delete`,
 
   // 诗词词频列表
-  peotryHotWord: `${preffix}/v1/api/get/peotry/hot-word`,
+  peotryHotWord: `${nodePreffix}/dynamic-api/peotry/hot-word`,
   // 热门诗词选集
   poetrySetPopular: `${preffix}/v1/api/get/peotry-set/popular`,
   // 年度诗词选集
