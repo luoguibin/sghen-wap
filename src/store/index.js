@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import Auth from './auth'
+import SysMsg from './sys-msg'
 
 Vue.use(Vuex)
 
@@ -12,6 +13,7 @@ export default new Vuex.Store({
   actions: {
   },
   modules: {
-    auth: Auth
+    auth: Auth,
+    sysMsg: SysMsg
   }
 })

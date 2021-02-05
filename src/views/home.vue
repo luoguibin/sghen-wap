@@ -113,7 +113,11 @@
 
         <!-- 诗词云库 -->
         <div class="info-panel">
-          <h2 title="词频率：全部诗词中出现次数最高的名词，取前20个名词的出现次数总和为基准，进行计算的结果（每天更新）">诗词云库</h2>
+          <h2
+            title="词频率：全部诗词中出现次数最高的名词，取前20个名词的出现次数总和为基准，进行计算的结果（每天更新）"
+          >
+            诗词云库
+          </h2>
           <peotry-hot-word></peotry-hot-word>
         </div>
 
@@ -157,6 +161,7 @@ export default {
 
       dropdownOptions: [
         { label: '我的诗词', value: 'my-list' },
+        { label: '我的消息', value: 'my-msgs' },
         { label: '个人中心', value: 'personal' },
         { label: '退出', value: 'logout' }
       ]
@@ -275,6 +280,9 @@ export default {
             name: 'peotry-list',
             query: { uuid: this.userID, username: this.userName }
           })
+          break
+        case 'my-msgs':
+          this.$router.push({ name: 'my-msgs' })
           break
         case 'logout':
           this.$confirm({

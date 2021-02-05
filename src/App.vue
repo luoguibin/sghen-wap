@@ -5,14 +5,34 @@
 </template>
 
 <script>
+import { mapActions, mapGetters } from 'vuex'
+
 export default {
   name: 'App',
 
-  created () {
-    window.app = this
+  computed: {
+    ...mapGetters({
+      isLogin: 'auth/isLogin'
+    })
   },
 
-  methods: {}
+  created () {
+    window.app = this
+    this.getUserMsgs()
+  },
+
+  methods: {
+    getUserMsgs () {
+      if (!this.isLogin) {
+        return
+      }
+      this.getSysMsgs()
+    },
+
+    ...mapActions({
+      getSysMsgs: 'sysMsg/getSysMsgs'
+    })
+  }
 }
 </script>
 

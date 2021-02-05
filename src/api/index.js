@@ -116,6 +116,11 @@ export const apiURL = {
   // 用户是否点赞诗词
   commentPraiseCheck: `${nodePreffix}/dynamic-api/peotry/praise/check`,
 
+  // 获取系统消息
+  sysMsg: `${preffix}/v1/auth/sys-msg/my-list`,
+  // 读系统消息
+  readSysMsg: `${preffix}/v1/auth/sys-msg/read`,
+
   // 简历API
   resumeCreate: `${preffix}/v1/auth/resume/create`,
   resumeDetail: `${preffix}/v1/auth/resume/detail`,

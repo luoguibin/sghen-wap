@@ -43,6 +43,14 @@ const routes = [
     }
   },
   {
+    path: '/my-msgs',
+    name: 'my-msgs',
+    component: () => import(/* webpackChunkName: 'my-msgs' */'@/views/my-msgs'),
+    meta: {
+      auth: false
+    }
+  },
+  {
     path: '/my-resume',
     name: 'myResume',
     component: () => import(/* webpackChunkName: 'my-resume' */'@/views/my-resume'),
