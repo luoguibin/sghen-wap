@@ -552,7 +552,7 @@ export default {
     display: inline-block;
     transform: translate(-10%, -10%);
     font-size: 1.5rem;
-    color: $color-error;
+    color: $color-theme;
   }
   &.user::before {
     animation: frames-opacity 6000ms 0ms infinite reverse;

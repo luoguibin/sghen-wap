@@ -1,14 +1,15 @@
 <template>
-  <div :class="{'personal': true, 'personal-editing': isEditing}">
+  <div :class="{ personal: true, 'personal-editing': isEditing }">
     <sg-header @back="onBack">
       <span>个人中心</span>
       <sg-button
         v-if="isSelf"
         slot="right"
         type="text"
-        style="font-size: 1rem;"
+        style="font-size: 1rem"
         @click="onEditOrSave"
-      >{{isEditing ? '保存' : '编辑'}}</sg-button>
+        >{{ isEditing ? "保存" : "编辑" }}</sg-button
+      >
     </sg-header>
     <div class="personal-main" v-if="personalID">
       <div class="info-item">
@@ -17,7 +18,7 @@
           <i>:</i>
         </span>
         <div>
-          <template v-if="!isEditing">{{personalName}}</template>
+          <template v-if="!isEditing">{{ personalName }}</template>
           <input v-else v-model="personalName" />
         </div>
       </div>
@@ -29,7 +30,9 @@
         <div>
           <img v-if="isAvatarBase64" :src="personalAvatar" />
           <img v-else :src="personalAvatar | imgSrcFilter('avatar')" />
-          <sg-button v-if="isEditing" type="text" @click="onOpenChangeAvatar">更换</sg-button>
+          <sg-button v-if="isEditing" type="text" @click="onOpenChangeAvatar"
+            >更换</sg-button
+          >
         </div>
       </div>
       <div v-if="isSelf" class="info-item">
@@ -37,7 +40,7 @@
           手机号码
           <i>:</i>
         </span>
-        <div>{{phoneText || '-'}}</div>
+        <div @click="newMsgVisible = true">{{ phoneText || "-" }}</div>
       </div>
       <div class="info-item">
         <span>
@@ -45,7 +48,7 @@
           <i>:</i>
         </span>
         <div>
-          <template v-if="!isEditing">{{personalMood || '-'}}</template>
+          <template v-if="!isEditing">{{ personalMood || "-" }}</template>
           <input v-else v-model="personalMood" />
         </div>
       </div>
@@ -57,21 +60,29 @@
         </span>
         <div class="statistics">
           <template v-if="peotryCount !== 0 || peotSetCount !== 0">
-            {{isSelf ? '我' : 'TA'}}共创建<i>{{peotSetCount | numFilter}}</i>个选集，
+            {{ isSelf ? "我" : "TA" }}共创建<i>{{ peotSetCount | numFilter }}</i
+            >个选集，
             <br />
-            共<i>{{peotryCount | numFilter}}</i>首诗词，
+            共<i>{{ peotryCount | numFilter }}</i
+            >首诗词，
             <br />
-            收获了<i>{{praiseCount | numFilter}}</i>赞
+            收获了<i>{{ praiseCount | numFilter }}</i
+            >赞
           </template>
-          <template v-else>Opps，{{isSelf ? '我' : 'TA'}}暂未有选集和诗词</template>
+          <template v-else
+            >Opps，{{ isSelf ? "我" : "TA" }}暂未有选集和诗词</template
+          >
         </div>
       </div>
 
       <div v-show="!isEditing">
         <sg-button
           type="primary"
-          @click="$router.push({name: 'peotry-list', query: {uuid: personalID}})"
-        >{{isSelf ? '我' : 'TA'}}&nbsp;的&nbsp;诗&nbsp;词</sg-button>
+          @click="
+            $router.push({ name: 'peotry-list', query: { uuid: personalID } })
+          "
+          >{{ isSelf ? "我" : "TA" }}&nbsp;的&nbsp;诗&nbsp;词</sg-button
+        >
       </div>
       <div v-if="isSelf && !isEditing" class="logout-item">
         <sg-button @click="onLogout">退&nbsp;出&nbsp;登&nbsp;陆</sg-button>
@@ -81,11 +92,59 @@
     <!-- 头像编辑 -->
     <div class="sg-mask" v-if="imageEditorVisible">
       <div class="sg-flex-column">
-        <sg-header style="color: white" @back="handleAvatarBack" :centerStatus="''">
+        <sg-header
+          style="color: white"
+          @back="handleAvatarBack"
+          :centerStatus="''"
+        >
           <template slot="left">头像编辑</template>
-          <sg-button type="text" slot="right" @click="onConfirmAvatar">确定</sg-button>
+          <sg-button type="text" slot="right" @click="onConfirmAvatar"
+            >确定</sg-button
+          >
         </sg-header>
-        <image-editor ref="imageEditor" class="sg-flex-one" :autoOpen="true"></image-editor>
+        <image-editor
+          ref="imageEditor"
+          class="sg-flex-one"
+          :autoOpen="true"
+        ></image-editor>
+      </div>
+    </div>
+
+    <!-- 系统消息新增 -->
+    <div class="sg-mask sys-msg-mask" v-if="newMsgVisible">
+      <div class="sg-flex-column">
+        <sg-header @back="newMsgVisible = false">
+          <template>系统消息新增</template>
+          <sg-button type="text" slot="right" @click="onConfirmNewMsg"
+            >确定</sg-button
+          >
+        </sg-header>
+        <div class="sg-flex-one">
+          <sg-form
+            ref="msgForm"
+            :formData="msgFormData"
+            :formRules="msgFormRules"
+            sg-scroll="vertical_stop"
+          >
+            <div slot="msgTypeKey" class="form-item-slot">
+              <sg-dropdown
+                ref="sgDropdown"
+                :options="msgTypeKeyOptions"
+                @change="handleMsgTypeKeyChange"
+                :initValue="msgFormData.msgTypeKey"
+                :optionType="'fullwidth'"
+                :pointerVisible="false"
+                :optionActive="true"
+              ></sg-dropdown>
+            </div>
+            <sg-button
+              type="primary"
+              style="margin: 2rem 0"
+              @click="onConfirmNewMsg"
+              >保存</sg-button
+            >
+          </sg-form>
+        </div>
       </div>
     </div>
   </div>
@@ -94,7 +153,7 @@
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
 import { base64ToFile } from '@/common/image'
-import { apiURL, apiGetData, apiPostUpload } from '@/api'
+import { apiURL, apiGetData, apiPostData, apiPostUpload } from '@/api'
 // import Cache from '@/common/cache-center'
 
 export default {
@@ -118,7 +177,37 @@ export default {
 
       isEditing: false,
 
-      imageEditorVisible: false
+      imageEditorVisible: false,
+
+      msgTypeKeyOptions: [
+        { label: '系统祝福', value: 'SYS_BLESS' }
+      ],
+      msgFormData: {
+        msgTypeKey: 'SYS_BLESS',
+        content: '',
+        serviceName: 'sys-msg',
+        type: 'create'
+      },
+      msgFormRules: [
+        {
+          key: 'msgTypeKey',
+          label: '消息类型',
+          required: true,
+          hasValue: true,
+          slot: true,
+          _error: ''
+        },
+        {
+          key: 'content',
+          label: '内容',
+          required: true,
+          validator: (v = '', rule) => {
+            return v.length ? '' : '请输入' + rule.label
+          },
+          _error: ''
+        }
+      ],
+      newMsgVisible: false
     }
   },
 
@@ -134,8 +223,8 @@ export default {
       return this.userID && +this.userID === +this.personalID
     },
     ...mapState({
-      userID: state => state.auth.userID,
-      phone: state => state.auth.phone
+      userID: (state) => state.auth.userID,
+      phone: (state) => state.auth.phone
     }),
     ...mapGetters({
       selfPublicInfo: 'auth/selfPublicInfo'
@@ -176,7 +265,7 @@ export default {
           this.saveData = null
         } else {
           apiGetData(apiURL.userInfoList, { datas: this.personalID })
-            .then(resp => {
+            .then((resp) => {
               const info = resp.data[0]
               this.personalName = info.username
               this.personalAvatar = info.avatar
@@ -191,15 +280,15 @@ export default {
     },
     getPersonalPeotryInfo () {
       const params = { id: this.personalID }
-      apiGetData(apiURL.userPoetryCount, params).then(resp => {
+      apiGetData(apiURL.userPoetryCount, params).then((resp) => {
         this.peotryCount = resp.data[0].count
       })
-      apiGetData(apiURL.userPraiseCount, { userId: params.id }).then(resp => {
+      apiGetData(apiURL.userPraiseCount, { userId: params.id }).then((resp) => {
         this.praiseCount = resp.data[0].count
       })
-      apiGetData(apiURL.peotSets, { userId: this.personalID }).then(resp => {
+      apiGetData(apiURL.peotSets, { userId: this.personalID }).then((resp) => {
         const userID = this.personalID
-        this.peotSetCount = resp.data.filter(o => o.userId === userID).length
+        this.peotSetCount = resp.data.filter((o) => o.userId === userID).length
       })
     },
 
@@ -225,7 +314,7 @@ export default {
         return
       }
       this.isAvatarUploading = true
-      this.$refs.imageEditor.getImage(base64 => {
+      this.$refs.imageEditor.getImage((base64) => {
         this.personalAvatar = base64
         this.isAvatarBase64 = true
 
@@ -235,7 +324,7 @@ export default {
           base64ToFile(base64, this.personalID + '-avatar.png')
         )
         apiPostUpload(apiURL.upload, formData, { pathType: 'icon' })
-          .then(resp => {
+          .then((resp) => {
             this.personalAvatar = resp.data[0]
             this.isAvatarBase64 = false
           })
@@ -255,7 +344,7 @@ export default {
             name: this.personalName,
             avatar: this.personalAvatar,
             mood: this.personalMood
-          }).then(resp => {
+          }).then((resp) => {
             this.$toast('保存成功')
             this.isEditing = false
           })
@@ -299,6 +388,40 @@ export default {
         }
       })
     },
+
+    handleMsgTypeKeyChange (value) {
+      this.msgFormData.msgTypeKey = value
+    },
+    handleMsgTypeChange (value) {
+      this.msgFormData.type = value
+    },
+    onConfirmNewMsg () {
+      this.$refs.msgForm.validate((error) => {
+        if (error) {
+          return
+        }
+        if (this.isMsgRequesting) {
+          return
+        }
+        this.isMsgRequesting = true
+        this.$confirm({
+          title: '新增提示',
+          content: '确认后不可撤回，是否确认新增消息？',
+          confirm: () => {
+            apiPostData(apiURL.servicesUrl, {
+              ...this.msgFormData
+            })
+              .then(() => {
+                this.isMsgRequesting = false
+              })
+              .finally(() => {
+                this.isMsgRequesting = false
+              })
+          }
+        })
+      })
+    },
+
     ...mapActions({
       logout: 'auth/logout',
       update: 'auth/update'
@@ -376,6 +499,19 @@ export default {
       &:focus {
         border-bottom-color: $color-theme-focus;
       }
+    }
+  }
+}
+
+.sys-msg-mask {
+  background-color: white;
+
+  .form-item-slot {
+    padding: 0.5rem 0;
+  }
+
+  /deep/ {
+    .sg-header .center {
     }
   }
 }
