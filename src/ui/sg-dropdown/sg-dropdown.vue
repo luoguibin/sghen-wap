@@ -26,7 +26,8 @@
             @click.stop="onSelectOption(item, $event)"
           >
             <i v-if="item.icon" :class="['iconfont', item.icon]"></i>
-            {{item.label}}
+            <slot v-if="item.slot" :name="item.slot" :option="item"></slot>
+            <template v-else>{{item.label}}</template>
           </div>
         </div>
       </div>
