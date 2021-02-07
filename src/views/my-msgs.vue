@@ -5,7 +5,11 @@
     </sg-header>
 
     <div class="main sg-flex-one">
-      <div class="msg-list" sg-scroll="vertical_stop">
+      <sg-scroll
+        ref="sgScroll"
+        :isEnd="true"
+        @refresh="handleRefresh"
+      >
         <div v-for="item in msgs" :key="item.id" class="msg-item">
           <!-- 消息内容 -->
           <p>{{ item | msgTextFilter }}</p>
@@ -27,14 +31,16 @@
             >
           </div>
         </div>
-      </div>
+
+        <div class="msg-bottom-tip">暂只获取最新{{maxCount}}条数据</div>
+      </sg-scroll>
     </div>
   </div>
 </template>
 
 <script>
 import { apiURL, apiPostData } from '@/api'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 const SYS_MODULE = {
   SYS: 1000,
@@ -46,6 +52,12 @@ const SYS_MODULE = {
 
 export default {
   name: 'MyMsgs',
+
+  data () {
+    return {
+      maxCount: 100
+    }
+  },
 
   computed: {
     ...mapState({
@@ -91,7 +103,18 @@ export default {
         .finally(() => {
           item.loading = false
         })
-    }
+    },
+
+    handleRefresh () {
+      this.getSysMsgs({ limit: this.maxCount }).then(() => {
+        this.$refs.sgScroll.success()
+      }).catch(() => {
+        this.$refs.sgScroll.fail()
+      })
+    },
+    ...mapActions({
+      getSysMsgs: 'sysMsg/getSysMsgs'
+    })
   }
 }
 </script>
@@ -108,15 +131,9 @@ export default {
   }
 }
 
-.msg-list {
-  height: 100%;
-  padding: 1rem;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
 .msg-item {
-  padding-bottom: 0.5rem;
-  margin-bottom: 1.5rem;
+  padding-bottom:  0.5rem;
+  margin: 0 1rem 1.5rem;
   font-size: 1.2rem;
   line-height: 2rem;
   align-items: flex-end;
@@ -137,5 +154,12 @@ export default {
   p {
     margin-bottom: 0.5rem;
   }
+}
+
+.msg-bottom-tip {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999999;
+  margin-bottom: 1rem;
 }
 </style>
