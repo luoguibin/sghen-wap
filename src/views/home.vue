@@ -9,10 +9,20 @@
           @change="handleDropdown"
           :pointerVisible="false"
         >
-          <div class="user">
+          <div
+            :class="{ user: true, 'has-msg': unReadMsgCountText !== '' }"
+            :unreadcount="unReadMsgCountText"
+          >
             <span>{{ userName }}</span>
             <img :src="userAvatar | imgSrcFilter('avatar')" />
           </div>
+          <span
+            slot="myMsgs"
+            slot-scope="{ option }"
+            :class="{ 'has-msg': unReadMsgCountText !== '' }"
+            :unreadcount="unReadMsgCountText"
+            >{{ option.label }}</span
+          >
         </sg-dropdown>
         <sg-button v-else type="text" @click="onGoLogin">登陆~</sg-button>
       </div>
@@ -161,7 +171,7 @@ export default {
 
       dropdownOptions: [
         { label: '我的诗词', value: 'my-list' },
-        { label: '我的消息', value: 'my-msgs' },
+        { label: '我的消息', value: 'my-msgs', slot: 'myMsgs' },
         { label: '个人中心', value: 'personal' },
         { label: '退出', value: 'logout' }
       ]
@@ -173,7 +183,8 @@ export default {
       return this.yearPoetrySets.reduce((v, o) => v + +o.count, 0)
     },
     ...mapGetters({
-      isLogin: 'auth/isLogin'
+      isLogin: 'auth/isLogin',
+      unReadMsgCountText: 'sysMsg/unReadCountText'
     }),
     ...mapState({
       userID: (state) => state.auth.userID,
@@ -533,6 +544,21 @@ export default {
     }
   }
 }
+
+.has-msg {
+  &::before {
+    content: "•";
+    position: relative;
+    display: inline-block;
+    transform: translate(-10%, -10%);
+    font-size: 1.5rem;
+    color: $color-error;
+  }
+  &.user::before {
+    animation: frames-opacity 6000ms 0ms infinite reverse;
+  }
+}
+
 </style>
 
 <style>
@@ -542,17 +568,14 @@ export default {
   box-sizing: border-box;
 }
 @keyframes frames-opacity {
-  0% {
+  0%, 80% {
     opacity: 1;
   }
-  30% {
-    opacity: 1;
-  }
-  65% {
-    opacity: 0.5;
+  90% {
+    opacity: 0;
   }
   100% {
-    opacity: 0;
+    opacity: 1;
   }
 }
 </style>
