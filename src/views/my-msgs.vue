@@ -13,7 +13,7 @@
           <!-- 消息简介 -->
           <div class="msg-bottom sg-flex">
             <div class="title">
-              {{ item.msgType | msgTypeFilter }}
+              {{ item | msgTypeFilter }}
             </div>
             <div class="sg-flex-one time">
               {{ item.createTime | timeFilter }}
@@ -36,6 +36,14 @@
 import { apiURL, apiPostData } from '@/api'
 import { mapState } from 'vuex'
 
+const SYS_MODULE = {
+  SYS: 1000,
+  SYS_BLESS: 1001,
+  USER: 2000,
+  USER_CREATE: 2001,
+  PEOTRY: 3000
+}
+
 export default {
   name: 'MyMsgs',
 
@@ -48,13 +56,17 @@ export default {
   filters: {
     msgTypeFilter (item) {
       switch (item.msgType) {
+        case SYS_MODULE.SYS_BLESS:
+          return '系统祝福'
+        case SYS_MODULE.PEOTRY:
+          return '诗词消息'
         default:
           return '系统消息'
       }
     },
     msgTextFilter (item) {
       switch (item.msgType) {
-        case 2001:
+        case SYS_MODULE.USER_CREATE:
           return item.content || '欢迎注册Sghen三行~'
         default:
           return item.content || '--'
