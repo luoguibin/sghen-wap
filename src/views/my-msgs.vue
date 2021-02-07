@@ -32,7 +32,7 @@
           </div>
         </div>
 
-        <div class="msg-bottom-tip">暂只获取最新{{maxCount}}条数据</div>
+        <div class="msg-bottom-tip">暂只展示最新{{maxCount}}条消息</div>
       </sg-scroll>
     </div>
   </div>
@@ -132,16 +132,18 @@ export default {
 }
 
 .msg-item {
-  padding-bottom:  0.5rem;
-  margin: 0 1rem 1.5rem;
+  padding: 0.5rem 1rem 1rem;
   font-size: 1.2rem;
   line-height: 2rem;
   align-items: flex-end;
-  border-bottom: 1px dashed gray;
+  &:nth-child(2n) {
+    background-color: white;
+  }
 
   .msg-bottom {
     font-size: 1rem;
     color: #888888;
+    border-bottom: 1px dashed gray;
   }
   .title {
     width: 100px;
@@ -160,6 +162,6 @@ export default {
   text-align: center;
   font-size: 0.8rem;
   color: #999999;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 </style>
