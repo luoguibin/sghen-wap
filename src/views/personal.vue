@@ -137,12 +137,6 @@
                 :optionActive="true"
               ></sg-dropdown>
             </div>
-            <sg-button
-              type="primary"
-              style="margin: 2rem 0"
-              @click="onConfirmNewMsg"
-              >保存</sg-button
-            >
           </sg-form>
         </div>
       </div>
