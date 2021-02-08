@@ -40,7 +40,7 @@
           手机号码
           <i>:</i>
         </span>
-        <div @click="newMsgVisible = true">{{ phoneText || "-" }}</div>
+        <div @click="onClickPhone">{{ phoneText || "-" }}</div>
       </div>
       <div class="info-item">
         <span>
@@ -383,11 +383,19 @@ export default {
       })
     },
 
+    onClickPhone () {
+      const nowTime = Date.now()
+      if (!this.newMsgTime) {
+        this.newMsgTime = nowTime
+        return
+      }
+      if (nowTime - this.newMsgTime < 300) {
+        this.newMsgVisible = true
+      }
+      this.newMsgTime = nowTime
+    },
     handleMsgTypeKeyChange (value) {
       this.msgFormData.msgTypeKey = value
-    },
-    handleMsgTypeChange (value) {
-      this.msgFormData.type = value
     },
     onConfirmNewMsg () {
       this.$refs.msgForm.validate((error) => {
@@ -407,6 +415,7 @@ export default {
             })
               .then(() => {
                 this.isMsgRequesting = false
+                this.newMsgVisible = false
               })
               .finally(() => {
                 this.isMsgRequesting = false
