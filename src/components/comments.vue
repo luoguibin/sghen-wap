@@ -10,7 +10,8 @@
         item-type="comment-avatar"
         alt
       />
-      <div v-if="hasAvatarsMore" class="more" item-type="avatars-more">...</div>
+      <div v-if="hasAvatarsMore" v-show="!isPraiseLoading" class="more" item-type="avatars-more">...</div>
+      <div v-if="isPraiseLoading" class="praise-loading"><i></i></div>
     </div>
 
     <div v-show="currentPraises.length && textComments.length" style="border-bottom: 1px solid white;"></div>
@@ -35,7 +36,8 @@
       </div>
 
       <div v-if="hasCommentsMore" class="more">
-        <span item-type="comments-more">加载更多...</span>
+        <span v-show="!isCommentLoading" item-type="comments-more">加载更多...</span>
+        <div v-if="isCommentLoading" class="praise-loading"><i></i></div>
       </div>
     </div>
   </div>
@@ -71,6 +73,14 @@ export default {
       default: -1
     },
     isDetail: {
+      type: Boolean,
+      default: false
+    },
+    isPraiseLoading: {
+      type: Boolean,
+      default: false
+    },
+    isCommentLoading: {
       type: Boolean,
       default: false
     }
@@ -155,7 +165,8 @@ $background: rgba(0, 0, 0, 0.03);
     box-sizing: border-box;
     overflow: hidden;
     user-select: none;
-    .more {
+    .more,
+    .praise-loading {
       display: inline-block;
       width: 3rem;
       height: 3rem;
@@ -192,6 +203,11 @@ $background: rgba(0, 0, 0, 0.03);
       text-align: center;
       border-top: 1px dashed white;
     }
+    .praise-loading {
+      line-height: $height-text;
+      font-size: 1.6rem;
+      text-align: center;
+    }
   }
   .comment {
     .names {
@@ -226,6 +242,25 @@ $background: rgba(0, 0, 0, 0.03);
     padding: 0 8px 0 3px;
     font-size: 1.1rem;
     color: #555555;
+  }
+}
+
+.praise-loading i{
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  vertical-align: middle;
+  border-radius: 50%;
+  border: 2px solid $color-theme;
+  border-left-color: transparent;
+  animation: loading-rotate 1s infinite linear;
+}
+@keyframes loading-rotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(1turn);
   }
 }
 </style>

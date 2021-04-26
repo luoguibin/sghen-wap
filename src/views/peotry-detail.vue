@@ -193,8 +193,10 @@ export default {
       const setSimplePeotry = o => {
         o.praiseTotal = -1
         o.praiseComments = []
+        o.isPraiseLoading = false
         o.commentTotal = -1
         o.realComments = []
+        o.isCommentLoading = false
         if (o.user) {
           o.user = Object.freeze(o.user)
         }
@@ -247,6 +249,7 @@ export default {
       if (isReset) {
         this.commentOffset = 0
       }
+      this.peotry.isCommentLoading = true
       apiGetData(apiURL.commentContent, {
         id: this.peotryID,
         limit: this.pageLimit,
@@ -279,12 +282,15 @@ export default {
         peotry.commentTotal = count
 
         this.commentOffset += this.pageLimit
+      }).finally(() => {
+        this.peotry.isCommentLoading = false
       })
     },
     getPraiseComments (isReset) {
       if (isReset) {
         this.praiseOffset = 0
       }
+      this.peotry.isPraiseLoading = true
       apiGetData(apiURL.commentPraise, {
         id: this.peotryID,
         limit: this.pageLimit,
@@ -316,6 +322,8 @@ export default {
         peotry.praiseTotal = count
 
         this.praiseOffset += this.pageLimit
+      }).finally(() => {
+        this.peotry.isPraiseLoading = false
       })
     },
     formatComments (comments = []) {

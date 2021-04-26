@@ -57,6 +57,8 @@
         :comments="peotry.realComments"
         :commentTotal="peotry.commentTotal"
         :isDetail="isDetail"
+        :isPraiseLoading="peotry.isPraiseLoading"
+        :isCommentLoading="peotry.isCommentLoading"
       ></comments>
     </div>
   </div>
