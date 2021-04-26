@@ -29,13 +29,13 @@
           <div :class="{'is-praise': isPraise}">
             <i class="iconfont icon-like"></i>
           </div>
-          <span>{{peotry.praiseTotal | numFilter}}</span>
+          <span>{{peotry.praiseTotal | numFilter(true)}}</span>
         </div>
         <div class="menu-item" @click="handleDropdown('comment', $event)">
           <div>
             <i class="iconfont icon-message"></i>
           </div>
-          <span>{{peotry.commentTotal | numFilter}}</span>
+          <span>{{peotry.commentTotal | numFilter(true)}}</span>
         </div>
         <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
           <div>

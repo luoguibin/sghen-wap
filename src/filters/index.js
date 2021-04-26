@@ -72,11 +72,15 @@ export const imgSrcFilter = function (v, type) {
   return path
 }
 
-export const numFilter = function (v) {
+export const numFilter = function (v, hasGap) {
   if (v < 0) {
     return '?'
   }
-  if (v && (v + '').length > 4) {
+  if (v && (v + '').length >= 4) {
+    if (hasGap && v > 1000) {
+      v = v / 1000
+      return v.toFixed(v > 10 ? 1 : 2) + 'k'
+    }
     return v.toString().replace(/(\d)(?=(?:\d{3})+$)/g, '$1,')
   }
   return v || 0
