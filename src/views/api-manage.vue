@@ -481,7 +481,8 @@ export default {
       }
       this.setDropdownsValue()
     },
-    setDropdownsValue ({ statusVal, methodVal }) {
+    setDropdownsValue (valObj = {}) {
+      const { statusVal, methodVal } = valObj
       this.$nextTick(() => {
         const statusOption = this.statusOptions.find(o => o.value === statusVal) || this.statusOptions[1]
         this.$refs.statusDropdown.setSelectOption(statusOption)
