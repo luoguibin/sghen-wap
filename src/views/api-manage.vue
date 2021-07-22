@@ -422,23 +422,25 @@ export default {
         return
       }
 
+      this.$toast('加载中...', { direction: 'middle', loading: true, duration: -1 })
       const { suffixPath, method } = this.formData
-      if (method === 'GET') {
-        this.$toast('加载中...', { direction: 'middle', loading: true, duration: -1 })
-        apiGetData(preffix + '/dynamic-api/' + suffixPath, params)
-          .then(resp => {
-            this.testResult = resp // JSON.stringify(resp.data)
-            this.$toast('测试成功', { replace: true })
-          })
-          .catch(err => {
-            if (err && err.data) {
-              this.testResult = err.data // JSON.stringify(err.data)
-            }
-            this.$toast('测试失败', { replace: true })
-          })
-      } else {
-        this.$toast('正在码...')
+      let apiFunc = apiGetData
+      let apiPreffix = `${preffix}/dynamic-api/`
+      if (method === 'POST') {
+        apiFunc = apiPostData
+        apiPreffix = `${preffix}/auth/dynamic-api/`
       }
+      apiFunc(apiPreffix + suffixPath, params)
+        .then(resp => {
+          this.testResult = resp // JSON.stringify(resp.data)
+          this.$toast('测试成功', { replace: true })
+        })
+        .catch(err => {
+          if (err && err.data) {
+            this.testResult = err.data // JSON.stringify(err.data)
+          }
+          this.$toast('测试失败', { replace: true })
+        })
     },
     onDelete () {
       if (this.isDeleting) {
