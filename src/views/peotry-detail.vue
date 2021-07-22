@@ -279,7 +279,7 @@ export default {
         } else {
           peotry.realComments.push(...comments)
         }
-        peotry.commentTotal = count
+        peotry.commentTotal = +count
 
         this.commentOffset += this.pageLimit
       }).finally(() => {
@@ -319,7 +319,7 @@ export default {
         } else {
           peotry.praiseComments.push(...comments)
         }
-        peotry.praiseTotal = count
+        peotry.praiseTotal = +count
 
         this.praiseOffset += this.pageLimit
       }).finally(() => {

@@ -254,7 +254,7 @@ export default {
         const imageMap = arrayToMap(images)
         const imgSrcFunc = Vue.filter('imgSrcFilter')
         list.forEach((o) => {
-          o.praiseTotal = commentMap[o.id].count
+          o.praiseTotal = +commentMap[o.id].count
           o.set = setMap[o.set_id]
           o.user = userMap[o.user_id]
 
