@@ -344,7 +344,7 @@ export default {
             })
           }
           this.tableItems = list
-          this.total = total
+          this.total = +total
         })
         .catch(() => {
           this.$toast('加载失败，请重试')
