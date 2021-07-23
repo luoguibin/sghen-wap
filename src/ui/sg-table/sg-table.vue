@@ -10,7 +10,7 @@
     </div>
 
     <div class="sg-table-content sg-flex-one">
-      <div class="sg-scroll">
+      <div class="sg-scroll" sg-scroll>
         <div v-for="item in items" :key="item.id" class="row-item sg-flex">
           <div
             v-for="item_ in headers"
