@@ -65,7 +65,7 @@ export const apiURL = {
   // 作者诗词总数
   userPoetryCount: `${preffix}/v1/api/get/user/peotry-count`,
   // 作者诗词被赞总数
-  userPraiseCount: `${nodePreffix}/dynamic-api/user/peotry/praise-count`,
+  userPraiseCount: `${nodePreffix}/dynamic-api/v2/auth/user/peotry/praise-census`,
 
   // 诗词默认列表
   peotryList: `${preffix}/v1/peotry/query`,
