@@ -72,6 +72,11 @@ const routes = [
     component: () => import(/* webpackChunkName: 'sg-components' */'@/views/sg-components')
   },
   {
+    path: '/page-invalid/:invalidType',
+    name: 'page-invalid',
+    component: () => import(/* webpackChunkName: 'page-invalid' */'@/views/page-invalid')
+  },
+  {
     path: '/*',
     redirect: '/home'
   }

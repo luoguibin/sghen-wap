@@ -52,6 +52,10 @@ axios.interceptors.response.use(
       if (data.code === 1002) {
         store.dispatch('auth/logout')
         router.push({ name: 'login', query: { redirect: router.currentRoute.fullPath } })
+      } else if (data.code === 999) {
+        store.dispatch('auth/logout')
+        router.push({ name: 'page-invalid', params: { invalidType: 'updating' } })
+        return
       }
       return Promise.reject(res)
     }
