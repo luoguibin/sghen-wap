@@ -1,5 +1,5 @@
 <template>
-  <div class="peotry-detail">
+  <div class="poetry-detail">
     <sg-header @back="onBack">
       诗词详情
       <div slot="right"></div>
@@ -7,14 +7,14 @@
 
     <div class="main">
       <div ref="wrapper" class="main-wrapper" @click="onClickPoetry" sg-scroll="vertical_stop">
-        <peotry v-if="peotry" ref="peotry" :peotry="peotry" :isDetail="true"></peotry>
+        <poetry v-if="poetry" ref="poetry" :poetry="poetry" :isDetail="true"></poetry>
       </div>
     </div>
 
-    <image-viewer v-if="peotry" :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
+    <image-viewer v-if="poetry" :visible.sync="viewerVisible" :index="imageIndex" :images="images"></image-viewer>
 
     <comment-input
-      v-if="peotry"
+      v-if="poetry"
       :visible.sync="commentVisible"
       :id="commentID"
       :typeUserId="commentTypeUserID"
@@ -24,25 +24,25 @@
     ></comment-input>
 
     <transition name="slide">
-      <div v-if="peotry"  v-show="menusVisible" class="right-menus">
+      <div v-if="poetry"  v-show="menusVisible" class="right-menus">
         <div class="menu-item" @click="handleDropdown('praise', $event)">
           <div :class="{'is-praise': isPraise}">
             <i class="iconfont icon-like"></i>
           </div>
-          <span>{{peotry.praiseTotal | numFilter(true)}}</span>
+          <span>{{poetry.praiseTotal | numFilter(true)}}</span>
         </div>
         <div class="menu-item" @click="handleDropdown('comment', $event)">
           <div>
             <i class="iconfont icon-message"></i>
           </div>
-          <span>{{peotry.commentTotal | numFilter(true)}}</span>
+          <span>{{poetry.commentTotal | numFilter(true)}}</span>
         </div>
-        <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('edit', $event)">
+        <div v-if="isSelfPoetry" class="menu-item" @click="handleDropdown('edit', $event)">
           <div>
             <i class="iconfont icon-edit"></i>
           </div>
         </div>
-        <div v-if="isSelfPeotry" class="menu-item" @click="handleDropdown('delete', $event)">
+        <div v-if="isSelfPoetry" class="menu-item" @click="handleDropdown('delete', $event)">
           <div>
             <i class="iconfont icon-delete"></i>
           </div>
@@ -69,10 +69,10 @@ import Cache from '@/common/cache-center'
 import { PEOTRY } from '@/const'
 
 export default {
-  name: 'PeotryDetail',
+  name: 'PoetryDetail',
 
   components: {
-    peotry: () => import('@/components/peotry'),
+    poetry: () => import('@/components/poetry'),
     'image-viewer': () => import('@/components/image-viewer'),
     'comment-input': () => import('@/components/comment-input'),
     'praise-anime': () => import('@/components/praise-anime')
@@ -80,8 +80,8 @@ export default {
 
   data () {
     return {
-      peotryID: 0,
-      peotry: null,
+      poetryID: 0,
+      poetry: null,
 
       menusVisible: true,
 
@@ -116,9 +116,9 @@ export default {
     /**
      * @returns {Boolean} 返回是否为当前用户创建的诗词
      */
-    isSelfPeotry () {
-      const peotry = this.peotry
-      return peotry && peotry.user && this.userID === peotry.user.id
+    isSelfPoetry () {
+      const poetry = this.poetry
+      return poetry && poetry.user && this.userID === poetry.user.id
     },
 
     /**
@@ -137,7 +137,7 @@ export default {
   },
 
   created () {
-    window.peotryDetail = this
+    window.poetryDetail = this
     this.checkRestorePageData()
   },
 
@@ -158,8 +158,8 @@ export default {
     },
 
     savePageData () {
-      Cache.PeotryPageCache.setData(this.peotryID, {
-        peotry: this.peotry,
+      Cache.PoetryPageCache.setData(this.poetryID, {
+        poetry: this.poetry,
         praiseOffset: this.praiseOffset,
         commentOffset: this.commentOffset,
         scrollTop: this.$refs.wrapper.scrollTop,
@@ -167,12 +167,12 @@ export default {
       })
     },
     restorePageData () {
-      const pageCacheData = Cache.PeotryPageCache.getData(this.peotryID)
+      const pageCacheData = Cache.PoetryPageCache.getData(this.poetryID)
       if (!pageCacheData) {
         return false
       }
 
-      this.peotry = pageCacheData.peotry
+      this.poetry = pageCacheData.poetry
       this.praiseOffset = pageCacheData.praiseOffset
       this.commentOffset = pageCacheData.commentOffset
       this.myPraiseComment = pageCacheData.myPraiseComment
@@ -183,14 +183,14 @@ export default {
       return true
     },
     checkRestorePageData () {
-      this.peotryID = this.$route.params.id
+      this.poetryID = this.$route.params.id
       if (!this.restorePageData()) {
-        this.getPeotryDetail()
+        this.getPoetryDetail()
       }
     },
 
-    getPeotryDetail () {
-      const setSimplePeotry = o => {
+    getPoetryDetail () {
+      const setSimplePoetry = o => {
         o.praiseTotal = -1
         o.praiseComments = []
         o.isPraiseLoading = false
@@ -200,34 +200,34 @@ export default {
         if (o.user) {
           o.user = Object.freeze(o.user)
         }
-        this.peotry = o
-        this.checkPraisePeotry()
+        this.poetry = o
+        this.checkPraisePoetry()
         this.getContentComments()
         this.getPraiseComments()
       }
 
-      const temp = sessionStorage.getItem('peotry-detail')
+      const temp = sessionStorage.getItem('poetry-detail')
       if (temp) {
         const o = JSON.parse(temp)
-        if (this.peotryID === o.id) {
-          setSimplePeotry(o)
+        if (this.poetryID === o.id) {
+          setSimplePoetry(o)
           return
         }
-        sessionStorage.removeItem('peotry-detail')
+        sessionStorage.removeItem('poetry-detail')
       }
 
-      apiGetData(apiURL.peotryList, { id: this.peotryID }).then(data => {
-        setSimplePeotry(data.data)
+      apiGetData(apiURL.poetryList, { id: this.poetryID }).then(data => {
+        setSimplePoetry(data.data)
       })
     },
 
-    checkPraisePeotry () {
+    checkPraisePoetry () {
       if (!this.userID) {
         return
       }
       this.praiseRequesting = true
       apiGetData(apiURL.commentPraiseCheck, {
-        id: this.peotryID,
+        id: this.poetryID,
         userId: this.userID
       })
         .then(resp => {
@@ -236,8 +236,8 @@ export default {
             this.myPraiseComment = undefined
             return
           }
-          list[0].fromPeot = users[0] || {}
-          list[0].toPeot = {}
+          list[0].fromPoet = users[0] || {}
+          list[0].toPoet = {}
           this.myPraiseComment = this.formatComments(list)[0]
         })
         .finally(() => {
@@ -249,9 +249,9 @@ export default {
       if (isReset) {
         this.commentOffset = 0
       }
-      this.peotry.isCommentLoading = true
+      this.poetry.isCommentLoading = true
       apiGetData(apiURL.commentContent, {
-        id: this.peotryID,
+        id: this.poetryID,
         limit: this.pageLimit,
         offset: this.commentOffset
       }).then(resp => {
@@ -260,39 +260,39 @@ export default {
         const comments = this.formatComments(list)
         comments.forEach(o => {
           const fromInfo = userMap[o.fromId]
-          o.fromPeot = {
+          o.fromPoet = {
             id: fromInfo.id,
             username: fromInfo.user_name,
             avatar: fromInfo.avatar
           }
           const toInfo = userMap[o.toId]
-          o.toPeot = {
+          o.toPoet = {
             id: toInfo.id,
             username: toInfo.user_name,
             avatar: toInfo.avatar
           }
         })
 
-        const peotry = this.peotry
+        const poetry = this.poetry
         if (isReset) {
-          peotry.realComments = comments
+          poetry.realComments = comments
         } else {
-          peotry.realComments.push(...comments)
+          poetry.realComments.push(...comments)
         }
-        peotry.commentTotal = +count
+        poetry.commentTotal = +count
 
         this.commentOffset += this.pageLimit
       }).finally(() => {
-        this.peotry.isCommentLoading = false
+        this.poetry.isCommentLoading = false
       })
     },
     getPraiseComments (isReset) {
       if (isReset) {
         this.praiseOffset = 0
       }
-      this.peotry.isPraiseLoading = true
+      this.poetry.isPraiseLoading = true
       apiGetData(apiURL.commentPraise, {
-        id: this.peotryID,
+        id: this.poetryID,
         limit: this.pageLimit,
         offset: this.praiseOffset
       }).then(resp => {
@@ -305,25 +305,25 @@ export default {
         const comments = this.formatComments(list)
         comments.forEach(o => {
           const info = userMap[o.fromId]
-          o.fromPeot = {
+          o.fromPoet = {
             id: info.id,
             username: info.user_name,
             avatar: info.avatar
           }
-          o.toPeot = {}
+          o.toPoet = {}
         })
 
-        const peotry = this.peotry
+        const poetry = this.poetry
         if (isReset) {
-          peotry.praiseComments = comments
+          poetry.praiseComments = comments
         } else {
-          peotry.praiseComments.push(...comments)
+          poetry.praiseComments.push(...comments)
         }
-        peotry.praiseTotal = +count
+        poetry.praiseTotal = +count
 
         this.praiseOffset += this.pageLimit
       }).finally(() => {
-        this.peotry.isPraiseLoading = false
+        this.poetry.isPraiseLoading = false
       })
     },
     formatComments (comments = []) {
@@ -347,11 +347,11 @@ export default {
       }
       this.commentVisible = true
       this.commentID = typeId
-      this.commentTypeUserID = this.peotry.user.id
+      this.commentTypeUserID = this.poetry.user.id
       this.commentToID = +fromId
       this.commentTip = tip
     },
-    onCheckPraisePeotry (e) {
+    onCheckPraisePoetry (e) {
       if (!this.userID) {
         this.$toastLogin()
         return
@@ -369,13 +369,13 @@ export default {
           fromId: comment.fromId
         })
           .then(data => {
-            const { praiseComments } = this.peotry
+            const { praiseComments } = this.poetry
             const index = praiseComments.findIndex(o => o.id === comment.id)
             if (index >= 0) {
               praiseComments.splice(index, 1)
               this.praiseOffset -= 1
             }
-            this.peotry.praiseTotal -= 1
+            this.poetry.praiseTotal -= 1
             this.myPraiseComment = undefined
           })
           .finally(() => {
@@ -384,24 +384,24 @@ export default {
       } else {
         apiPostData(apiURL.commentCreate, {
           type: 1,
-          typeId: this.peotry.id,
-          typeUserId: this.peotry.user.id,
+          typeId: this.poetry.id,
+          typeUserId: this.poetry.user.id,
           content: 'praise',
           fromId: this.userID,
           toId: -1
         })
           .then(({ data }) => {
             const comment = data
-            const { praiseTotal, praiseComments } = this.peotry
+            const { praiseTotal, praiseComments } = this.poetry
             if (praiseTotal === praiseComments.length) {
-              comment.fromPeot = JSON.parse(
+              comment.fromPoet = JSON.parse(
                 JSON.stringify(this.selfPublicInfo)
               )
               comment.itemTag = 'opacity'
               praiseComments.push(comment)
             }
             this.myPraiseComment = comment
-            this.peotry.praiseTotal += 1
+            this.poetry.praiseTotal += 1
 
             this.$nextTick(() => {
               this.onPraiseAnime(e, comment)
@@ -412,7 +412,7 @@ export default {
           })
       }
     },
-    deleteComment (peotry, comment) {
+    deleteComment (poetry, comment) {
       apiPostData(apiURL.commentDelete, {
         id: comment.id,
         fromId: comment.fromId
@@ -422,42 +422,42 @@ export default {
     },
 
     handleDropdown (key, e) {
-      const peotry = this.peotry
+      const poetry = this.poetry
       switch (key) {
         case 'edit':
-          const editPeotry = {
-            id: peotry.id,
-            set: peotry.set,
-            title: peotry.title,
-            content: peotry.content,
-            end: peotry.end
+          const editPoetry = {
+            id: poetry.id,
+            set: poetry.set,
+            title: poetry.title,
+            content: poetry.content,
+            end: poetry.end
           }
-          sessionStorage.setItem(PEOTRY.EDIT_DATA, JSON.stringify(editPeotry))
+          sessionStorage.setItem(PEOTRY.EDIT_DATA, JSON.stringify(editPoetry))
           this.$router.push({
-            name: 'peotry-edit',
-            params: { id: editPeotry.id }
+            name: 'poetry-edit',
+            params: { id: editPoetry.id }
           })
           break
         case 'comment':
-          this.openCommentInput(peotry.id, this.userID, '请输入评论')
+          this.openCommentInput(poetry.id, this.userID, '请输入评论')
           break
         case 'praise':
-          this.onCheckPraisePeotry(e)
+          this.onCheckPraisePoetry(e)
           break
         case 'delete':
           this.$confirm({
             title: '删除提示',
             content: '诗词删除后将无法找回，请确认!',
             confirm: () => {
-              apiPostData(apiURL.peotryDelete, {
+              apiPostData(apiURL.poetryDelete, {
                 userId: this.userID,
-                id: this.peotry.id
+                id: this.poetry.id
               }).then(resp => {
                 this.$toast('删除成功')
-                Cache.PeotryPageCache.delete(this.peotryID)
+                Cache.PoetryPageCache.delete(this.poetryID)
                 Cache.OptionCache.setData(Cache.OPTION.DELETE, {
-                  id: this.peotryID,
-                  type: 'peotry'
+                  id: this.poetryID,
+                  type: 'poetry'
                 })
                 this.onBack()
               })
@@ -475,56 +475,56 @@ export default {
         return
       }
 
-      const peotry = this.peotry
+      const poetry = this.poetry
       const itemIndex = getItemIndex(el)
       const commentIndex = getItemTypeIndex(el, 'comment')
 
       switch (itemType) {
-        case 'peotry-content':
+        case 'poetry-content':
           const time = this.previousTime || 0
           const currentTime = Date.now()
           if (currentTime - time < 300) {
-            this.onCheckPraisePeotry(e)
+            this.onCheckPraisePoetry(e)
           }
           this.previousTime = currentTime
           break
-        case 'peotry-image':
-          this.images = this.$refs.peotry.peotryImages
+        case 'poetry-image':
+          this.images = this.$refs.poetry.poetryImages
           this.imageIndex = itemIndex
           this.viewerVisible = true
           break
-        case 'peot':
-          this.openCommentInput(peotry.id, this.userID, '请输入评论')
+        case 'poet':
+          this.openCommentInput(poetry.id, this.userID, '请输入评论')
           break
-        case 'peot-avatar':
+        case 'poet-avatar':
           this.$router.push({
             name: 'personal',
-            query: { uuid: peotry.user.id, username: peotry.user.username }
+            query: { uuid: poetry.user.id, username: poetry.user.username }
           })
           break
         case 'comment-avatar':
-          const poet = peotry.praiseComments[itemIndex].fromPeot
+          const poet = poetry.praiseComments[itemIndex].fromPoet
           this.$router.push({
             name: 'personal',
             query: { uuid: poet.id, username: poet.username }
           })
           break
         case 'comment-from':
-          const fromComment = peotry.realComments[commentIndex]
+          const fromComment = poetry.realComments[commentIndex]
           this.$router.push({
             name: 'personal',
             query: { uuid: fromComment.fromId }
           })
           break
         case 'comment-to':
-          const toComment = peotry.realComments[commentIndex]
+          const toComment = poetry.realComments[commentIndex]
           this.$router.push({
             name: 'personal',
             query: { uuid: toComment.toId }
           })
           break
         case 'comment-content':
-          this.onClickComment(peotry, peotry.realComments[commentIndex])
+          this.onClickComment(poetry, poetry.realComments[commentIndex])
           break
         case 'avatars-more':
           this.getPraiseComments()
@@ -537,7 +537,7 @@ export default {
           break
       }
     },
-    onClickComment (peotry, comment) {
+    onClickComment (poetry, comment) {
       if (!this.userID) {
         this.$toastLogin()
         return
@@ -548,31 +548,31 @@ export default {
           title: '提示',
           content: '是否删除该评论?',
           confirm: () => {
-            this.deleteComment(peotry, comment)
+            this.deleteComment(poetry, comment)
           }
         })
         return
       }
-      Cache.UserCache.setData(comment.fromId, comment.fromPeot)
+      Cache.UserCache.setData(comment.fromId, comment.fromPoet)
       this.openCommentInput(
         comment.typeId,
         comment.fromId,
-        `回复 ${comment.fromPeot.username}`
+        `回复 ${comment.fromPoet.username}`
       )
     },
     handleCommentOk (o) {
-      const { commentTotal, realComments } = this.peotry
+      const { commentTotal, realComments } = this.poetry
       if (commentTotal === realComments.length) {
-        o.fromPeot = JSON.parse(JSON.stringify(this.selfPublicInfo))
-        o.toPeot = Cache.UserCache.getData(+this.commentToID)
+        o.fromPoet = JSON.parse(JSON.stringify(this.selfPublicInfo))
+        o.toPoet = Cache.UserCache.getData(+this.commentToID)
         realComments.push(o)
       }
-      this.peotry.commentTotal += 1
+      this.poetry.commentTotal += 1
     },
 
     onPraiseAnime (e, data) {
-      const peotry = this.peotry
-      const instance = this.$refs.peotry
+      const poetry = this.poetry
+      const instance = this.$refs.poetry
       const commentsEl = instance.$refs.comments
       if (!commentsEl) {
         return
@@ -592,10 +592,10 @@ export default {
         left: rect.left + rect.width / 2 + 'px',
         top: rect.top + rect.height / 2 + 'px'
       }
-      this.praiseId = peotry.id
+      this.praiseId = poetry.id
       this.praiseVisible = true
-      this.praiseMap[peotry.id] = {
-        peotry,
+      this.praiseMap[poetry.id] = {
+        poetry,
         data
       }
     },
@@ -615,7 +615,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/ui/style/const.scss";
 
-.peotry-detail {
+.poetry-detail {
   display: flex;
   flex-direction: column;
   position: relative;

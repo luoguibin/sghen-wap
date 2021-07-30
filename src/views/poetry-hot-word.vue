@@ -1,5 +1,5 @@
 <template>
-  <div class="peotry-hot-word">
+  <div class="poetry-hot-word">
     <div ref="container" class="container"></div>
   </div>
 </template>
@@ -18,7 +18,7 @@ export default {
   },
 
   mounted () {
-    window.peotryWordcloud = this
+    window.poetryWordcloud = this
     this.initChart()
     this.getWords()
   },
@@ -78,7 +78,7 @@ export default {
       })
       this.chart.on('click', (params) => {
         this.$router.push({
-          name: 'peotry-list',
+          name: 'poetry-list',
           query: {
             keyword: params.data.name
           }
@@ -92,7 +92,7 @@ export default {
       toDay += '-' + (date.getMonth() + 1)
       toDay += '-' + date.getDate() + ' 00:00:00'
 
-      apiGetData(apiURL.peotryHotWord, { toDay }).then((data) => {
+      apiGetData(apiURL.poetryHotWord, { toDay }).then((data) => {
         const list = data.data || []
         const words = list.map((o) => {
           return {
@@ -121,7 +121,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.peotry-hot-word {
+.poetry-hot-word {
   .container {
     width: 348px;
     height: 348px;

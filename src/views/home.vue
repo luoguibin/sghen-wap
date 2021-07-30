@@ -38,7 +38,7 @@
             ref="sgSlider"
             :index="sliderIndex"
             :items="sliderItems"
-            :itemType="'slider-peotry'"
+            :itemType="'slider-poetry'"
             :duration="sliderDuration"
             :loopTotal="99"
             @change="onSliderChange"
@@ -76,14 +76,14 @@
           <div class="menu-item">
             <sg-button
               type="primary"
-              @click="$router.push({ name: 'peotry-images' })"
+              @click="$router.push({ name: 'poetry-images' })"
               >诗词图集~</sg-button
             >
           </div>
           <div class="menu-item">
             <sg-button
               type="primary"
-              @click="$router.push({ name: 'peotry-list' })"
+              @click="$router.push({ name: 'poetry-list' })"
               >最新诗词~</sg-button
             >
           </div>
@@ -94,14 +94,14 @@
           <h2>{{ year }}年度诗词概况</h2>
           <p @click="onClickItemType">
             本年度共创建
-            <span>{{ yearPeotryCount }}</span
+            <span>{{ yearPoetryCount }}</span
             >首诗词，其中以选集
             <span item-type="year-set">《{{ yearPoetrySets[0].name }}》</span>
             {{ yearPoetrySets[0].count }}首稳居榜首；
-            <template v-if="yearPeots.length">
+            <template v-if="yearPoets.length">
               诗词创建数量最多的是
-              <span item-type="year-poet">[{{ yearPeots[0].username }}]</span>
-              ，共创建{{ yearPeots[0].count }}首。
+              <span item-type="year-poet">[{{ yearPoets[0].username }}]</span>
+              ，共创建{{ yearPoets[0].count }}首。
             </template>
           </p>
         </div>
@@ -111,7 +111,7 @@
           <h2>选集总排行榜</h2>
           <div class="popular-sets" @click="onClickItemType">
             <div
-              v-for="item in popularPeotrySets"
+              v-for="item in popularPoetrySets"
               :key="item.id"
               class="popular-set"
               item-type="popular-set"
@@ -128,7 +128,7 @@
           >
             诗词云库
           </h2>
-          <peotry-hot-word></peotry-hot-word>
+          <poetry-hot-word></poetry-hot-word>
         </div>
 
         <site-instruction></site-instruction>
@@ -154,15 +154,15 @@ export default {
   components: {
     SiteInstruction: () => import('@/components/site-instruction'),
     SghenLogo: () => import('@/components/sghen-logo'),
-    PeotryHotWord: () => import('./peotry-hot-word')
+    PoetryHotWord: () => import('./poetry-hot-word')
   },
 
   data () {
     return {
       year: new Date().getFullYear() - 1,
-      yearPeots: [],
+      yearPoets: [],
       yearPoetrySets: [],
-      popularPeotrySets: [],
+      popularPoetrySets: [],
 
       sliderItems: [],
       sliderIndex: 0,
@@ -179,7 +179,7 @@ export default {
   },
 
   computed: {
-    yearPeotryCount () {
+    yearPoetryCount () {
       return this.yearPoetrySets.reduce((v, o) => v + +o.count, 0)
     },
     ...mapGetters({
@@ -205,20 +205,20 @@ export default {
         sliderItems: this.sliderItems,
         sliderIndex: this.sliderIndex,
         yearPoetrySets: this.yearPoetrySets,
-        yearPeots: this.yearPeots,
-        popularPeotrySets: this.popularPeotrySets
+        yearPoets: this.yearPoets,
+        popularPoetrySets: this.popularPoetrySets
       }
-      Cache.PeotryPageCache.setData(HOME_ID, data)
+      Cache.PoetryPageCache.setData(HOME_ID, data)
     },
     resotrePageData () {
-      const pageData = Cache.PeotryPageCache.getData(HOME_ID)
+      const pageData = Cache.PoetryPageCache.getData(HOME_ID)
       if (pageData) {
         this.sliderPoetries = pageData.sliderPoetries
         this.sliderItems = pageData.sliderItems
         this.sliderIndex = pageData.sliderIndex
         this.yearPoetrySets = pageData.yearPoetrySets
-        this.yearPeots = pageData.yearPeots
-        this.popularPeotrySets = pageData.popularPeotrySets
+        this.yearPoets = pageData.yearPoets
+        this.popularPoetrySets = pageData.popularPoetrySets
         return true
       } else {
         return false
@@ -227,7 +227,7 @@ export default {
     checkRestorePageData () {
       if (!this.resotrePageData()) {
         this.getYearInfos()
-        this.getPopularPeotries()
+        this.getPopularPoetries()
       }
     },
     getYearInfos () {
@@ -235,18 +235,18 @@ export default {
         date0: `${this.year}-01-01 00:00:00`,
         date1: `${this.year + 1}-01-01 00:00:00`
       }
-      apiGetData(apiURL.peotrySetListYear, params).then((resp) => {
+      apiGetData(apiURL.poetrySetListYear, params).then((resp) => {
         this.yearPoetrySets = resp.data
       })
-      apiGetData(apiURL.peotryUserListYear, params).then((resp) => {
-        this.yearPeots = resp.data
+      apiGetData(apiURL.poetryUserListYear, params).then((resp) => {
+        this.yearPoets = resp.data
       })
       apiGetData(apiURL.poetrySetPopular).then((resp) => {
-        this.popularPeotrySets = resp.data
+        this.popularPoetrySets = resp.data
       })
     },
-    getPopularPeotries () {
-      apiGetData(apiURL.peotryPopular).then((resp) => {
+    getPopularPoetries () {
+      apiGetData(apiURL.poetryPopular).then((resp) => {
         const { comments, list = [], sets, users, images } = resp.data
         const commentMap = arrayToMap(comments, 'type_id')
         const setMap = arrayToMap(sets)
@@ -288,7 +288,7 @@ export default {
       switch (key) {
         case 'my-list':
           this.$router.push({
-            name: 'peotry-list',
+            name: 'poetry-list',
             query: { uuid: this.userID, username: this.userName }
           })
           break
@@ -339,27 +339,27 @@ export default {
 
       const itemIndex = getItemIndex(el)
       switch (itemType) {
-        case 'slider-peotry':
+        case 'slider-poetry':
           this.$router.push({
-            name: 'peotry-detail',
+            name: 'poetry-detail',
             params: { id: this.sliderPoetries[itemIndex].id }
           })
           break
         case 'popular-set':
           {
-            const set = this.popularPeotrySets[itemIndex]
+            const set = this.popularPoetrySets[itemIndex]
             const query = { setId: set.id, setName: set.name }
             if (set.userId && set.userId !== '0') {
               query.uuid = set.userId
             }
-            this.$router.push({ name: 'peotry-list', query })
+            this.$router.push({ name: 'poetry-list', query })
           }
           break
         case 'year-set':
           {
             const set = this.yearPoetrySets[0]
             this.$router.push({
-              name: 'peotry-list',
+              name: 'poetry-list',
               query: { setId: set.id, setName: set.name }
             })
           }
@@ -367,7 +367,7 @@ export default {
         case 'year-poet':
           this.$router.push({
             name: 'personal',
-            query: { uuid: this.yearPeots[0].id }
+            query: { uuid: this.yearPoets[0].id }
           })
           break
         default:

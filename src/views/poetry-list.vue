@@ -1,12 +1,12 @@
 <template>
-  <div class="peotry-list">
+  <div class="poetry-list">
     <sg-header @back="$router.go(-1)">
       {{title}}
       <span
         v-show="isSelf"
         slot="right"
         class="iconfont icon-increase"
-        @click="onGoNewPeotry"
+        @click="onGoNewPoetry"
       ></span>
     </sg-header>
 
@@ -19,9 +19,9 @@
         @refresh="handleRefresh"
         @scroll="handleScroll"
       >
-        <template v-for="item in peotries">
+        <template v-for="item in poetries">
           <div v-if="item.timeLine" :key="item.id + '-time'" class="time-line sg-sticky-item" item-empty>{{item.timeLine}}</div>
-          <peotry :key="item.id" :peotry="item" ref="peotries"></peotry>
+          <poetry :key="item.id" :poetry="item" ref="poetries"></poetry>
         </template>
       </sg-scroll>
       <div v-show="isEmpty" class="empty">暂未有诗词</div>
@@ -37,13 +37,13 @@ import { apiURL, apiGetData } from '@/api'
 import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
 import Cache from '@/common/cache-center'
 
-const CACHE_ROOT_ID = 'peotry_list_root'
+const CACHE_ROOT_ID = 'poetry_list_root'
 
 export default {
-  nae: 'PeotryList',
+  nae: 'PoetryList',
 
   components: {
-    peotry: () => import('@/components/peotry'),
+    poetry: () => import('@/components/poetry'),
     'image-viewer': () => import('@/components/image-viewer')
   },
 
@@ -55,7 +55,7 @@ export default {
       page: 1,
       limit: 20,
       isEnd: false,
-      peotries: [],
+      poetries: [],
       isDataReady: false,
 
       viewerVisible: false,
@@ -83,7 +83,7 @@ export default {
       return +this.userID === +this.uuid
     },
     isEmpty () {
-      return !this.peotries.length && this.isDataReady
+      return !this.poetries.length && this.isDataReady
     },
     ...mapState({
       userID: state => state.auth.userID
@@ -91,7 +91,7 @@ export default {
   },
 
   mounted () {
-    window.peotryList = this
+    window.poetryList = this
     this.checkRestorePageData()
   },
 
@@ -102,7 +102,7 @@ export default {
   },
 
   beforeRouteLeave (to, from, next) {
-    if (to.name === 'peotry-detail' || to.name === 'personal') {
+    if (to.name === 'poetry-detail' || to.name === 'personal') {
       this.savePageData()
     }
     next()
@@ -113,20 +113,20 @@ export default {
       return `${this.uuid}-${this.setId}`
     },
     savePageData () {
-      Cache.PeotryPageCache.setData(this.getSaveID(), {
-        peotries: this.peotries,
+      Cache.PoetryPageCache.setData(this.getSaveID(), {
+        poetries: this.poetries,
         page: this.page,
         isEnd: this.isEnd,
         scrollTop: this.$refs.sgScroll.getScrollTop()
       })
     },
     restorePageData () {
-      const pageCacheData = Cache.PeotryPageCache.getData(this.getSaveID())
+      const pageCacheData = Cache.PoetryPageCache.getData(this.getSaveID())
       if (!pageCacheData) {
         return false
       }
 
-      this.peotries = pageCacheData.peotries
+      this.poetries = pageCacheData.poetries
       this.page = pageCacheData.page
       this.isEnd = pageCacheData.isEnd
       this.isDataReady = true
@@ -134,7 +134,7 @@ export default {
       this.$refs.sgScroll.success()
       this.$nextTick(() => {
         this.$refs.sgScroll.setScrollTop(pageCacheData.scrollTop)
-        this.checkPeotriesVisible()
+        this.checkPoetriesVisible()
       })
       return true
     },
@@ -148,7 +148,7 @@ export default {
 
       // 若删除了诗词，列表应该刷新
       const optionData = Cache.OptionCache.getData(Cache.OPTION.DELETE)
-      if (!optionData || optionData.type !== 'peotry') {
+      if (!optionData || optionData.type !== 'poetry') {
         if (this.restorePageData()) {
           return
         }
@@ -158,7 +158,7 @@ export default {
       }
       this.isDataReady = false
       this.page = 1
-      this.peotries = []
+      this.poetries = []
       this.$refs.sgScroll.refresh()
     },
 
@@ -182,19 +182,19 @@ export default {
         params.content = keyword
       }
 
-      apiGetData(apiURL.peotryList, params)
+      apiGetData(apiURL.poetryList, params)
         .then(data => {
           const list = data.data
 
           if (isRefresh) {
-            this.peotries = list
+            this.poetries = list
           } else {
-            this.peotries.push(...list)
+            this.poetries.push(...list)
           }
           // 判断添加时间线
           let currentYearMonth = 999911
           const nowYear = new Date().getFullYear()
-          this.peotries.forEach(o => {
+          this.poetries.forEach(o => {
             const createDate = new Date(o.time)
             const tempYearMonth =
               createDate.getFullYear() * 100 + createDate.getMonth()
@@ -208,12 +208,12 @@ export default {
             currentYearMonth = tempYearMonth
           })
           this.isDataReady = true
-          this.isEnd = this.peotries.length === data.totalCount
+          this.isEnd = this.poetries.length === data.totalCount
 
           this.$refs.sgScroll.success()
           isRefresh && this.$refs.sgScroll.onScrollToTop()
 
-          isRefresh && this.checkPeotriesVisible()
+          isRefresh && this.checkPoetriesVisible()
         })
         .catch(() => {
           this.$refs.sgScroll.fail()
@@ -222,13 +222,13 @@ export default {
     handleRefresh () {
       this.page = 1
       this.scrollItemMap = {}
-      Cache.PeotryPageCache.delete(this.getSaveID())
+      Cache.PoetryPageCache.delete(this.getSaveID())
       Cache.UserCache.clear()
       this.handleLoad(true)
     },
-    checkPeotriesVisible () {
+    checkPoetriesVisible () {
       this.timeHandler = setInterval(() => {
-        if (this.$refs.peotries) {
+        if (this.$refs.poetries) {
           clearInterval(this.timeHandler)
           this.handleScroll(0, this.$el.clientHeight)
         }
@@ -236,10 +236,10 @@ export default {
     },
     handleScroll (scrollTop, clientHeight) {
       const map = this.scrollItemMap
-      this.$refs.peotries.forEach((o, index) => {
+      this.$refs.poetries.forEach((o, index) => {
         const offsetTop = o.$el.offsetTop
         if (Math.abs(offsetTop - scrollTop) <= clientHeight) {
-          const id = this.peotries[index].id
+          const id = this.poetries[index].id
           if (!map[id]) {
             map[id] = true
             o.setScrollIntoView()
@@ -254,35 +254,35 @@ export default {
       }
 
       const itemIndex = getItemIndex(el)
-      const index = getItemTypeIndex(el, 'peotry')
-      const peotry = this.peotries[index]
-      const instance = this.$refs.peotries[index]
+      const index = getItemTypeIndex(el, 'poetry')
+      const poetry = this.poetries[index]
+      const instance = this.$refs.poetries[index]
       switch (itemType) {
-        case 'peotry-content':
-          sessionStorage.setItem('peotry-detail', JSON.stringify(peotry))
+        case 'poetry-content':
+          sessionStorage.setItem('poetry-detail', JSON.stringify(poetry))
           this.$router.push({
-            name: 'peotry-detail',
-            params: { id: peotry.id }
+            name: 'poetry-detail',
+            params: { id: poetry.id }
           })
           break
-        case 'peotry-image':
-          this.images = instance.peotryImages
+        case 'poetry-image':
+          this.images = instance.poetryImages
           this.imageIndex = itemIndex
           this.viewerVisible = true
           break
-        case 'peot-avatar':
+        case 'poet-avatar':
           this.$router.push({
             name: 'personal',
-            query: { uuid: peotry.user.id, username: peotry.user.username }
+            query: { uuid: poetry.user.id, username: poetry.user.username }
           })
           break
         default:
           break
       }
     },
-    onGoNewPeotry () {
+    onGoNewPoetry () {
       this.$router.push({
-        name: 'peotry-edit',
+        name: 'poetry-edit',
         params: { id: 'new' },
         query: { setId: this.setId, setName: this.setName }
       })
@@ -292,7 +292,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.peotry-list {
+.poetry-list {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -306,7 +306,7 @@ export default {
     overflow: hidden;
   }
 
-  .peotry {
+  .poetry {
     margin-bottom: 3rem;
     &:first-child {
       margin-top: 2rem;

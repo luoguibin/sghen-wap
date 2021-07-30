@@ -15,24 +15,24 @@ const routes = [
     component: () => import(/* webpackChunkName: 'home' */'@/views/home')
   },
   {
-    path: '/peotry-images',
-    name: 'peotry-images',
-    component: () => import(/* webpackChunkName: 'peotry-images' */'@/views/peotry-images')
+    path: '/poetry-images',
+    name: 'poetry-images',
+    component: () => import(/* webpackChunkName: 'poetry-images' */'@/views/poetry-images')
   },
   {
-    path: '/peotry-list',
-    name: 'peotry-list',
-    component: () => import(/* webpackChunkName: 'peotry-list' */'@/views/peotry-list')
+    path: '/poetry-list',
+    name: 'poetry-list',
+    component: () => import(/* webpackChunkName: 'poetry-list' */'@/views/poetry-list')
   },
   {
-    path: '/peotry-detail/:id',
-    name: 'peotry-detail',
-    component: () => import(/* webpackChunkName: 'peotry-detail' */'@/views/peotry-detail')
+    path: '/poetry-detail/:id',
+    name: 'poetry-detail',
+    component: () => import(/* webpackChunkName: 'poetry-detail' */'@/views/poetry-detail')
   },
   {
-    path: '/peotry-edit/:id',
-    name: 'peotry-edit',
-    component: () => import(/* webpackChunkName: 'peotry-edit' */'@/views/peotry-edit')
+    path: '/poetry-edit/:id',
+    name: 'poetry-edit',
+    component: () => import(/* webpackChunkName: 'poetry-edit' */'@/views/poetry-edit')
   },
   {
     path: '/personal',

@@ -1,32 +1,32 @@
 <template>
-  <div class="peotry" item-type="peotry">
+  <div class="poetry" item-type="poetry">
     <slot name="header"></slot>
     <div :class="{'wrapper': true, 'avatar-visible': showAvatar}">
       <!-- 诗词选集及标题 -->
       <div class="set--title">
-        <span v-if="peotry.set" class="set">{{peotry.set.name}}</span>
-        <span v-if="peotry.set && peotry.title" class="dot">*</span>
-        <span class="title" v-if="peotry.title">{{peotry.title}}</span>
+        <span v-if="poetry.set" class="set">{{poetry.set.name}}</span>
+        <span v-if="poetry.set && poetry.title" class="dot">*</span>
+        <span class="title" v-if="poetry.title">{{poetry.title}}</span>
 
         <!-- 诗人头像 -->
         <img
           v-if="showAvatar"
           class="avatar"
-          item-type="peot-avatar"
-          :src="(peotry.user && peotry.user.avatar) | imgSrcFilter('avatar')"
+          item-type="poet-avatar"
+          :src="(poetry.user && poetry.user.avatar) | imgSrcFilter('avatar')"
         />
       </div>
 
       <!-- 诗词作者及创建时间 -->
-      <div class="peot--time">
-        <span item-type="peot">{{peotry.user ? peotry.user.username : ""}}</span>
-        <span><i class="iconfont icon-history"></i>{{peotry.time | timeFilter}}</span>
+      <div class="poet--time">
+        <span item-type="poet">{{poetry.user ? poetry.user.username : ""}}</span>
+        <span><i class="iconfont icon-history"></i>{{poetry.time | timeFilter}}</span>
       </div>
 
       <!-- 诗词内容 -->
       <div ref="contentEnd" :class="{'content--end': true, 'max-height': !isExpand }">
-        <div item-type="peotry-content" class="content" v-html="safeContent"></div>
-        <div class="end" v-if="peotry.end">{{peotry.end}}</div>
+        <div item-type="poetry-content" class="content" v-html="safeContent"></div>
+        <div class="end" v-if="poetry.end">{{poetry.end}}</div>
       </div>
 
       <!-- 诗词扩展按钮 -->
@@ -41,7 +41,7 @@
           v-for="(value, index) in currentThumbnails"
           :key="index"
           class="image-wrapper"
-          item-type="peotry-image"
+          item-type="poetry-image"
         >
           <div class="image-wrapper__inner">
             <img :src="value" />
@@ -52,13 +52,13 @@
       <!-- 诗词评论 -->
       <comments
         ref="comments"
-        :praises="peotry.praiseComments"
-        :praiseTotal="peotry.praiseTotal"
-        :comments="peotry.realComments"
-        :commentTotal="peotry.commentTotal"
+        :praises="poetry.praiseComments"
+        :praiseTotal="poetry.praiseTotal"
+        :comments="poetry.realComments"
+        :commentTotal="poetry.commentTotal"
         :isDetail="isDetail"
-        :isPraiseLoading="peotry.isPraiseLoading"
-        :isCommentLoading="peotry.isCommentLoading"
+        :isPraiseLoading="poetry.isPraiseLoading"
+        :isCommentLoading="poetry.isCommentLoading"
       ></comments>
     </div>
   </div>
@@ -71,14 +71,14 @@ import { defaultImgSrc } from '@/common/const'
 import Comments from './comments'
 
 export default {
-  name: 'Peotry',
+  name: 'Poetry',
 
   components: {
     Comments
   },
 
   props: {
-    peotry: {
+    poetry: {
       type: Object,
       required: true
     },
@@ -109,9 +109,9 @@ export default {
         typeId: 0,
         content: '',
         fromId: 0,
-        fromPeot: null,
+        fromPoet: null,
         toId: 0,
-        toPeot: null
+        toPoet: null
       },
       clickTime: 0,
       hasExpand: false,
@@ -124,13 +124,13 @@ export default {
   filters: {},
   computed: {
     safeContent () {
-      return this.$xss(this.peotry ? this.peotry.content : '')
+      return this.$xss(this.poetry ? this.poetry.content : '')
     },
     /**
      * @returns {Array} 返回诗词的直接可用图片列表
      */
-    peotryImages () {
-      const imageObj = this.peotry.image
+    poetryImages () {
+      const imageObj = this.poetry.image
       if (imageObj && imageObj.count) {
         const srcFilter = Vue.filter('imgSrcFilter')
         return JSON.parse(imageObj.images).map(v => {
@@ -141,7 +141,7 @@ export default {
       }
     },
     thumbnails () {
-      return this.peotryImages.map(v => {
+      return this.poetryImages.map(v => {
         if (v.endsWith('.jpg')) {
           v = v.replace(/.jpg$/, '_100.jpg')
         } else if (v.endsWith('.png')) {
@@ -196,7 +196,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.peotry {
+.poetry {
   position: relative;
 
   .wrapper {
@@ -236,7 +236,7 @@ export default {
     }
   }
 
-  .peot--time {
+  .poet--time {
     padding-bottom: 1.2rem;
     font-size: 14px;
     color: #888888;

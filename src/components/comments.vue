@@ -23,13 +23,13 @@
           <span
             class="name"
             item-type="comment-from"
-          >{{comment.fromPeot ? comment.fromPeot.username : comment.fromId}}</span>
+          >{{comment.fromPoet ? comment.fromPoet.username : comment.fromId}}</span>
           <span v-if="comment.toId !== comment.fromId" class="to">回复</span>
           <span
             v-if="comment.toId !== comment.fromId"
             class="name"
             item-type="comment-to"
-          >{{comment.toPeot ? comment.toPeot.username : comment.toId}}</span>
+          >{{comment.toPoet ? comment.toPoet.username : comment.toId}}</span>
           <i>:</i>
         </span>
         <p item-type="comment-content" v-html="$xss(comment.content0)"></p>
@@ -118,7 +118,7 @@ export default {
       const srcFilter = Vue.filter('imgSrcFilter')
       return this.praises.map(o => {
         const temp = { ...o }
-        temp.avatar = this.isIntoView ? srcFilter(o.fromPeot && o.fromPeot.avatar, 'avatar') : this.defaultAvatarSrc
+        temp.avatar = this.isIntoView ? srcFilter(o.fromPoet && o.fromPoet.avatar, 'avatar') : this.defaultAvatarSrc
         return temp
       })
     }

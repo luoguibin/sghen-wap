@@ -1,3 +1,3 @@
 export const PEOTRY = {
-  EDIT_DATA: 'peotry_edit_data'
+  EDIT_DATA: 'poetry_edit_data'
 }

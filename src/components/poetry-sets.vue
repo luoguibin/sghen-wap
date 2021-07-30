@@ -1,5 +1,5 @@
 <template>
-  <div class="peotry-sets sg-flex-column">
+  <div class="poetry-sets sg-flex-column">
     <sg-header @back="$emit('back')" :centerStatus="''" :backVisible="false">
       <span slot="left">{{userID ? '我的' : '公开'}}选集（{{sets.length ? sets.length : '?'}}）</span>
       <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
@@ -29,7 +29,7 @@ import { mapState } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 
 export default {
-  name: 'PeotrySets',
+  name: 'PoetrySets',
 
   props: {
     defId: {
@@ -52,14 +52,14 @@ export default {
   },
 
   created () {
-    window.peotrySets = this
+    window.poetrySets = this
     this.currentId = this.defId
-    this.getPeotSets()
+    this.getPoetSets()
   },
 
   methods: {
-    getPeotSets (selectLast) {
-      apiGetData(apiURL.peotSets, { userId: this.userID }).then(resp => {
+    getPoetSets (selectLast) {
+      apiGetData(apiURL.poetSets, { userId: this.userID }).then(resp => {
         const selfId = this.userID
         const systemSets = []
         const selfSets = []
@@ -88,7 +88,7 @@ export default {
         title: '提示',
         content: '是否删除该选集',
         confirm: () => {
-          apiPostData(apiURL.peotSetDelete, { id }).then(resp => {
+          apiPostData(apiURL.poetSetDelete, { id }).then(resp => {
             const index = this.sets.findIndex(o => o.id === id)
             this.sets.splice(index, 1)
           })
@@ -131,8 +131,8 @@ export default {
           return ''
         },
         confirm: v => {
-          apiPostData(apiURL.peotSetCreate, { name: v }).then(resp => {
-            this.getPeotSets(true)
+          apiPostData(apiURL.poetSetCreate, { name: v }).then(resp => {
+            this.getPoetSets(true)
           })
         }
       })
@@ -146,7 +146,7 @@ export default {
 
 $set-item-height: $height-text * 2;
 $set-item-size: $size-text * 1.2;
-.peotry-sets {
+.poetry-sets {
   background-color: $color-bg;
   .wrapper {
     padding: $padding-normal;

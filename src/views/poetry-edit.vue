@@ -1,7 +1,7 @@
 <template>
   <div class="sg-mask">
-    <div class="peotry-edit-wrapper">
-      <div class="peotry-edit">
+    <div class="poetry-edit-wrapper">
+      <div class="poetry-edit">
         <sg-header @back="onBack">诗词{{formData.id ? '更新':'创建'}}</sg-header>
 
         <div class="main">
@@ -33,12 +33,12 @@
 
     <!-- 选集选择 -->
     <transition name="drawer">
-      <div v-if="isFormInit" v-show="peotrySetsVisible" class="sg-mask" @click="onCloseSets">
-        <peotry-sets
+      <div v-if="isFormInit" v-show="poetrySetsVisible" class="sg-mask" @click="onCloseSets">
+        <poetry-sets
           :defId="formData.setId"
           @close="onCloseSets()"
           @select="handleSetSelect"
-        ></peotry-sets>
+        ></poetry-sets>
       </div>
     </transition>
   </div>
@@ -50,11 +50,11 @@ import { apiURL, apiGetData, apiPostData } from '@/api'
 import { PEOTRY } from '@/const'
 
 export default {
-  name: 'PeotryEdit',
+  name: 'PoetryEdit',
 
   components: {
     'image-uploader': () => import('@/components/image-uploader'),
-    'peotry-sets': () => import('@/components/peotry-sets')
+    'poetry-sets': () => import('@/components/poetry-sets')
   },
 
   data () {
@@ -122,7 +122,7 @@ export default {
       ],
 
       setName: '',
-      peotrySetsVisible: false,
+      poetrySetsVisible: false,
       isSaveing: false
     }
   },
@@ -135,7 +135,7 @@ export default {
   },
 
   created () {
-    window.peotryEdit = this
+    window.poetryEdit = this
     this.initFormData()
   },
 
@@ -151,26 +151,26 @@ export default {
         this.formData.setId = +setId || ''
         this.setName = setName
 
-        const tempFormData = window.peotryEdit_formData
+        const tempFormData = window.poetryEdit_formData
         if (tempFormData) {
           this.setName = tempFormData.setName
           tempFormData.setName = undefined
           this.formData = tempFormData
-          window.peotryEdit_formData = undefined
+          window.poetryEdit_formData = undefined
         }
         this.isFormInit = true
         return
       }
       const jsonStr = sessionStorage.getItem(PEOTRY.EDIT_DATA)
-      const onSuccess = peotry => {
+      const onSuccess = poetry => {
         const data = this.formData
-        data.id = peotry.id
-        data.setId = peotry.set && peotry.set.id
-        data.title = peotry.title
-        data.content = peotry.content
-        data.end = peotry.end
+        data.id = poetry.id
+        data.setId = poetry.set && poetry.set.id
+        data.title = poetry.title
+        data.content = poetry.content
+        data.end = poetry.end
 
-        this.setName = peotry.set && peotry.set.name
+        this.setName = poetry.set && poetry.set.name
         this.formRules[this.formRules.length - 1].hidden = true
         this.isFormInit = true
       }
@@ -184,7 +184,7 @@ export default {
           duration: -1,
           loading: true
         })
-        apiGetData(apiURL.peotryList, { id: +tempId })
+        apiGetData(apiURL.poetryList, { id: +tempId })
           .then(data => {
             onSuccess(data.data)
             this.$toast('加载中...', {
@@ -202,7 +202,7 @@ export default {
       }
     },
     onOpenSetChoice () {
-      this.peotrySetsVisible = true
+      this.poetrySetsVisible = true
     },
     onCloseSets (e) {
       if (e) {
@@ -211,12 +211,12 @@ export default {
           return
         }
       }
-      this.peotrySetsVisible = false
+      this.poetrySetsVisible = false
     },
     handleSetSelect ({ id, name }) {
       this.formData.setId = id
       this.setName = name
-      this.peotrySetsVisible = false
+      this.poetrySetsVisible = false
     },
 
     handleUpload (images = []) {
@@ -226,7 +226,7 @@ export default {
         this.formData.imageNames = ''
       }
 
-      this.savePeotry()
+      this.savePoetry()
     },
     handleUploadFail () {
       this.isSaveing = false
@@ -239,7 +239,7 @@ export default {
         if (!this.userID) {
           // 添加非表单数据进入缓存，重置后删除
           this.formData.setName = this.setName
-          window.peotryEdit_formData = this.formData
+          window.poetryEdit_formData = this.formData
           this.$refs.uploader.saveImages()
           this.$toastLogin()
           return
@@ -257,7 +257,7 @@ export default {
       })
     },
 
-    savePeotry () {
+    savePoetry () {
       const data = this.formData
       const params = {
         userId: this.userID,
@@ -280,7 +280,7 @@ export default {
         loading: true,
         replace: true
       })
-      apiPostData(id ? apiURL.peotryUpdate : apiURL.peotryCreate, params)
+      apiPostData(id ? apiURL.poetryUpdate : apiURL.poetryCreate, params)
         .then(resp => {
           this.$toast(id ? '更新成功' : '创建成功', { replace: true })
           sessionStorage.removeItem(PEOTRY.EDIT_DATA)
@@ -298,7 +298,7 @@ export default {
 @import "@/ui/style/const.scss";
 
 .sg-mask {
-  .peotry-edit-wrapper {
+  .poetry-edit-wrapper {
     position: relative;
     width: 100%;
     height: 100%;
@@ -316,20 +316,20 @@ export default {
 .drawer-leave-to {
   background-color: transparent;
 }
-.drawer-enter .peotry-sets,
-.drawer-leave-to .peotry-sets {
+.drawer-enter .poetry-sets,
+.drawer-leave-to .poetry-sets {
   transform: translate(100%, 0);
 }
 .drawer-enter-active,
 .drawer-leave-active {
   transition: background-color 0.3s ease;
 }
-.drawer-enter-active .peotry-sets,
-.drawer-leave-active .peotry-sets {
+.drawer-enter-active .poetry-sets,
+.drawer-leave-active .poetry-sets {
   transition: transform 0.3s ease;
 }
 
-.peotry-edit {
+.poetry-edit {
   display: flex;
   flex-direction: column;
   position: relative;

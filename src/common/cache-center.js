@@ -31,8 +31,8 @@ class CacheCenter {
 
 const cache = {
   UserCache: new CacheCenter('user'),
-  PeotryPageCache: new CacheCenter('petory-page'),
-  PeotrySetCache: new CacheCenter('petory-set'),
+  PoetryPageCache: new CacheCenter('petory-page'),
+  PoetrySetCache: new CacheCenter('petory-set'),
   OptionCache: new CacheCenter('option'),
   OPTION: {
     CREATE: 'option-create',

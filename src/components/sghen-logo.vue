@@ -1,5 +1,5 @@
 <template>
-  <svg class="sghen-logo letters letters--effect-1" viewBox="0 0 500 100" width="500" height="100" @click="onRobotPeotry">
+  <svg class="sghen-logo letters letters--effect-1" viewBox="0 0 500 100" width="500" height="100" @click="onRobotPoetry">
     <g v-for="(p, i) in pathItems" :key="i" class="letter letter-s">
       <g class="letter-part">
         <path class="letter-layer color-bg" :d="p" />
@@ -80,7 +80,7 @@ export default {
   },
 
   methods: {
-    onRobotPeotry () {
+    onRobotPoetry () {
       if (!this.isLogin) {
         return
       }
@@ -107,8 +107,8 @@ export default {
           },
           confirm: v => {
             apiPostData(apiURL.servicesUrl, {
-              serviceName: 'peotry',
-              type: 'auto-create-peotry',
+              serviceName: 'poetry',
+              type: 'auto-create-poetry',
               keyWords: v
             }).then(resp => {
               this.$toast('需自行在一段时间后刷新列表，查看是否创建成功')

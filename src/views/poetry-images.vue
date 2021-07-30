@@ -1,5 +1,5 @@
 <template>
-  <div class="peotry-images sg-flex-column">
+  <div class="poetry-images sg-flex-column">
     <sg-header @back="$router.go(-1)">诗词图集</sg-header>
 
     <div class="main sg-flex-one" @click="onClickImage">
@@ -42,7 +42,7 @@ import { getSmallImage } from '@/common/image'
 import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
 
 export default {
-  name: 'PeotryImages',
+  name: 'PoetryImages',
 
   components: {
     ImageViewer: () => import('@/components/image-viewer')
@@ -63,7 +63,7 @@ export default {
   },
 
   created () {
-    window.peotryImages = this
+    window.poetryImages = this
   },
 
   methods: {
@@ -72,7 +72,7 @@ export default {
         this.page += 1
       }
 
-      apiGetData(apiURL.peotryImageList, {
+      apiGetData(apiURL.poetryImageList, {
         offset: (this.page - 1) * this.limit,
         limit: this.limit
       }).then(resp => {
@@ -139,9 +139,9 @@ export default {
     handleChange (index) {
     },
 
-    onGoPeotry (index) {
+    onGoPoetry (index) {
       this.$router.push({
-        name: 'peotry-detail',
+        name: 'poetry-detail',
         params: { id: this.lastestImages[index].id }
       })
     }
@@ -152,7 +152,7 @@ export default {
 <style lang="scss" scoped>
 @import "@/ui/style/const.scss";
 
-.peotry-images {
+.poetry-images {
   height: 100%;
 
   .time-line {

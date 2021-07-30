@@ -64,10 +64,10 @@ export const imgSrcFilter = function (v, type) {
     if (v.indexOf('./file') === 0) {
       path = '/sapi' + v.substr(1)
     } else {
-      path = '/sapi/file/peotry/img' + v.substr(1)
+      path = '/sapi/file/poetry/img' + v.substr(1)
     }
   } else {
-    path = '/sapi/file/peotry/img/' + v
+    path = '/sapi/file/poetry/img/' + v
   }
   return path
 }

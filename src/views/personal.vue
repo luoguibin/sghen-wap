@@ -59,11 +59,11 @@
           <i>:</i>
         </span>
         <div class="statistics">
-          <template v-if="peotryCount !== 0 || peotSetCount !== 0">
-            {{ isSelf ? "我" : "TA" }}共创建<i>{{ peotSetCount | numFilter }}</i
+          <template v-if="poetryCount !== 0 || poetSetCount !== 0">
+            {{ isSelf ? "我" : "TA" }}共创建<i>{{ poetSetCount | numFilter }}</i
             >个选集，
             <br />
-            共<i>{{ peotryCount | numFilter }}</i
+            共<i>{{ poetryCount | numFilter }}</i
             >首诗词，
             <br />
             收获了<i>{{ praiseCount | numFilter }}</i
@@ -79,7 +79,7 @@
         <sg-button
           type="primary"
           @click="
-            $router.push({ name: 'peotry-list', query: { uuid: personalID } })
+            $router.push({ name: 'poetry-list', query: { uuid: personalID } })
           "
           >{{ isSelf ? "我" : "TA" }}&nbsp;的&nbsp;诗&nbsp;词</sg-button
         >
@@ -165,9 +165,9 @@ export default {
       personalMood: '',
       isAvatarBase64: false,
 
-      peotryCount: -1,
+      poetryCount: -1,
       praiseCount: -1,
-      peotSetCount: -1,
+      poetSetCount: -1,
 
       isEditing: false,
 
@@ -228,13 +228,13 @@ export default {
   created () {
     window.personal = this
     this.initData()
-    this.getPersonalPeotryInfo()
+    this.getPersonalPoetryInfo()
   },
 
   beforeRouteUpdate (to, from, next) {
     next()
     this.initData()
-    this.getPersonalPeotryInfo()
+    this.getPersonalPoetryInfo()
   },
 
   methods: {
@@ -272,17 +272,17 @@ export default {
       }
       this.isAvatarBase64 = false
     },
-    getPersonalPeotryInfo () {
+    getPersonalPoetryInfo () {
       const params = { id: this.personalID }
       apiGetData(apiURL.userPoetryCount, params).then((resp) => {
-        this.peotryCount = resp.data[0].count
+        this.poetryCount = resp.data[0].count
       })
       apiGetData(apiURL.userPraiseCount).then((resp) => {
         this.praiseCount = resp.data.count + resp.data.recentCount
       })
-      apiGetData(apiURL.peotSets, { userId: this.personalID }).then((resp) => {
+      apiGetData(apiURL.poetSets, { userId: this.personalID }).then((resp) => {
         const userID = this.personalID
-        this.peotSetCount = resp.data.filter((o) => o.userId === userID).length
+        this.poetSetCount = resp.data.filter((o) => o.userId === userID).length
       })
     },
 
@@ -405,11 +405,11 @@ export default {
         if (this.isMsgRequesting) {
           return
         }
-        this.isMsgRequesting = true
         this.$confirm({
           title: '新增提示',
           content: '确认后不可撤回，是否确认新增消息？',
           confirm: () => {
+            this.isMsgRequesting = true
             apiPostData(apiURL.servicesUrl, {
               ...this.msgFormData
             })

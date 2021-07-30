@@ -138,7 +138,7 @@ export default {
 
       this.progress = '0%'
       this.isUploading = true
-      apiPostUpload(apiURL.upload, form, { pathType: 'peotry' }, e => {
+      apiPostUpload(apiURL.upload, form, { pathType: 'poetry' }, e => {
         this.progress = Math.floor(e.loaded / e.total * 100) + '%'
       })
         .then(resp => {

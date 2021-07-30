@@ -63,47 +63,47 @@ export const apiURL = {
   // 获取作者基本信息
   userInfoList: `${preffix}/v1/api/get/user/list`,
   // 作者诗词总数
-  userPoetryCount: `${preffix}/v1/api/get/user/peotry-count`,
+  userPoetryCount: `${preffix}/v1/api/get/user/poetry-count`,
   // 作者诗词被赞总数
-  userPraiseCount: `${nodePreffix}/dynamic-api/v2/auth/user/peotry/praise-census`,
+  userPraiseCount: `${nodePreffix}/dynamic-api/v2/auth/user/poetry/praise-census`,
 
   // 诗词默认列表
-  peotryList: `${preffix}/v1/peotry/query`,
+  poetryList: `${preffix}/v1/poetry/query`,
   // 诗词热门列表
-  peotryPopular: `${nodePreffix}/dynamic-api/peotry/popular`,
+  poetryPopular: `${nodePreffix}/dynamic-api/poetry/popular`,
 
   // 诗词创建
-  peotryCreate: `${preffix}/v1/peotry/create`,
+  poetryCreate: `${preffix}/v1/poetry/create`,
   // 诗词更新
-  peotryUpdate: `${preffix}/v1/peotry/update`,
+  poetryUpdate: `${preffix}/v1/poetry/update`,
   // 诗词删除
-  peotryDelete: `${preffix}/v1/peotry/delete`,
+  poetryDelete: `${preffix}/v1/poetry/delete`,
   // 诗词图片
-  peotryImages: `${preffix}/v1/api/get/peotry/images`,
+  poetryImages: `${preffix}/v1/api/get/poetry/images`,
   // 诗词图片列表
-  peotryImageList: `${nodePreffix}/dynamic-api/peotry-image/list`,
+  poetryImageList: `${nodePreffix}/dynamic-api/poetry-image/list`,
   // 诗词图片查询
-  peotryImageQuery: `${preffix}/v1/api/get/peotry/images-query`,
+  poetryImageQuery: `${preffix}/v1/api/get/poetry/images-query`,
   // 诗词选集查询
-  peotrySetQuery: `${preffix}/v1/api/get/peotry/set-query`,
+  poetrySetQuery: `${preffix}/v1/api/get/poetry/set-query`,
 
   // 选集列表
-  peotSets: `${preffix}/v1/peotry-set/query`,
+  poetSets: `${preffix}/v1/poetry-set/query`,
   // 选集创建
-  peotSetCreate: `${preffix}/v1/peotry-set/create`,
+  poetSetCreate: `${preffix}/v1/poetry-set/create`,
   // 选集删除
-  peotSetDelete: `${preffix}/v1/peotry-set/delete`,
+  poetSetDelete: `${preffix}/v1/poetry-set/delete`,
 
   // 诗词词频列表
-  peotryHotWord: `${nodePreffix}/dynamic-api/peotry/hot-word`,
+  poetryHotWord: `${nodePreffix}/dynamic-api/poetry/hot-word`,
   // 热门诗词选集
-  poetrySetPopular: `${preffix}/v1/api/get/peotry-set/popular`,
+  poetrySetPopular: `${preffix}/v1/api/get/poetry-set/popular`,
   // 年度诗词选集
-  peotrySetListYear: `${preffix}/v1/api/get/peotry-set/list-year`,
+  poetrySetListYear: `${preffix}/v1/api/get/poetry-set/list-year`,
   // 根据年度诗词创建数获取诗词作者列表
-  peotryUserListYear: `${preffix}/v1/api/get/peotry-user/list-year`,
+  poetryUserListYear: `${preffix}/v1/api/get/poetry-user/list-year`,
   // 书三行选集对应的诗词总数
-  peotryCount10001: `${preffix}/v1/api/get/peotry/count-10001`,
+  poetryCount10001: `${preffix}/v1/api/get/poetry/count-10001`,
 
   // 评论创建
   commentCreate: `${preffix}/v1/comment/create`,
@@ -114,7 +114,7 @@ export const apiURL = {
   // 用户评论列表
   commentContent: `${nodePreffix}/dynamic-api/comment/content/list`,
   // 用户是否点赞诗词
-  commentPraiseCheck: `${nodePreffix}/dynamic-api/peotry/praise/check`,
+  commentPraiseCheck: `${nodePreffix}/dynamic-api/poetry/praise/check`,
 
   // 获取系统消息
   sysMsg: `${preffix}/v1/auth/sys-msg/my-list`,
