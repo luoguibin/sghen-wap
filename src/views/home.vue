@@ -247,16 +247,16 @@ export default {
     },
     getPopularPoetries () {
       apiGetData(apiURL.poetryPopular).then((resp) => {
-        const { comments, list = [], sets, users, images } = resp.data
-        const commentMap = arrayToMap(comments, 'type_id')
+        const { census: comments, list = [], sets, users, images } = resp.data
+        const commentMap = arrayToMap(comments)
         const setMap = arrayToMap(sets)
         const userMap = arrayToMap(users)
         const imageMap = arrayToMap(images)
         const imgSrcFunc = Vue.filter('imgSrcFilter')
         list.forEach((o) => {
-          o.praiseTotal = +commentMap[o.id].count
-          o.set = setMap[o.set_id]
-          o.user = userMap[o.user_id]
+          o.praiseTotal = +commentMap[o.id].total
+          o.set = setMap[o.setId]
+          o.user = userMap[o.userId]
 
           if (imageMap[o.id]) {
             o.images = JSON.parse(imageMap[o.id].images).map((v) =>

@@ -277,13 +277,23 @@ export default {
       apiGetData(apiURL.userPoetryCount, params).then((resp) => {
         this.poetryCount = resp.data[0].count
       })
-      apiGetData(apiURL.userPraiseCount).then((resp) => {
-        this.praiseCount = resp.data.count + resp.data.recentCount
-      })
       apiGetData(apiURL.poetSets, { userId: this.personalID }).then((resp) => {
         const userID = this.personalID
         this.poetSetCount = resp.data.filter((o) => o.userId === userID).length
       })
+      if (this.userID === this.personalID) {
+        // 当前登录用户获取精确总赞数
+        apiGetData(apiURL.userPraiseCount).then((resp) => {
+          this.praiseCount = resp.data.count + resp.data.recentCount
+        })
+      } else {
+        // 其他则获取统计总赞数
+        apiGetData(apiURL.userRecentPraiseCount, { poetId: this.personalID }).then((resp) => {
+          const item0 = resp.data[0] || {}
+          const count = item0.count || 0
+          this.praiseCount = +count
+        })
+      }
     },
 
     hasEditChange () {

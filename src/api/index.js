@@ -67,11 +67,13 @@ export const apiURL = {
   userPoetryCount: `${preffix}/v1/api/get/user/poetry-count`,
   // 作者诗词被赞总数
   userPraiseCount: `${nodePreffix}/dynamic-api/v2/auth/user/poetry/praise-census`,
+  // 用户所有诗词的已统计获赞数
+  userRecentPraiseCount: `${nodePreffix}/dynamic-api/v2/user/poetry/recent-praise-census`,
 
   // 诗词默认列表
   poetryList: `${preffix}/v1/poetry/query`,
   // 诗词热门列表
-  poetryPopular: `${nodePreffix}/dynamic-api/poetry/popular`,
+  poetryPopular: `${nodePreffix}/dynamic-api/v2/poetry/popular`,
 
   // 诗词创建
   poetryCreate: `${preffix}/v1/poetry/create`,
