@@ -45,7 +45,7 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   res => {
-    if (res) {
+    if (!localStorage.getItem('sghen_is-test')) {
       store.dispatch('auth/logout')
       router.push({ name: 'page-invalid', params: { invalidType: 'updating' } })
       return
