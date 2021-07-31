@@ -5,25 +5,25 @@ import router from '@/router'
 
 axios.defaults.timeout = 100000
 
-const resetObjectId = function (obj = {}) {
-  if (obj instanceof Array) {
-    obj.forEach(o => {
-      resetObjectId(o)
-    })
-  } else {
-    for (const key in obj) {
-      if (Object.hasOwnProperty.call(obj, key)) {
-        if (key === 'id') {
-          obj[key] = '' + obj[key]
-        } else if (obj[key] instanceof Array) {
-          resetObjectId(obj[key])
-        } else if (obj[key] instanceof Object) {
-          resetObjectId(obj[key])
-        }
-      }
-    }
-  }
-}
+// const resetObjectId = function (obj = {}) {
+//   if (obj instanceof Array) {
+//     obj.forEach(o => {
+//       resetObjectId(o)
+//     })
+//   } else {
+//     for (const key in obj) {
+//       if (Object.hasOwnProperty.call(obj, key)) {
+//         if (key === 'id') {
+//           obj[key] = '' + obj[key]
+//         } else if (obj[key] instanceof Array) {
+//           resetObjectId(obj[key])
+//         } else if (obj[key] instanceof Object) {
+//           resetObjectId(obj[key])
+//         }
+//       }
+//     }
+//   }
+// }
 
 axios.interceptors.request.use(
   config => {
@@ -60,9 +60,9 @@ axios.interceptors.response.use(
       return Promise.reject(res)
     }
 
-    if (res.config.url.includes('/sapi/v1/')) {
-      resetObjectId(data)
-    }
+    // if (res.config.url.includes('/sapi/v1/')) {
+    //   resetObjectId(data)
+    // }
 
     return data
   },

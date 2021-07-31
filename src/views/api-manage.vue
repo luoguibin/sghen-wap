@@ -424,12 +424,8 @@ export default {
 
       this.$toast('加载中...', { direction: 'middle', loading: true, duration: -1 })
       const { suffixPath, method } = this.formData
-      let apiFunc = apiGetData
-      let apiPreffix = `${preffix}/dynamic-api/`
-      if (method === 'POST') {
-        apiFunc = apiPostData
-        apiPreffix = `${preffix}/auth/dynamic-api/`
-      }
+      const apiPreffix = `${preffix}/dynamic-api/`
+      const apiFunc = method === 'POST' ? apiPostData : apiGetData
       apiFunc(apiPreffix + suffixPath, params)
         .then(resp => {
           this.testResult = resp // JSON.stringify(resp.data)

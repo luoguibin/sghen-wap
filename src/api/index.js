@@ -62,6 +62,7 @@ export const apiURL = {
 
   // 获取作者基本信息
   userInfoList: `${preffix}/v1/api/get/user/list`,
+  userInfoList2: `${nodePreffix}/dynamic-api/v2/user/info/list`,
   // 作者诗词总数
   userPoetryCount: `${preffix}/v1/api/get/user/poetry-count`,
   // 作者诗词被赞总数
@@ -106,15 +107,20 @@ export const apiURL = {
   poetryCount10001: `${preffix}/v1/api/get/poetry/count-10001`,
 
   // 评论创建
-  commentCreate: `${preffix}/v1/comment/create`,
+  commentCreate: `${nodePreffix}/dynamic-api/v2/poetry-comment/create`,
   // 评论删除
-  commentDelete: `${preffix}/v1/comment/delete`,
+  commentDelete: `${nodePreffix}/dynamic-api/v2/poetry-comment/delete`,
+  // 分页获取一诗词评论列表
+  commentList: `${nodePreffix}/dynamic-api/v2/poetry-comment/list`,
+
+  // 点赞创建
+  praiseCreate: `${nodePreffix}/dynamic-api/v2/poetry-praise/create`,
   // 点赞列表
-  commentPraise: `${nodePreffix}/dynamic-api/comment/praise/list`,
-  // 用户评论列表
-  commentContent: `${nodePreffix}/dynamic-api/comment/content/list`,
+  praiseList: `${nodePreffix}/dynamic-api/v2/poetry-praise/list`,
+  // 点赞删除
+  praiseDelete: `${nodePreffix}/dynamic-api/v2/poetry-praise/delete`,
   // 用户是否点赞诗词
-  commentPraiseCheck: `${nodePreffix}/dynamic-api/poetry/praise/check`,
+  praiseCheck: `${nodePreffix}/dynamic-api/v2/auth/poetry-praise/checked`,
 
   // 获取系统消息
   sysMsg: `${preffix}/v1/auth/sys-msg/my-list`,

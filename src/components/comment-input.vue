@@ -221,11 +221,9 @@ export default {
       this.isLoading = true
       const content = toEmotionCodes(this.contentHTML)
       apiPostData(apiURL.commentCreate, {
-        type: 1,
-        typeId: this.id,
-        typeUserId: this.typeUserId,
+        poetryId: this.id,
+        poetId: this.typeUserId,
         content,
-        fromId: this.userID,
         toId: this.toId
       })
         .then((data) => {

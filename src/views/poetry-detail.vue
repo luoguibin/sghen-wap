@@ -64,7 +64,6 @@
 import { mapState, mapGetters } from 'vuex'
 import { apiURL, apiGetData, apiPostData } from '@/api'
 import { getItemIndex, getItemTypeIndex, getItemTypeObj } from '@/utils/dom'
-import { arrayToMap } from '@/utils/data'
 import Cache from '@/common/cache-center'
 import { PEOTRY } from '@/const'
 
@@ -226,19 +225,21 @@ export default {
         return
       }
       this.praiseRequesting = true
-      apiGetData(apiURL.commentPraiseCheck, {
-        id: this.poetryID,
-        userId: this.userID
+      apiGetData(apiURL.praiseCheck, {
+        poetryId: this.poetryID
       })
         .then(resp => {
-          const { list = [], users } = resp.data
-          if (!list.length) {
+          const { data: list = [] } = resp
+          const praiseItem = list[0]
+          if (!praiseItem) {
             this.myPraiseComment = undefined
             return
           }
-          list[0].fromPoet = users[0] || {}
-          list[0].toPoet = {}
-          this.myPraiseComment = this.formatComments(list)[0]
+          praiseItem.fromPoet = JSON.parse(
+            JSON.stringify(this.selfPublicInfo)
+          )
+          praiseItem.toPoet = {}
+          this.myPraiseComment = praiseItem
         })
         .finally(() => {
           this.praiseRequesting = false
@@ -250,36 +251,42 @@ export default {
         this.commentOffset = 0
       }
       this.poetry.isCommentLoading = true
-      apiGetData(apiURL.commentContent, {
+      apiGetData(apiURL.commentList, {
         id: this.poetryID,
         limit: this.pageLimit,
         offset: this.commentOffset
       }).then(resp => {
-        const { list = [], fromUsers = [], toUsers = [], count } = resp.data
-        const userMap = { ...arrayToMap(fromUsers), ...arrayToMap(toUsers) }
-        const comments = this.formatComments(list)
-        comments.forEach(o => {
-          const fromInfo = userMap[o.fromId]
-          o.fromPoet = {
-            id: fromInfo.id,
-            username: fromInfo.user_name,
-            avatar: fromInfo.avatar
-          }
-          const toInfo = userMap[o.toId]
-          o.toPoet = {
-            id: toInfo.id,
-            username: toInfo.user_name,
-            avatar: toInfo.avatar
-          }
+        const { count = 0, list = [] } = resp.data
+
+        // TODO:
+        const userIdMap = {}
+        list.forEach(o => {
+          o.toPoet = null
+          o.fromPoet = null
+          userIdMap[o.toId] = true
+          userIdMap[o.fromId] = true
+        })
+        const userIds = Object.keys(userIdMap)
+        userIds.length && apiGetData(apiURL.userInfoList2, { ids: userIds.join(',') }).then(resp => {
+          const users = resp.data || []
+          const userMap = {}
+          users.forEach(o => {
+            userMap[o.id] = o
+          })
+
+          list.forEach(o => {
+            o.toPoet = userMap[o.toId]
+            o.fromPoet = userMap[o.fromId]
+          })
         })
 
         const poetry = this.poetry
         if (isReset) {
-          poetry.realComments = comments
+          poetry.realComments = list
         } else {
-          poetry.realComments.push(...comments)
+          poetry.realComments.push(...list)
         }
-        poetry.commentTotal = +count
+        poetry.commentTotal = count
 
         this.commentOffset += this.pageLimit
       }).finally(() => {
@@ -291,35 +298,40 @@ export default {
         this.praiseOffset = 0
       }
       this.poetry.isPraiseLoading = true
-      apiGetData(apiURL.commentPraise, {
+      apiGetData(apiURL.praiseList, {
         id: this.poetryID,
         limit: this.pageLimit,
         offset: this.praiseOffset
       }).then(resp => {
-        const data = resp.data
-        if (!data || data.length < 2) {
-          return
-        }
-        const { list = [], users = [], count } = resp.data
-        const userMap = arrayToMap(users)
-        const comments = this.formatComments(list)
-        comments.forEach(o => {
-          const info = userMap[o.fromId]
-          o.fromPoet = {
-            id: info.id,
-            username: info.user_name,
-            avatar: info.avatar
-          }
+        const { count = [], list = [] } = resp.data
+
+        // TODO:
+        const userIdMap = {}
+        list.forEach(o => {
           o.toPoet = {}
+          o.fromPoet = null
+          userIdMap[o.fromId] = true
+        })
+        const userIds = Object.keys(userIdMap)
+        userIds.length && apiGetData(apiURL.userInfoList2, { ids: userIds.join(',') }).then(resp => {
+          const users = resp.data || []
+          const userMap = {}
+          users.forEach(o => {
+            userMap[o.id] = o
+          })
+
+          list.forEach(o => {
+            o.fromPoet = userMap[o.fromId]
+          })
         })
 
         const poetry = this.poetry
         if (isReset) {
-          poetry.praiseComments = comments
+          poetry.praiseComments = list
         } else {
-          poetry.praiseComments.push(...comments)
+          poetry.praiseComments.push(...list)
         }
-        poetry.praiseTotal = +count
+        poetry.praiseTotal = count
 
         this.praiseOffset += this.pageLimit
       }).finally(() => {
@@ -364,9 +376,8 @@ export default {
       this.praiseRequesting = true
       const comment = this.myPraiseComment
       if (this.isPraise) {
-        apiPostData(apiURL.commentDelete, {
-          id: comment.id,
-          fromId: comment.fromId
+        apiPostData(apiURL.praiseDelete, {
+          id: comment.id
         })
           .then(data => {
             const { praiseComments } = this.poetry
@@ -382,16 +393,19 @@ export default {
             this.praiseRequesting = false
           })
       } else {
-        apiPostData(apiURL.commentCreate, {
-          type: 1,
-          typeId: this.poetry.id,
-          typeUserId: this.poetry.user.id,
-          content: 'praise',
-          fromId: this.userID,
-          toId: -1
-        })
+        const params = {
+          poetryId: this.poetry.id,
+          poetId: this.poetry.poetId || this.poetry.user.id
+        }
+        apiPostData(apiURL.praiseCreate, params)
           .then(({ data }) => {
-            const comment = data
+            // TODO:
+            const comment = {
+              id: data.insertId,
+              ...params,
+              fromId: this.selfPublicInfo.id,
+              createTime: ''
+            }
             const { praiseTotal, praiseComments } = this.poetry
             if (praiseTotal === praiseComments.length) {
               comment.fromPoet = JSON.parse(
@@ -413,9 +427,10 @@ export default {
       }
     },
     deleteComment (poetry, comment) {
+      console.log(comment)
       apiPostData(apiURL.commentDelete, {
-        id: comment.id,
-        fromId: comment.fromId
+        id: comment.id
+        // fromId: comment.fromId
       }).then(data => {
         this.getContentComments(true)
       })
@@ -561,13 +576,15 @@ export default {
       )
     },
     handleCommentOk (o) {
-      const { commentTotal, realComments } = this.poetry
-      if (commentTotal === realComments.length) {
-        o.fromPoet = JSON.parse(JSON.stringify(this.selfPublicInfo))
-        o.toPoet = Cache.UserCache.getData(+this.commentToID)
-        realComments.push(o)
-      }
-      this.poetry.commentTotal += 1
+      this.getContentComments(true)
+      // TODO:
+      // const { commentTotal, realComments } = this.poetry
+      // if (commentTotal === realComments.length) {
+      //   o.fromPoet = JSON.parse(JSON.stringify(this.selfPublicInfo))
+      //   o.toPoet = Cache.UserCache.getData(+this.commentToID)
+      //   realComments.push(o)
+      // }
+      // this.poetry.commentTotal += 1
     },
 
     onPraiseAnime (e, data) {
