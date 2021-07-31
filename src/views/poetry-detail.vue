@@ -117,7 +117,7 @@ export default {
      */
     isSelfPoetry () {
       const poetry = this.poetry
-      return poetry && poetry.user && this.userID === poetry.user.id
+      return poetry && poetry.user && this.userID === (poetry.poetId || poetry.user.id)
     },
 
     /**
@@ -338,28 +338,15 @@ export default {
         this.poetry.isPraiseLoading = false
       })
     },
-    formatComments (comments = []) {
-      return comments.map(o => {
-        return {
-          id: o.id,
-          fromId: o.from_id,
-          toId: o.to_id,
-          content: o.content,
-          createTime: o.create_time,
-          type: o.type,
-          typeId: o.type_id
-        }
-      })
-    },
 
-    openCommentInput (typeId, fromId, tip) {
+    openCommentInput (poetryId, fromId, tip) {
       if (!this.userID) {
         this.$toastLogin()
         return
       }
       this.commentVisible = true
-      this.commentID = typeId
-      this.commentTypeUserID = this.poetry.user.id
+      this.commentID = poetryId
+      this.commentTypeUserID = this.poetry.poetId || this.poetry.user.id
       this.commentToID = +fromId
       this.commentTip = tip
     },
@@ -514,7 +501,7 @@ export default {
         case 'poet-avatar':
           this.$router.push({
             name: 'personal',
-            query: { uuid: poetry.user.id, username: poetry.user.username }
+            query: { uuid: poetry.poetId || poetry.user.id, username: poetry.user.username }
           })
           break
         case 'comment-avatar':
@@ -570,7 +557,7 @@ export default {
       }
       Cache.UserCache.setData(comment.fromId, comment.fromPoet)
       this.openCommentInput(
-        comment.typeId,
+        comment.poetryId,
         comment.fromId,
         `回复 ${comment.fromPoet.username}`
       )

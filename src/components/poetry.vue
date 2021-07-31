@@ -104,15 +104,6 @@ export default {
       defaultImgSrc,
       isIntoView: false,
 
-      newComment: {
-        type: 1,
-        typeId: 0,
-        content: '',
-        fromId: 0,
-        fromPoet: null,
-        toId: 0,
-        toPoet: null
-      },
       clickTime: 0,
       hasExpand: false,
       isExpand: false,
