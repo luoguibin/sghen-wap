@@ -122,13 +122,13 @@
         </div>
 
         <!-- 诗词云库 -->
-        <div class="info-panel">
+        <div class="info-panel" v-show="hotWordVisible">
           <h2
             title="词频率：全部诗词中出现次数最高的名词，取前20个名词的出现次数总和为基准，进行计算的结果（每天更新）"
           >
             诗词云库
           </h2>
-          <poetry-hot-word></poetry-hot-word>
+          <poetry-hot-word @loaded="handleHotWordLoaded"></poetry-hot-word>
         </div>
 
         <site-instruction></site-instruction>
@@ -174,7 +174,9 @@ export default {
         { label: '我的消息', value: 'my-msgs', slot: 'myMsgs' },
         { label: '个人中心', value: 'personal' },
         { label: '退出', value: 'logout' }
-      ]
+      ],
+
+      hotWordVisible: false
     }
   },
 
@@ -282,6 +284,10 @@ export default {
         this.sliderItems = orderList.map((o) => ({ slot: o.id }))
         this.sliderIndex = 0
       })
+    },
+
+    handleHotWordLoaded (count) {
+      this.hotWordVisible = !!count
     },
 
     handleDropdown (key) {

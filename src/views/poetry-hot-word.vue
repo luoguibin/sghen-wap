@@ -110,10 +110,13 @@ export default {
           o.rate = Number(o.value / total).toFixed(2)
         })
         this.words = words
-        this.chart.setOption({
-          series: [{ data: this.words }]
+        this.$emit('loaded', words.length)
+        this.$nextTick(() => {
+          this.chart.setOption({
+            series: [{ data: this.words }]
+          })
+          this.chart.resize()
         })
-        this.chart.resize()
       })
     }
   }
