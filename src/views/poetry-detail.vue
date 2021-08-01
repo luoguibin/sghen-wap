@@ -175,6 +175,9 @@ export default {
       this.praiseOffset = pageCacheData.praiseOffset
       this.commentOffset = pageCacheData.commentOffset
       this.myPraiseComment = pageCacheData.myPraiseComment
+      if (!this.myPraiseComment) {
+        this.checkPraisePoetry()
+      }
 
       this.$nextTick(() => {
         this.$refs.wrapper.scrollTop = pageCacheData.scrollTop
