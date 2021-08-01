@@ -1,8 +1,8 @@
 <template>
   <div class="page-invalid">
     <div v-if="invalidType === 'updating'">
-      <p>系统正在升级...</p>
-      <p>预计2021-08-01正常服务</p>
+      <!-- <p>系统正在升级...</p> -->
+      <!-- <p>预计2021-08-01正常服务</p> -->
     </div>
     <div v-else>页面丢失....</div>
   </div>

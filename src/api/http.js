@@ -45,11 +45,11 @@ axios.interceptors.request.use(
 
 axios.interceptors.response.use(
   res => {
-    if (!localStorage.getItem('sghen_is-test')) {
-      store.dispatch('auth/logout')
-      router.push({ name: 'page-invalid', params: { invalidType: 'updating' } })
-      return
-    }
+    // if (!localStorage.getItem('sghen_is-test')) {
+    //   store.dispatch('auth/logout')
+    //   router.push({ name: 'page-invalid', params: { invalidType: 'updating' } })
+    //   return
+    // }
     const status = Number(res.status) || 0
     const data = res.data || {}
     if (status !== 200 || data.code !== 1000) {
