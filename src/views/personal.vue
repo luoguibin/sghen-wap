@@ -258,7 +258,7 @@ export default {
           }
           this.saveData = null
         } else {
-          apiGetData(apiURL.userInfoList, { datas: this.personalID })
+          apiGetData(apiURL.userInfoList2, { ids: this.personalID })
             .then((resp) => {
               const info = resp.data[0]
               this.personalName = info.username
@@ -273,11 +273,11 @@ export default {
       this.isAvatarBase64 = false
     },
     getPersonalPoetryInfo () {
-      const params = { id: this.personalID }
+      const params = { userId: this.personalID }
       apiGetData(apiURL.userPoetryCount, params).then((resp) => {
         this.poetryCount = resp.data[0].count
       })
-      apiGetData(apiURL.poetSets, { userId: this.personalID }).then((resp) => {
+      apiGetData(apiURL.poetSets, params).then((resp) => {
         const userID = this.personalID
         this.poetSetCount = resp.data.filter((o) => o.userId === userID).length
       })

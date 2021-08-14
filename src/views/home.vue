@@ -233,14 +233,10 @@ export default {
       }
     },
     getYearInfos () {
-      const params = {
-        date0: `${this.year}-01-01 00:00:00`,
-        date1: `${this.year + 1}-01-01 00:00:00`
-      }
-      apiGetData(apiURL.poetrySetListYear, params).then((resp) => {
+      apiGetData(apiURL.poetrySetListYear).then((resp) => {
         this.yearPoetrySets = resp.data
       })
-      apiGetData(apiURL.poetryUserListYear, params).then((resp) => {
+      apiGetData(apiURL.poetryUserListYear).then((resp) => {
         this.yearPoets = resp.data
       })
       apiGetData(apiURL.poetrySetPopular).then((resp) => {
