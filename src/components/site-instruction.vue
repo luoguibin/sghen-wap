@@ -2,7 +2,7 @@
   <div class="site-instruction">
     <span :title="new Date()">{{authYear}}</span> /
     <span @click="onPageHome">Sghen三行</span> /
-    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备19116971号-1</a>
+    <a href="http://beian.miit.gov.cn" target="_blank">粤ICP备19116971号</a>
     /
     <a
       href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=44010602007093"
