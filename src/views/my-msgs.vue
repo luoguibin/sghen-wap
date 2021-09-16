@@ -5,11 +5,7 @@
     </sg-header>
 
     <div class="main sg-flex-one">
-      <sg-scroll
-        ref="sgScroll"
-        :isEnd="true"
-        @refresh="handleRefresh"
-      >
+      <sg-scroll ref="sgScroll" :isEnd="true" @refresh="handleRefresh">
         <div v-for="item in msgs" :key="item.id" class="msg-item">
           <!-- 消息内容 -->
           <p>{{ item | msgTextFilter }}</p>
@@ -32,94 +28,85 @@
           </div>
         </div>
 
-        <div class="msg-bottom-tip">暂只展示最新{{maxCount}}条消息</div>
+        <div class="msg-bottom-tip">暂只展示最新{{ maxCount }}条消息</div>
       </sg-scroll>
     </div>
   </div>
 </template>
 
 <script>
-import { apiURL, apiPostData } from '@/api'
-import { mapActions, mapState } from 'vuex'
+import { apiURL, apiPostData } from "@/api";
+import { mapActions, mapState } from "vuex";
+import { MSG_TYPE } from "@/common/const";
 
-const MSG_TYPE = {
-  SYS: 1000,
-  SYS_BLESS: 1001,
-  USER: 2000,
-  USER_CREATE: 2001,
-  PEOTRY: 3000
-}
+const msgTypeMap = {};
+Object.keys(MSG_TYPE).forEach((key) => {
+  msgTypeMap[MSG_TYPE[key].value] = MSG_TYPE[key];
+});
 
 export default {
-  name: 'MyMsgs',
+  name: "MyMsgs",
 
-  data () {
+  data() {
     return {
-      maxCount: 100
-    }
+      maxCount: 100,
+    };
   },
 
   computed: {
     ...mapState({
-      msgs: (state) => state.sysMsg.msgs
-    })
+      msgs: (state) => state.sysMsg.msgs,
+    }),
   },
 
   filters: {
-    msgTypeFilter (item) {
+    msgTypeFilter(item) {
+      const o = msgTypeMap[item.msgType] || MSG_TYPE.SYS;
+      return o.label;
+    },
+    msgTextFilter(item) {
       switch (item.msgType) {
-        case MSG_TYPE.SYS_BLESS:
-          return '系统祝福'
-        case MSG_TYPE.USER:
-        case MSG_TYPE.USER_CREATE:
-          return '用户消息'
-        case MSG_TYPE.PEOTRY:
-          return '诗词消息'
+        case MSG_TYPE.USER_CREATE.value:
+          return item.content || "欢迎注册Sghen三行~";
         default:
-          return '系统消息'
+          return item.content || "--";
       }
     },
-    msgTextFilter (item) {
-      switch (item.msgType) {
-        case MSG_TYPE.USER_CREATE:
-          return item.content || '欢迎注册Sghen三行~'
-        default:
-          return item.content || '--'
-      }
-    }
   },
 
-  created () {
-    window.myMsgs = this
+  created() {
+    window.myMsgs = this;
   },
 
   methods: {
-    onReadMsg (item) {
+    onReadMsg(item) {
       if (item.loading) {
-        return
+        return;
       }
-      item.loading = true
+      item.loading = true;
       apiPostData(apiURL.readSysMsg, { id: item.id })
         .then(() => {
-          item.status = 1
+          item.status = 1;
         })
         .finally(() => {
-          item.loading = false
-        })
+          item.loading = false;
+        });
     },
 
-    handleRefresh () {
-      this.getSysMsgs({ limit: this.maxCount }).then(() => {
-        this.$refs.sgScroll.success()
-      }).catch(() => {
-        this.$refs.sgScroll.fail()
-      })
+    handleRefresh() {
+      this.getSysMsgs({ limit: this.maxCount })
+        .then(() => {
+          this.$refs.sgScroll.success();
+        })
+        .catch(() => {
+          this.$refs.sgScroll.fail();
+        });
     },
     ...mapActions({
-      getSysMsgs: 'sysMsg/getSysMsgs'
-    })
-  }
-}
+      getSysMsgs: "sysMsg/getSysMsgs",
+    }),
+  },
+};
 </script>
 
 <style lang="scss" scoped>
