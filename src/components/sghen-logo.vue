@@ -1,12 +1,75 @@
 <template>
-  <svg class="sghen-logo letters letters--effect-1" viewBox="0 0 500 100" width="500" height="100" @click="onRobotPoetry">
-    <g v-for="(p, i) in pathItems" :key="i" class="letter letter-s">
-      <g class="letter-part">
-        <path class="letter-layer color-bg" :d="p" />
-        <path class="letter-layer color-fg" :d="p" />
+  <div class="sghen-logo">
+    <svg
+      class="letters letters--effect-1"
+      viewBox="0 0 500 100"
+      width="500"
+      height="100"
+      @click="onRobotPoetry"
+    >
+      <g v-for="(p, i) in pathItems" :key="i" class="letter letter-s">
+        <g class="letter-part">
+          <path class="letter-layer color-bg" :d="p" />
+          <path class="letter-layer color-fg" :d="p" />
+        </g>
       </g>
-    </g>
-  </svg>
+    </svg>
+
+    <!-- 机器作诗词 -->
+    <div class="sg-mask sys-type-mask" v-if="typeVisible">
+      <div class="sg-flex-column">
+        <sg-header @back="typeVisible = false">
+          <template>机器作诗词</template>
+          <sg-button type="text" slot="right" @click="onConfirm"
+            >确定</sg-button
+          >
+        </sg-header>
+        <div class="sg-flex-one">
+          <sg-form
+            ref="form"
+            :formData="formData"
+            :formRules="formRules"
+            sg-scroll="vertical_stop"
+          >
+            <div slot="key">
+              <sg-dropdown
+                :options="poetryTypes"
+                @change="handleTypeChange"
+                :initValue="formData.key"
+                :optionType="'fullwidth'"
+                :pointerVisible="false"
+                :optionActive="true"
+              ></sg-dropdown>
+            </div>
+
+            <div slot="yan">
+              <sg-dropdown
+                ref="yanDropdown"
+                :options="poetryYans"
+                @change="handleYanChange"
+                :initValue="formData.yan"
+                :optionType="'fullwidth'"
+                :pointerVisible="false"
+                :optionActive="true"
+              ></sg-dropdown>
+            </div>
+
+            <div v-show="poetStyles.length" slot="style">
+              <sg-dropdown
+                ref="styleDropdown"
+                :options="poetStyles"
+                @change="handleStyleChange"
+                :initValue="formData.style"
+                :optionType="'fullwidth'"
+                :pointerVisible="false"
+                :optionActive="true"
+              ></sg-dropdown>
+            </div>
+          </sg-form>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -21,6 +84,11 @@ export default {
   name: 'SghenLogo',
 
   data () {
+    const yans = [
+      { label: '五言', value: '5' },
+      { label: '七言', value: '7' }
+    ]
+
     return {
       pathItems: Object.freeze([
         'M57.07 79.9Q51.31 79.9 45.91 79.18Q40.6 78.37 37.72 77.47L39.16 70.09Q42.31 71.17 47.17 72.07Q52.03 72.88 57.61 72.88Q62.2 72.88 65.71 71.89Q69.31 70.9 71.29 68.2Q73.27 65.5 73.27 60.46Q73.27 57.49 72.1 55.69Q70.93 53.89 68.14 52.45Q65.44 51.01 60.76 49.3Q55.63 47.41 52.48 45.7Q49.33 43.9 47.89 41.47Q46.54 38.95 46.54 35.17Q46.54 27.79 49.42 23.56Q52.3 19.33 57.52 17.53Q62.83 15.64 69.76 15.64Q74.35 15.64 78.76 16.36Q83.17 16.99 85.42 17.89L83.98 25.09Q81.46 24.1 77.41 23.38Q73.45 22.57 69.22 22.57Q64.72 22.57 61.39 23.47Q58.06 24.37 56.26 26.8Q54.46 29.14 54.46 33.73Q54.46 36.16 55.45 37.69Q56.44 39.13 58.87 40.39Q61.3 41.56 65.71 43.18Q71.29 45.25 74.71 47.23Q78.13 49.21 79.66 52.09Q81.28 54.88 81.28 59.56Q81.28 70.09 75.25 75.04Q69.31 79.9 57.07 79.9Z',
@@ -37,12 +105,146 @@ export default {
         'M400.69 3.67L407.08 6.19Q404.2 10.15 400.33 14.2Q396.46 18.25 392.23 21.94Q388.09 25.63 384.04 28.51Q383.32 27.43 382.15 25.81Q380.98 24.1 380.08 23.2Q383.86 20.68 387.73 17.35Q391.6 14.02 395.02 10.42Q398.44 6.82 400.69 3.67Z',
         'M404.38 22.84L410.59 25.18Q408.52 28.6 406 32.02Q403.48 35.44 400.69 38.77L400.69 86.11L394.03 86.11L394.03 46.15Q391.51 48.76 388.9 51.19Q386.38 53.53 383.86 55.51Q383.14 54.52 381.61 52.72Q380.17 50.92 379.18 49.93Q383.86 46.6 388.45 42.28Q393.04 37.87 397.18 32.92Q401.32 27.88 404.38 22.84Z',
         'M411.85 33.73L462.25 33.73L462.25 40.12L448.66 40.12L448.66 77.29Q448.66 80.35 447.76 82.06Q446.95 83.77 444.7 84.58Q442.45 85.3 438.4 85.48Q434.44 85.57 427.78 85.57Q427.6 84.22 426.97 82.42Q426.34 80.53 425.62 79.09Q430.39 79.18 434.35 79.27Q438.4 79.27 439.66 79.18Q440.92 79.09 441.37 78.73Q441.91 78.37 441.91 77.2L441.91 40.12L411.85 40.12L411.85 33.73Z'
-      ])
+      ]),
+
+      typeVisible: false,
+      formData: {
+        keyWords: '',
+        key: '',
+        yan: '',
+        style: ''
+      },
+      formRules: [
+        {
+          key: 'keyWords',
+          label: '关键词',
+          required: true,
+          _error: '',
+          validator: (v = '', rule) => {
+            return v.length ? '' : '请输入' + rule.label
+          }
+        },
+        {
+          key: 'key',
+          label: '类型',
+          required: true,
+          hasValue: true,
+          slot: true,
+          _error: ''
+        },
+        {
+          key: 'yan',
+          label: '言数',
+          required: true,
+          hasValue: true,
+          slot: true,
+          _error: ''
+        },
+        {
+          key: 'style',
+          label: '情感',
+          hidden: false,
+          required: false,
+          hasValue: true,
+          slot: true,
+          _error: ''
+        }
+      ],
+      poetryTypes: [
+        { label: '绝句', value: 'jueju', genre: 1, yans },
+        {
+          label: '风格绝句',
+          value: 'fengge',
+          genre: 4,
+          yans,
+          userStyles: [
+            '萧瑟凄凉',
+            '忆旧感喟',
+            '孤寂惆怅',
+            '思乡忧老',
+            '渺远孤逸'
+          ].map((v) => {
+            return { label: v, value: v }
+          })
+        },
+        {
+          label: '藏头诗',
+          value: 'cangtou',
+          genre: 2,
+          yans,
+          userStyles: ['悲伤', '较悲伤', '中性', '较喜悦', '喜悦'].map((v) => {
+            return { label: v, value: v }
+          }),
+          isInputValid: function (v) {
+            return v && v.length > 0 && v.length <= 5
+          }
+        },
+        {
+          label: '律诗',
+          value: 'lvshi',
+          genre: 7,
+          yans
+        },
+        {
+          label: '集句诗',
+          value: 'jiju',
+          genre: 5,
+          yans: yans.filter((o) => o.value === '5'),
+          isInputValid: function (v) {
+            return v && (v.length === 5 || v.length === 7)
+          }
+        },
+        {
+          label: '词',
+          value: 'ci',
+          genre: 3,
+          yans: [{ label: '默认', value: '0' }],
+          userStyles: [
+            '归字谣',
+            '如梦令',
+            '梧桐影',
+            '渔歌子',
+            '捣练子',
+            '忆江南',
+            '秋风清',
+            '忆王孙',
+            '河满子',
+            '思帝乡',
+            '望江怨',
+            '醉吟商',
+            '卜算子',
+            '点绛唇',
+            '乌夜啼',
+            '江亭怨',
+            '踏莎行',
+            '画堂春',
+            '浣溪沙',
+            '武陵春',
+            '采桑子',
+            '城头月',
+            '玉楼春',
+            '海棠春',
+            '苏幕遮',
+            '蝶恋花',
+            '江城子',
+            '八声甘州',
+            '声声慢',
+            '水龙吟',
+            '满江红',
+            '沁园春'
+          ].map((v) => {
+            return { label: v, value: v }
+          })
+        }
+      ],
+      poetryYans: [],
+      poetStyles: []
     }
   },
 
   mounted () {
     window.sghenLogo = this
+
     this.bounceIn = anime({
       targets: '.letter-part',
       translateY: {
@@ -80,6 +282,70 @@ export default {
   },
 
   methods: {
+    handleTypeChange (v) {
+      this.formData.key = v
+      const typeObj = this.poetryTypes.find((o) => o.value === v)
+
+      this.poetryYans = typeObj.yans
+      this.$refs.yanDropdown &&
+        this.$refs.yanDropdown.setSelectOption(typeObj.yans[0])
+      this.formData.yan = typeObj.yans[0].value
+
+      this.poetStyles = typeObj.userStyles || []
+      const hasStyle = !!this.poetStyles.length
+      if (hasStyle) {
+        this.$refs.yanDropdown &&
+          this.$refs.styleDropdown.setSelectOption(this.poetStyles[0])
+        this.formData.style = this.poetStyles[0].value
+      } else {
+        this.formData.style = ''
+      }
+      const styleRule = this.formRules.find((o) => o.key === 'style')
+      styleRule.hidden = !hasStyle
+    },
+    handleYanChange (v) {
+      this.formData.yan = v
+    },
+    handleStyleChange (v) {
+      this.formData.style = v
+    },
+    onConfirm () {
+      this.$refs.form.validate((error) => {
+        if (error) {
+          return
+        }
+        const fData = this.formData
+        const typeObj = this.poetryTypes.find((o) => o.value === fData.key)
+        if (typeObj.isInputValid && !typeObj.isInputValid(fData.keyWords)) {
+          this.$toast('关键词长度或格式不正确')
+          return
+        }
+
+        if (this.loading) {
+          return
+        }
+        this.loading = true
+
+        const params = {}
+        for (const key in fData) {
+          if (Object.hasOwnProperty.call(fData, key) && fData[key]) {
+            params[key] = fData[key]
+          }
+        }
+        apiPostData(apiURL.servicesUrl, {
+          serviceName: 'poetry',
+          type: 'auto-create-poetry',
+          ...params
+        })
+          .then(() => {
+            this.typeVisible = false
+            this.$toast('需自行在一段时间后刷新列表，查看是否创建成功')
+          })
+          .finally(() => {
+            this.loading = false
+          })
+      })
+    },
     onRobotPoetry () {
       if (!this.isLogin) {
         return
@@ -90,31 +356,8 @@ export default {
         return
       }
       if (nowTime - this.robotTime < 300) {
-        this.$confirm({
-          title: '机器作诗词',
-          type: 'input',
-          placeholder: '请输入关键词',
-          validator: v => {
-            if (!v) {
-              this.$toast('请输入关键词')
-              return '请输入关键词'
-            }
-            if (v.length > 8) {
-              this.$toast('关键词长度不能超过8个字符')
-              return '关键词长度不能超过8个字符'
-            }
-            return ''
-          },
-          confirm: v => {
-            apiPostData(apiURL.servicesUrl, {
-              serviceName: 'poetry',
-              type: 'auto-create-poetry',
-              keyWords: v
-            }).then(resp => {
-              this.$toast('需自行在一段时间后刷新列表，查看是否创建成功')
-            })
-          }
-        })
+        this.handleTypeChange(this.poetryTypes[0].value)
+        this.typeVisible = true
       }
       this.robotTime = nowTime
     }
@@ -123,13 +366,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '@/ui/style/const.scss';
+@import "@/ui/style/const.scss";
 
-.sghen-logo {
+.sghen-logo,
+svg {
   width: 100%;
   height: 100%;
-  // background-color: black;
+}
 
+svg {
+  // background-color: black;
   .color-bg {
     stroke: $color-border;
     stroke-width: 8px;
@@ -150,5 +396,9 @@ export default {
   .letter-layer {
     fill: transparent;
   }
+}
+
+.sys-type-mask {
+  background-color: white;
 }
 </style>
