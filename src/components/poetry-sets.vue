@@ -64,7 +64,7 @@ export default {
         const systemSets = []
         const selfSets = []
         resp.data.forEach(o => {
-          o.isOwn = o.userId === selfId
+          o.isOwn = +o.userId === selfId
           if (o.isOwn) {
             selfSets.push(o)
           } else {
@@ -74,7 +74,7 @@ export default {
         const timeSortFunc = function (o0, o1) {
           const time0 = new Date(o0.timeCreate).getTime()
           const time1 = new Date(o1.timeCreate).getTime()
-          return time0 >= time1 ? -1 : 1
+          return time0 >= time1 ? 1 : -1
         }
         this.sets = [...systemSets.sort(timeSortFunc), ...selfSets.sort(timeSortFunc)]
         if (selectLast) {

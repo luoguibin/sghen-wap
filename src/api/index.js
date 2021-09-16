@@ -84,11 +84,11 @@ export const apiURL = {
   poetryImageList: `${nodePreffix}/dynamic-api/poetry-image/list`,
 
   // 选集列表
-  poetSets: `${preffix}/v1/poetry-set/query`,
+  poetSets: `${nodePreffix}/dynamic-api/v2/user/poetry-set/list`,
   // 选集创建
-  poetSetCreate: `${preffix}/v1/poetry-set/create`,
+  poetSetCreate: `${nodePreffix}/dynamic-api/v2/poetry-set/create`,
   // 选集删除
-  poetSetDelete: `${preffix}/v1/poetry-set/delete`,
+  poetSetDelete: `${nodePreffix}/dynamic-api/v2/poetry-set/delete`,
 
   // 诗词词频列表
   poetryHotWord: `${nodePreffix}/dynamic-api/poetry/hot-word`,
@@ -116,9 +116,9 @@ export const apiURL = {
   praiseCheck: `${nodePreffix}/dynamic-api/v2/auth/poetry-praise/checked`,
 
   // 获取系统消息
-  sysMsg: `${preffix}/v1/auth/sys-msg/my-list`,
+  sysMsg: `${nodePreffix}/dynamic-api/v2/auth/user/sys-msg/list`,
   // 读系统消息
-  readSysMsg: `${preffix}/v1/auth/sys-msg/read`,
+  readSysMsg: `${nodePreffix}/dynamic-api/v2/sys-msg/read`,
 
   // 简历API
   resumeCreate: `${preffix}/v1/auth/resume/create`,

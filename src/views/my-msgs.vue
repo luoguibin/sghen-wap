@@ -42,7 +42,7 @@
 import { apiURL, apiPostData } from '@/api'
 import { mapActions, mapState } from 'vuex'
 
-const SYS_MODULE = {
+const MSG_TYPE = {
   SYS: 1000,
   SYS_BLESS: 1001,
   USER: 2000,
@@ -68,9 +68,12 @@ export default {
   filters: {
     msgTypeFilter (item) {
       switch (item.msgType) {
-        case SYS_MODULE.SYS_BLESS:
+        case MSG_TYPE.SYS_BLESS:
           return '系统祝福'
-        case SYS_MODULE.PEOTRY:
+        case MSG_TYPE.USER:
+        case MSG_TYPE.USER_CREATE:
+          return '用户消息'
+        case MSG_TYPE.PEOTRY:
           return '诗词消息'
         default:
           return '系统消息'
@@ -78,7 +81,7 @@ export default {
     },
     msgTextFilter (item) {
       switch (item.msgType) {
-        case SYS_MODULE.USER_CREATE:
+        case MSG_TYPE.USER_CREATE:
           return item.content || '欢迎注册Sghen三行~'
         default:
           return item.content || '--'

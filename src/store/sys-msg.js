@@ -35,16 +35,17 @@ const storeMsg = {
     }
   },
   actions: {
-    getSysMsgs ({ commit, dispatch }, data = { page: 1, limit: 100 }) {
+    getSysMsgs ({ commit, dispatch }, data = { page: 1, limit: 100, offset: 0 }) {
       if (refreshTimer) {
         clearTimeout(refreshTimer)
         refreshTimer = null
       }
       return apiGetData(apiURL.sysMsg, {
-        status: 0,
+        status: -1,
         ...data
-      }).then(data => {
-        commit('setMsgs', data.data)
+      }).then(resp => {
+        const { list = [] } = resp.data
+        commit('setMsgs', list)
       }).finally(() => {
         if (refreshTimer) {
           return

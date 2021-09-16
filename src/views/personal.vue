@@ -279,7 +279,7 @@ export default {
       })
       apiGetData(apiURL.poetSets, params).then((resp) => {
         const userID = this.personalID
-        this.poetSetCount = resp.data.filter((o) => o.userId === userID).length
+        this.poetSetCount = resp.data.filter((o) => +o.userId === userID).length
       })
       if (this.userID === this.personalID) {
         // 当前登录用户获取精确总赞数
