@@ -35,78 +35,78 @@
 </template>
 
 <script>
-import { apiURL, apiPostData } from "@/api";
-import { mapActions, mapState } from "vuex";
-import { MSG_TYPE } from "@/common/const";
+import { apiURL, apiPostData } from '@/api'
+import { mapActions, mapState } from 'vuex'
+import { MSG_TYPE } from '@/common/const'
 
-const msgTypeMap = {};
+const msgTypeMap = {}
 Object.keys(MSG_TYPE).forEach((key) => {
-  msgTypeMap[MSG_TYPE[key].value] = MSG_TYPE[key];
-});
+  msgTypeMap[MSG_TYPE[key].value] = MSG_TYPE[key]
+})
 
 export default {
-  name: "MyMsgs",
+  name: 'MyMsgs',
 
-  data() {
+  data () {
     return {
-      maxCount: 100,
-    };
+      maxCount: 100
+    }
   },
 
   computed: {
     ...mapState({
-      msgs: (state) => state.sysMsg.msgs,
-    }),
+      msgs: (state) => state.sysMsg.msgs
+    })
   },
 
   filters: {
-    msgTypeFilter(item) {
-      const o = msgTypeMap[item.msgType] || MSG_TYPE.SYS;
-      return o.label;
+    msgTypeFilter (item) {
+      const o = msgTypeMap[item.msgType] || MSG_TYPE.SYS
+      return o.label
     },
-    msgTextFilter(item) {
+    msgTextFilter (item) {
       switch (item.msgType) {
         case MSG_TYPE.USER_CREATE.value:
-          return item.content || "欢迎注册Sghen三行~";
+          return item.content || '欢迎注册Sghen三行~'
         default:
-          return item.content || "--";
+          return item.content || '--'
       }
-    },
+    }
   },
 
-  created() {
-    window.myMsgs = this;
+  created () {
+    window.myMsgs = this
   },
 
   methods: {
-    onReadMsg(item) {
+    onReadMsg (item) {
       if (item.loading) {
-        return;
+        return
       }
-      item.loading = true;
+      item.loading = true
       apiPostData(apiURL.readSysMsg, { id: item.id })
         .then(() => {
-          item.status = 1;
+          item.status = 1
         })
         .finally(() => {
-          item.loading = false;
-        });
+          item.loading = false
+        })
     },
 
-    handleRefresh() {
+    handleRefresh () {
       this.getSysMsgs({ limit: this.maxCount })
         .then(() => {
-          this.$refs.sgScroll.success();
+          this.$refs.sgScroll.success()
         })
         .catch(() => {
-          this.$refs.sgScroll.fail();
-        });
+          this.$refs.sgScroll.fail()
+        })
     },
     ...mapActions({
-      getSysMsgs: "sysMsg/getSysMsgs",
-    }),
-  },
-};
+      getSysMsgs: 'sysMsg/getSysMsgs'
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>

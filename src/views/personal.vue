@@ -145,24 +145,24 @@
 </template>
 
 <script>
-import { mapState, mapActions, mapGetters } from "vuex";
-import { base64ToFile } from "@/common/image";
-import { apiURL, apiGetData, apiPostData, apiPostUpload } from "@/api";
-import { MSG_TYPE } from "@/common/const";
+import { mapState, mapActions, mapGetters } from 'vuex'
+import { base64ToFile } from '@/common/image'
+import { apiURL, apiGetData, apiPostData, apiPostUpload } from '@/api'
+import { MSG_TYPE } from '@/common/const'
 
 export default {
-  name: "Personal",
+  name: 'Personal',
 
   components: {
-    ImageEditor: () => import("@/components/image-editor"),
+    ImageEditor: () => import('@/components/image-editor')
   },
 
-  data() {
+  data () {
     return {
       personalID: 0,
-      personalName: "",
-      personalAvatar: "",
-      personalMood: "",
+      personalName: '',
+      personalAvatar: '',
+      personalMood: '',
       isAvatarBase64: false,
 
       poetryCount: -1,
@@ -177,279 +177,279 @@ export default {
         Object.keys(MSG_TYPE).map((key) => {
           return {
             label: MSG_TYPE[key].label,
-            value: key,
-          };
+            value: key
+          }
         })
       ),
       msgFormData: {
-        msgTypeKey: "SYS_BLESS",
-        content: "",
-        serviceName: "sys-msg",
-        type: "create",
+        msgTypeKey: 'SYS_BLESS',
+        content: '',
+        serviceName: 'sys-msg',
+        type: 'create'
       },
       msgFormRules: [
         {
-          key: "msgTypeKey",
-          label: "消息类型",
+          key: 'msgTypeKey',
+          label: '消息类型',
           required: true,
           hasValue: true,
           slot: true,
-          _error: "",
+          _error: ''
         },
         {
-          key: "content",
-          label: "内容",
+          key: 'content',
+          label: '内容',
           required: true,
-          validator: (v = "", rule) => {
-            return v.length ? "" : "请输入" + rule.label;
+          validator: (v = '', rule) => {
+            return v.length ? '' : '请输入' + rule.label
           },
-          _error: "",
-        },
+          _error: ''
+        }
       ],
-      newMsgVisible: false,
-    };
+      newMsgVisible: false
+    }
   },
 
   computed: {
-    phoneText() {
-      const phone = this.phone + "";
+    phoneText () {
+      const phone = this.phone + ''
       if (!phone || phone.length !== 11) {
-        return "";
+        return ''
       }
-      return phone.substr(0, 3) + "****" + phone.substr(7);
+      return phone.substr(0, 3) + '****' + phone.substr(7)
     },
-    isSelf() {
-      return this.userID && +this.userID === +this.personalID;
+    isSelf () {
+      return this.userID && +this.userID === +this.personalID
     },
     ...mapState({
       userID: (state) => state.auth.userID,
-      phone: (state) => state.auth.phone,
+      phone: (state) => state.auth.phone
     }),
     ...mapGetters({
-      selfPublicInfo: "auth/selfPublicInfo",
-    }),
+      selfPublicInfo: 'auth/selfPublicInfo'
+    })
   },
 
-  created() {
-    window.personal = this;
-    this.initData();
-    this.getPersonalPoetryInfo();
+  created () {
+    window.personal = this
+    this.initData()
+    this.getPersonalPoetryInfo()
   },
 
-  beforeRouteUpdate(to, from, next) {
-    next();
-    this.initData();
-    this.getPersonalPoetryInfo();
+  beforeRouteUpdate (to, from, next) {
+    next()
+    this.initData()
+    this.getPersonalPoetryInfo()
   },
 
   methods: {
-    initData() {
-      const uuid = this.$route.query.uuid || this.userID;
+    initData () {
+      const uuid = this.$route.query.uuid || this.userID
       if (!uuid) {
-        this.$toastLogin();
-        return;
+        this.$toastLogin()
+        return
       }
 
-      this.personalID = +uuid;
+      this.personalID = +uuid
       if (this.isSelf) {
-        this.personalName = this.selfPublicInfo.username;
-        this.personalAvatar = this.selfPublicInfo.avatar;
-        this.personalMood = this.selfPublicInfo.mood;
+        this.personalName = this.selfPublicInfo.username
+        this.personalAvatar = this.selfPublicInfo.avatar
+        this.personalMood = this.selfPublicInfo.mood
       } else {
         if (this.saveData) {
-          const saveData = this.saveData;
+          const saveData = this.saveData
           for (const key in saveData) {
-            this[key] = saveData[key];
+            this[key] = saveData[key]
           }
-          this.saveData = null;
+          this.saveData = null
         } else {
           apiGetData(apiURL.userInfoList2, { ids: this.personalID })
             .then((resp) => {
-              const info = resp.data[0];
-              this.personalName = info.username;
-              this.personalAvatar = info.avatar;
-              this.personalMood = info.mood;
+              const info = resp.data[0]
+              this.personalName = info.username
+              this.personalAvatar = info.avatar
+              this.personalMood = info.mood
             })
             .catch(() => {
-              this.$toast("获取个人信息失败");
-            });
+              this.$toast('获取个人信息失败')
+            })
         }
       }
-      this.isAvatarBase64 = false;
+      this.isAvatarBase64 = false
     },
-    getPersonalPoetryInfo() {
-      const params = { userId: this.personalID };
+    getPersonalPoetryInfo () {
+      const params = { userId: this.personalID }
       apiGetData(apiURL.userPoetryCount, params).then((resp) => {
-        this.poetryCount = resp.data[0].count;
-      });
+        this.poetryCount = resp.data[0].count
+      })
       apiGetData(apiURL.poetSets, params).then((resp) => {
-        const userID = this.personalID;
+        const userID = this.personalID
         this.poetSetCount = resp.data.filter(
           (o) => +o.userId === userID
-        ).length;
-      });
+        ).length
+      })
       if (this.userID === this.personalID) {
         // 当前登录用户获取精确总赞数
         apiGetData(apiURL.userPraiseCount).then((resp) => {
-          this.praiseCount = resp.data.count + resp.data.recentCount;
-        });
+          this.praiseCount = resp.data.count + resp.data.recentCount
+        })
       } else {
         // 其他则获取统计总赞数
         apiGetData(apiURL.userRecentPraiseCount, {
-          poetId: this.personalID,
+          poetId: this.personalID
         }).then((resp) => {
-          const item0 = resp.data[0] || {};
-          const count = item0.count || 0;
-          this.praiseCount = +count;
-        });
+          const item0 = resp.data[0] || {}
+          const count = item0.count || 0
+          this.praiseCount = +count
+        })
       }
     },
 
-    hasEditChange() {
-      const saveData = this.saveData;
-      let hasChange = false;
+    hasEditChange () {
+      const saveData = this.saveData
+      let hasChange = false
       for (const key in saveData) {
         if (this[key] !== saveData[key]) {
-          hasChange = true;
+          hasChange = true
         }
       }
-      return hasChange;
+      return hasChange
     },
 
-    onOpenChangeAvatar() {
-      this.imageEditorVisible = true;
+    onOpenChangeAvatar () {
+      this.imageEditorVisible = true
     },
-    handleAvatarBack() {
-      this.imageEditorVisible = false;
+    handleAvatarBack () {
+      this.imageEditorVisible = false
     },
-    onConfirmAvatar() {
+    onConfirmAvatar () {
       if (this.isAvatarUploading) {
-        return;
+        return
       }
-      this.isAvatarUploading = true;
+      this.isAvatarUploading = true
       this.$refs.imageEditor.getImage((base64) => {
-        this.personalAvatar = base64;
-        this.isAvatarBase64 = true;
+        this.personalAvatar = base64
+        this.isAvatarBase64 = true
 
-        const formData = new FormData();
+        const formData = new FormData()
         formData.append(
-          "file",
-          base64ToFile(base64, this.personalID + "-avatar.png")
-        );
-        apiPostUpload(apiURL.upload, formData, { pathType: "icon" })
+          'file',
+          base64ToFile(base64, this.personalID + '-avatar.png')
+        )
+        apiPostUpload(apiURL.upload, formData, { pathType: 'icon' })
           .then((resp) => {
-            this.personalAvatar = resp.data[0];
-            this.isAvatarBase64 = false;
+            this.personalAvatar = resp.data[0]
+            this.isAvatarBase64 = false
           })
           .finally(() => {
-            this.imageEditorVisible = false;
-            this.isAvatarUploading = false;
-          });
-      });
+            this.imageEditorVisible = false
+            this.isAvatarUploading = false
+          })
+      })
     },
-    onEditOrSave() {
+    onEditOrSave () {
       if (this.isEditing) {
         if (this.hasEditChange()) {
           if (this.isAvatarBase64) {
-            return;
+            return
           }
           this.update({
             name: this.personalName,
             avatar: this.personalAvatar,
-            mood: this.personalMood,
+            mood: this.personalMood
           }).then((resp) => {
-            this.$toast("保存成功");
-            this.isEditing = false;
-          });
+            this.$toast('保存成功')
+            this.isEditing = false
+          })
         } else {
-          this.isEditing = false;
+          this.isEditing = false
         }
       } else {
         this.saveData = {
           personalName: this.personalName,
           personalAvatar: this.personalAvatar,
-          personalMood: this.personalMood,
-        };
-        this.isEditing = true;
+          personalMood: this.personalMood
+        }
+        this.isEditing = true
       }
     },
-    onBack() {
+    onBack () {
       if (this.isEditing) {
         if (this.hasEditChange()) {
           this.$confirm({
-            title: "系统提示",
-            content: "信息已编辑，是否放弃修改？",
+            title: '系统提示',
+            content: '信息已编辑，是否放弃修改？',
             confirm: () => {
-              this.initData();
-              this.isEditing = false;
-            },
-          });
-          return;
+              this.initData()
+              this.isEditing = false
+            }
+          })
+          return
         }
-        this.initData();
-        this.isEditing = false;
+        this.initData()
+        this.isEditing = false
       } else {
-        this.$router.go(-1);
+        this.$router.go(-1)
       }
     },
-    onLogout() {
+    onLogout () {
       this.$confirm({
-        title: "提示",
-        content: "退出后需要重新登录验证",
+        title: '提示',
+        content: '退出后需要重新登录验证',
         confirm: () => {
-          this.logout();
-        },
-      });
+          this.logout()
+        }
+      })
     },
 
-    onClickPhone() {
-      const nowTime = Date.now();
+    onClickPhone () {
+      const nowTime = Date.now()
       if (!this.newMsgTime) {
-        this.newMsgTime = nowTime;
-        return;
+        this.newMsgTime = nowTime
+        return
       }
       if (nowTime - this.newMsgTime < 300) {
-        this.newMsgVisible = true;
+        this.newMsgVisible = true
       }
-      this.newMsgTime = nowTime;
+      this.newMsgTime = nowTime
     },
-    handleMsgTypeKeyChange(value) {
-      this.msgFormData.msgTypeKey = value;
+    handleMsgTypeKeyChange (value) {
+      this.msgFormData.msgTypeKey = value
     },
-    onConfirmNewMsg() {
+    onConfirmNewMsg () {
       this.$refs.msgForm.validate((error) => {
         if (error) {
-          return;
+          return
         }
         if (this.isMsgRequesting) {
-          return;
+          return
         }
         this.$confirm({
-          title: "新增提示",
-          content: "确认后不可撤回，是否确认新增消息？",
+          title: '新增提示',
+          content: '确认后不可撤回，是否确认新增消息？',
           confirm: () => {
-            this.isMsgRequesting = true;
+            this.isMsgRequesting = true
             apiPostData(apiURL.servicesUrl, {
-              ...this.msgFormData,
+              ...this.msgFormData
             })
               .then(() => {
-                this.isMsgRequesting = false;
-                this.newMsgVisible = false;
+                this.isMsgRequesting = false
+                this.newMsgVisible = false
               })
               .finally(() => {
-                this.isMsgRequesting = false;
-              });
-          },
-        });
-      });
+                this.isMsgRequesting = false
+              })
+          }
+        })
+      })
     },
 
     ...mapActions({
-      logout: "auth/logout",
-      update: "auth/update",
-    }),
-  },
-};
+      logout: 'auth/logout',
+      update: 'auth/update'
+    })
+  }
+}
 </script>
 
 <style lang="scss" scoped>
