@@ -94,7 +94,7 @@ export default {
     },
 
     handleRefresh () {
-      this.getSysMsgs({ limit: this.maxCount })
+      this.getSysMsgs({ limit: this.maxCount, offset: 0 })
         .then(() => {
           this.$refs.sgScroll.success()
         })
