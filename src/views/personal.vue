@@ -13,7 +13,7 @@
     </sg-header>
     <div class="personal-main" v-if="personalID">
       <div class="info-item">
-        <span>
+        <span @click="onClickName">
           昵称
           <i>:</i>
         </span>
@@ -401,7 +401,33 @@ export default {
         }
       })
     },
+    onClickName () {
+      const nowTime = Date.now()
+      if (!this.nameTime) {
+        this.nameTime = nowTime
+        this.canComment = true
+        return
+      }
 
+      if (nowTime - this.nameTime < 300) {
+        const canComment = this.canComment
+        this.canComment = !canComment
+
+        this.$confirm({
+          title: '提示',
+          content: canComment ? '启动自动评论' : '关闭自动评论',
+          confirm: () => {
+            apiPostData(apiURL.servicesUrl, {
+              serviceName: 'poetry',
+              type: canComment ? 'start-auto-praise' : 'stop-auto-praise'
+            }).then(() => {
+              this.$toast('操作成功')
+            })
+          }
+        })
+      }
+      this.nameTime = nowTime
+    },
     onClickPhone () {
       const nowTime = Date.now()
       if (!this.newMsgTime) {
