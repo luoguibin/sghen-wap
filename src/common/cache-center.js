@@ -12,8 +12,15 @@ class CacheCenter {
     this.cache.set(id, data)
   }
 
-  getData (id) {
-    return this.cache.get('' + id)
+  getData (id, isClone) {
+    const e = this.cache.get('' + id)
+    if (!isClone) {
+      return e
+    }
+    if (e instanceof String || !e) {
+      return e
+    }
+    return JSON.parse(JSON.stringify(e))
   }
 
   delete (id) {
