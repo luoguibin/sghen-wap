@@ -105,6 +105,8 @@ export const apiURL = {
   commentDelete: `${nodePreffix}/dynamic-api/v2/poetry-comment/delete`,
   // 分页获取一诗词评论列表
   commentList: `${nodePreffix}/dynamic-api/v2/poetry-comment/list`,
+  // 评论详情
+  commentDetail: `${nodePreffix}/dynamic-api/v2/poetry-comment/detail`,
 
   // 点赞创建
   praiseCreate: `${nodePreffix}/dynamic-api/v2/poetry-praise/create`,

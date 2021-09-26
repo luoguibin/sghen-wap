@@ -261,25 +261,38 @@ export default {
       }).then(resp => {
         const { count = 0, list = [] } = resp.data
 
-        // TODO:
-        const userIdMap = {}
+        const userIdMap = []
         list.forEach(o => {
-          o.toPoet = null
-          o.fromPoet = null
-          userIdMap[o.toId] = true
-          userIdMap[o.fromId] = true
+          const toPoet = Cache.UserCache.getData(o.toId, true)
+          if (toPoet) {
+            o.toPoet = toPoet
+          } else {
+            o.toPoet = null
+            userIdMap[o.toId] = true
+          }
+
+          const fromPoet = Cache.UserCache.getData(o.fromId, true)
+          if (fromPoet) {
+            o.fromPoet = fromPoet
+          } else {
+            o.fromPoet = null
+            userIdMap[o.fromId] = true
+          }
         })
         const userIds = Object.keys(userIdMap)
         userIds.length && apiGetData(apiURL.userInfoList2, { ids: userIds.join(',') }).then(resp => {
           const users = resp.data || []
-          const userMap = {}
           users.forEach(o => {
-            userMap[o.id] = o
+            Cache.UserCache.setData(o.id, o)
           })
 
           list.forEach(o => {
-            o.toPoet = userMap[o.toId]
-            o.fromPoet = userMap[o.fromId]
+            if (!o.toPoet) {
+              o.toPoet = Cache.UserCache.getData(o.toId, true)
+            }
+            if (!o.fromPoet) {
+              o.fromPoet = Cache.UserCache.getData(o.fromId, true)
+            }
           })
         })
 
@@ -308,23 +321,26 @@ export default {
       }).then(resp => {
         const { count = [], list = [] } = resp.data
 
-        // TODO:
-        const userIdMap = {}
+        const userIds = []
         list.forEach(o => {
           o.toPoet = {}
-          o.fromPoet = null
-          userIdMap[o.fromId] = true
+          const fromPoet = Cache.UserCache.getData(o.fromId)
+          if (fromPoet) {
+            o.fromPoet = JSON.parse(JSON.stringify(fromPoet))
+          } else {
+            o.fromPoet = null
+            userIds.push(o.fromId)
+          }
         })
-        const userIds = Object.keys(userIdMap)
         userIds.length && apiGetData(apiURL.userInfoList2, { ids: userIds.join(',') }).then(resp => {
           const users = resp.data || []
-          const userMap = {}
           users.forEach(o => {
-            userMap[o.id] = o
+            Cache.UserCache.setData(o.id, o)
           })
 
           list.forEach(o => {
-            o.fromPoet = userMap[o.fromId]
+            const fromPoet = Cache.UserCache.getData(o.fromId)
+            o.fromPoet = JSON.parse(JSON.stringify(fromPoet))
           })
         })
 
@@ -417,12 +433,15 @@ export default {
       }
     },
     deleteComment (poetry, comment) {
-      console.log(comment)
+      const id = comment.id
       apiPostData(apiURL.commentDelete, {
-        id: comment.id
-        // fromId: comment.fromId
-      }).then(data => {
-        this.getContentComments(true)
+        id
+      }).then(() => {
+        // this.getContentComments(true)
+        const comments = poetry.realComments
+        const index = comments.findIndex(o => o.id === id)
+        index !== -1 && comments.splice(index, 1)
+        poetry.commentTotal -= 1
       })
     },
 
@@ -566,15 +585,17 @@ export default {
       )
     },
     handleCommentOk (o) {
-      this.getContentComments(true)
-      // TODO:
-      // const { commentTotal, realComments } = this.poetry
-      // if (commentTotal === realComments.length) {
-      //   o.fromPoet = JSON.parse(JSON.stringify(this.selfPublicInfo))
-      //   o.toPoet = Cache.UserCache.getData(+this.commentToID)
-      //   realComments.push(o)
-      // }
-      // this.poetry.commentTotal += 1
+      // this.getContentComments(true)
+      const { commentTotal, realComments } = this.poetry
+      if (commentTotal === realComments.length) {
+        apiGetData(apiURL.commentDetail, { id: o.insertId }).then(resp => {
+          const comment = resp.data[0]
+          comment.fromPoet = JSON.parse(JSON.stringify(this.selfPublicInfo))
+          comment.toPoet = Cache.UserCache.getData(+this.commentToID)
+          realComments.push(comment)
+        })
+      }
+      this.poetry.commentTotal += 1
     },
 
     onPraiseAnime (e, data) {
