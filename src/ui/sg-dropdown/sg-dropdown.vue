@@ -191,10 +191,10 @@ export default {
     height: 0;
     z-index: $z-index-normal;
     box-sizing: border-box;
-    border-width: 1rem;
+    border-width: 0.6rem;
     border-style: solid;
     border-color: transparent transparent white transparent;
-
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.1));
     // test style
     // border-color: transparent transparent #ddd transparent;
   }
@@ -221,7 +221,7 @@ export default {
     bottom: 3.4rem;
   }
   .pointer {
-    bottom: 1.4rem;
+    bottom: 2.2rem;
     transform: rotate(180deg);
   }
 }
@@ -232,7 +232,7 @@ export default {
     top: 3.4rem;
   }
   .pointer {
-    top: 1.4rem;
+    top: 2.2rem;
   }
 }
 

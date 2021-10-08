@@ -227,7 +227,7 @@ export default {
 @import "../style/const.scss";
 .sg-toast {
   .toast-msg {
-    white-space: nowrap;
+    // white-space: nowrap;
     span {
       color: $color-theme;
     }

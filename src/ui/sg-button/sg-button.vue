@@ -1,7 +1,7 @@
 <template>
   <button :class="`sg-button sg-button-` + type" :disabled="disabled || isLoading" @click="onClick">
     <i v-if="isLoading"></i>
-    <slot></slot>
+    <span><slot></slot></span>
   </button>
 </template>
 
@@ -53,6 +53,11 @@ export default {
     border: 2px solid $color-theme;
     border-left-color: transparent;
     animation: sg-rotate 1s infinite linear;
+  }
+
+  i,
+  span {
+    vertical-align: middle;
   }
 }
 
