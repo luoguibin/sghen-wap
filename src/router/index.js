@@ -30,6 +30,12 @@ const routes = [
     component: () => import(/* webpackChunkName: 'poetry-detail' */'@/views/poetry-detail')
   },
   {
+    path: '/peotry-detail/:id',
+    redirect: {
+      name: 'poetry-detail'
+    }
+  },
+  {
     path: '/poetry-edit/:id',
     name: 'poetry-edit',
     component: () => import(/* webpackChunkName: 'poetry-edit' */'@/views/poetry-edit')
