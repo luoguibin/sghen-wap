@@ -5,9 +5,11 @@
 </template>
 
 <script>
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { TooltipComponent } from 'echarts/components'
 import 'echarts-wordcloud'
 import { apiURL, apiGetData } from '@/api'
+echarts.use([TooltipComponent])
 
 export default {
   data () {
