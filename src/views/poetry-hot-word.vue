@@ -11,6 +11,29 @@ import 'echarts-wordcloud'
 import { apiURL, apiGetData } from '@/api'
 echarts.use([TooltipComponent])
 
+const COLORS = [
+  '#4897c5',
+  '#45A3FF',
+  '#8DD1EC',
+  '#51CDCC',
+  '#8AE0BE',
+  '#57CD74',
+  '#B0DF87',
+  '#B0DF87',
+  '#EAA779',
+  '#F1667F',
+  '#DD82D5',
+  '#72A1F9',
+  '#9661E7',
+  '#5157D0',
+  '#8A90EB',
+  '#8A90EB',
+  '#8DCAFF',
+  '#3E86FF',
+  '#65ACF9',
+  '#1C60D4'
+]
+
 export default {
   data () {
     return {
@@ -55,16 +78,8 @@ export default {
             textStyle: {
               fontFamily: 'sans-serif',
               fontWeight: 'bold',
-              color: function () {
-                return (
-                  'rgb(' +
-                  [
-                    Math.round(Math.random() * 160),
-                    Math.round(Math.random() * 160),
-                    Math.round(Math.random() * 160)
-                  ].join(',') +
-                  ')'
-                )
+              color: function ({ dataIndex }) {
+                return COLORS[dataIndex % COLORS.length]
               }
             },
             emphasis: {
