@@ -1,22 +1,38 @@
 <template>
   <div class="poetry-sets sg-flex-column">
     <sg-header @back="$emit('back')" :centerStatus="''" :backVisible="false">
-      <span slot="left">{{userID ? '我的' : '公开'}}选集（{{sets.length ? sets.length : '?'}}）</span>
-      <span class="iconfont icon-increase" slot="right" @click="onNewSet"></span>
+      <span slot="left"
+        >{{ userID ? "我的" : "公开" }}选集（{{
+          sets.length ? sets.length : "?"
+        }}）</span
+      >
+      <span
+        class="iconfont icon-increase"
+        slot="right"
+        @click="onNewSet"
+      ></span>
     </sg-header>
     <!-- 选集列表 -->
-    <div class="sg-flex-one" style="overflow: hidden;">
+    <div class="sg-flex-one" style="overflow: hidden">
       <div class="scroll" sg-scroll="vertical_stop">
         <div class="wrapper">
           <div
             v-for="item in sets"
             :key="item.id"
             @click="onClickSet(item)"
-            :class="{'set-item': true,  'sg-flex': true, 'set-item__selected': currentId === item.id}"
+            :class="{
+              'set-item': true,
+              'sg-flex': true,
+              'set-item__selected': currentId === item.id,
+            }"
           >
             <span class="choice"></span>
-            <div class="sg-flex-one sg-text-ellipsis">{{item.name}}</div>
-            <span v-show="item.isOwn" class="iconfont icon-delete" @click.stop="onDeleteSet(item)"></span>
+            <div class="sg-flex-one sg-text-ellipsis">{{ item.name }}</div>
+            <span
+              v-show="item.isOwn"
+              class="iconfont icon-delete"
+              @click.stop="onDeleteSet(item)"
+            ></span>
           </div>
         </div>
       </div>
@@ -47,7 +63,7 @@ export default {
 
   computed: {
     ...mapState({
-      userID: state => state.auth.userID
+      userID: (state) => state.auth.userID
     })
   },
 
@@ -59,11 +75,11 @@ export default {
 
   methods: {
     getPoetSets (selectLast) {
-      apiGetData(apiURL.poetSets, { userId: this.userID }).then(resp => {
+      apiGetData(apiURL.poetSets, { userId: this.userID }).then((resp) => {
         const selfId = this.userID
         const systemSets = []
         const selfSets = []
-        resp.data.forEach(o => {
+        resp.data.forEach((o) => {
           o.isOwn = +o.userId === selfId
           if (o.isOwn) {
             selfSets.push(o)
@@ -76,7 +92,10 @@ export default {
           const time1 = new Date(o1.timeCreate).getTime()
           return time0 >= time1 ? 1 : -1
         }
-        this.sets = [...systemSets.sort(timeSortFunc), ...selfSets.sort(timeSortFunc)]
+        this.sets = [
+          ...systemSets.sort(timeSortFunc),
+          ...selfSets.sort(timeSortFunc)
+        ]
         if (selectLast) {
           this.onClickSet(selfSets[0])
         }
@@ -84,15 +103,25 @@ export default {
     },
 
     onDeleteSet ({ id }) {
-      this.$confirm({
-        title: '提示',
-        content: '是否删除该选集',
-        confirm: () => {
-          apiPostData(apiURL.poetSetDelete, { id }).then(resp => {
-            const index = this.sets.findIndex(o => o.id === id)
-            this.sets.splice(index, 1)
-          })
+      apiGetData(apiURL.poetryList, {
+        setId: id,
+        limit: 1
+      }).then((resp) => {
+        const list = resp.data || []
+        if (list.length) {
+          this.$toast('该选集下拥有诗词，禁止删除')
+          return
         }
+        this.$confirm({
+          title: '提示',
+          content: '是否删除该选集',
+          confirm: () => {
+            apiPostData(apiURL.poetSetDelete, { id }).then((resp) => {
+              const index = this.sets.findIndex((o) => o.id === id)
+              this.sets.splice(index, 1)
+            })
+          }
+        })
       })
     },
 
@@ -114,7 +143,7 @@ export default {
         title: '创建选集',
         type: 'input',
         placeholder: '请输入选集名',
-        validator: v => {
+        validator: (v) => {
           if (!v) {
             this.$toast('请输入选集名')
             return '请输入选集名'
@@ -123,15 +152,15 @@ export default {
             this.$toast('选集名长度不能超过16个字符')
             return '选集名长度不能超过16个字符'
           }
-          const o = this.sets.find(o => o.name === v)
+          const o = this.sets.find((o) => o.name === v)
           if (o) {
             this.$toast('选集名重复')
             return '选集名重复'
           }
           return ''
         },
-        confirm: v => {
-          apiPostData(apiURL.poetSetCreate, { name: v }).then(resp => {
+        confirm: (v) => {
+          apiPostData(apiURL.poetSetCreate, { name: v }).then((resp) => {
             this.getPoetSets(true)
           })
         }
