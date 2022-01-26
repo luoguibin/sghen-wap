@@ -19,7 +19,7 @@
           <span
             slot="myMsgs"
             slot-scope="{ option }"
-            :class="{ 'has-msg': unReadMsgCountText !== '' }"
+            :class="{ 'has-msg': unReadMsgCountText !== '', 'my-msgs': true }"
             :unreadcount="unReadMsgCountText"
             >{{ option.label }}</span
           >
@@ -419,7 +419,7 @@ export default {
     span {
       padding: 0 2px;
     }
-    span.has-msg {
+    .my-msgs {
       padding: 0;
     }
   }
