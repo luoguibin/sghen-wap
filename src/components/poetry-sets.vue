@@ -13,7 +13,7 @@
       ></span>
     </sg-header>
     <!-- 选集列表 -->
-    <div class="sg-flex-one" style="overflow: hidden">
+    <div class="sg-flex-one scroll-wrapper">
       <div class="scroll" sg-scroll="vertical_stop">
         <div class="wrapper">
           <div
@@ -177,8 +177,12 @@ $set-item-height: $height-text * 2;
 $set-item-size: $size-text * 1.2;
 .poetry-sets {
   background-color: $color-bg;
+  .scroll-wrapper {
+    overflow: hidden;
+    padding: $padding-normal 0;
+  }
   .wrapper {
-    padding: $padding-normal;
+    padding: 0 $padding-normal;
   }
   .scroll {
     height: 100%;
@@ -189,11 +193,11 @@ $set-item-size: $size-text * 1.2;
     height: $set-item-height;
     line-height: $set-item-height;
     padding: 0 $padding-big;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
     font-size: $set-item-size;
     color: $color-text;
-    background-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background-color: rgba(255, 255, 255, 0.5);
+    // box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   }
   .sg-flex {
     align-items: center;
