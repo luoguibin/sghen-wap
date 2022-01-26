@@ -419,6 +419,9 @@ export default {
     span {
       padding: 0 2px;
     }
+    span.has-msg {
+      padding: 0;
+    }
   }
 
   .home-body {
