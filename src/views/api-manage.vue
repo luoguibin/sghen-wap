@@ -19,8 +19,9 @@
     </div>
     <div class="footer">
       <div v-show="!hasSelected">
-        <sg-button type="text" @click="onNextPage(-1)" :disabled="offset === 0">上一页</sg-button>
-        <sg-button type="text" @click="onNextPage()" :disabled="isEnd">下一页</sg-button>
+        <span style="margin-right: 1rem; color: #aaaaaa;">暂支持100个接口</span>
+        <sg-button v-if="false" type="text" @click="onNextPage(-1)" :disabled="offset === 0">上一页</sg-button>
+        <sg-button v-if="false" type="text" @click="onNextPage()" :disabled="isEnd">下一页</sg-button>
         <sg-button type="text">共{{total}}项</sg-button>
       </div>
 
