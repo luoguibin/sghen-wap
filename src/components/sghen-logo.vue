@@ -66,6 +66,7 @@
               ></sg-dropdown>
             </div>
           </sg-form>
+          <div class="keyword-tip">输入要求：{{ keyWordTip }}</div>
         </div>
       </div>
     </div>
@@ -116,15 +117,6 @@ export default {
       },
       formRules: [
         {
-          key: 'keyWords',
-          label: '关键词',
-          required: true,
-          _error: '',
-          validator: (v = '', rule) => {
-            return v.length ? '' : '请输入' + rule.label
-          }
-        },
-        {
           key: 'key',
           label: '类型',
           required: true,
@@ -148,6 +140,15 @@ export default {
           hasValue: true,
           slot: true,
           _error: ''
+        },
+        {
+          key: 'keyWords',
+          label: '关键词',
+          required: true,
+          _error: '',
+          validator: (v = '', rule) => {
+            return v.length ? '' : '请输入' + rule.label
+          }
         }
       ],
       poetryTypes: [
@@ -177,7 +178,8 @@ export default {
           }),
           isInputValid: function (v) {
             return v && v.length > 0 && v.length <= 5
-          }
+          },
+          tip: '请输入1~4个字'
         },
         {
           label: '律诗',
@@ -192,7 +194,8 @@ export default {
           yans: yans.filter((o) => o.value === '5'),
           isInputValid: function (v) {
             return v && (v.length === 5 || v.length === 7)
-          }
+          },
+          tip: '请输入一句五字句或者七字句'
         },
         {
           label: '词',
@@ -238,7 +241,8 @@ export default {
         }
       ],
       poetryYans: [],
-      poetStyles: []
+      poetStyles: [],
+      keyWordTip: ''
     }
   },
 
@@ -302,6 +306,8 @@ export default {
       }
       const styleRule = this.formRules.find((o) => o.key === 'style')
       styleRule.hidden = !hasStyle
+
+      this.keyWordTip = typeObj.tip || '请输入句子、段落或关键词，以空格隔开'
     },
     handleYanChange (v) {
       this.formData.yan = v
@@ -400,5 +406,12 @@ svg {
 
 .sys-type-mask {
   background-color: white;
+}
+
+.keyword-tip {
+  padding: $padding-normal;
+  color: $color-tip;
+  font-size: $size-text;
+  line-height: 1.2;
 }
 </style>
