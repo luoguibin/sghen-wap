@@ -884,7 +884,9 @@ export default {
      * 更新简历
      */
     updateResume () {
-      const data = {}
+      const data = {
+        id: this.resumeId
+      }
       const object = this.tempResume
       for (const key in object) {
         if (object.hasOwnProperty(key)) {

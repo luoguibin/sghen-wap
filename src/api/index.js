@@ -42,7 +42,6 @@ export const apiPostUpload = (url, data, params, call) =>
     }
   })
 
-const preffix = '/sapi'
 const nodePreffix = '/napi'
 
 /**
@@ -50,15 +49,15 @@ const nodePreffix = '/napi'
  */
 export const apiURL = {
   // 用户登陆
-  login: `${preffix}/v1/user/login`,
-  userCreate: `${preffix}/v1/user/create`,
-  userUpdate: `${preffix}/v1/user/update`,
+  login: `${nodePreffix}/user/login`,
+  userCreate: `${nodePreffix}/user/regist`,
+  userUpdate: `${nodePreffix}/user/update`,
   // 校验码
-  captcha: `${preffix}/v1/sms/captcha`,
+  captcha: `${nodePreffix}/sms/captcha`,
   // 验证码
-  smsCode: `${preffix}/v1/sms/send`,
+  smsCode: `${nodePreffix}/sms/send`,
   // 上传
-  upload: `${preffix}/v1/upload`,
+  upload: `${nodePreffix}/upload`,
 
   // 获取作者基本信息
   userInfoList2: `${nodePreffix}/dynamic-api/v2/user/info/list`,
@@ -70,16 +69,16 @@ export const apiURL = {
   userRecentPraiseCount: `${nodePreffix}/dynamic-api/v2/user/poetry/recent-praise-census`,
 
   // 诗词默认列表
-  poetryList: `${preffix}/v1/poetry/query`,
+  poetryList: `${nodePreffix}/poetry/query`,
   // 诗词热门列表
   poetryPopular: `${nodePreffix}/dynamic-api/v2/poetry/popular`,
 
   // 诗词创建
-  poetryCreate: `${preffix}/v1/poetry/create`,
+  poetryCreate: `${nodePreffix}/poetry/create`,
   // 诗词更新
-  poetryUpdate: `${preffix}/v1/poetry/update`,
+  poetryUpdate: `${nodePreffix}/poetry/update`,
   // 诗词删除
-  poetryDelete: `${preffix}/v1/poetry/delete`,
+  poetryDelete: `${nodePreffix}/poetry/delete`,
   // 诗词图片列表
   poetryImageList: `${nodePreffix}/dynamic-api/poetry-image/list`,
 
@@ -123,10 +122,10 @@ export const apiURL = {
   readSysMsg: `${nodePreffix}/dynamic-api/v2/sys-msg/read`,
 
   // 简历API
-  resumeCreate: `${preffix}/v1/auth/resume/create`,
-  resumeDetail: `${preffix}/v1/auth/resume/detail`,
-  resumeUpdate: `${preffix}/v1/auth/resume/update`,
-  resumeDelete: `${preffix}/v1/auth/resume/delete`,
+  resumeCreate: `${nodePreffix}/resume/create`,
+  resumeDetail: `${nodePreffix}/auth/resume/detail`,
+  resumeUpdate: `${nodePreffix}/resume/update`,
+  resumeDelete: `${nodePreffix}/resume/delete`,
 
   // 分享链接
   shareCreate: `${nodePreffix}/auth/share/create`,

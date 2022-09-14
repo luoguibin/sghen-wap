@@ -142,7 +142,7 @@ export default {
       const query = this.$route.query
       // 强制转换为string作为id
       this.uuid = query.uuid ? '' + query.uuid : CACHE_ROOT_ID
-      this.setId = query.setId ? '' + query.setId : '0'
+      this.setId = query.setId ? '' + query.setId : ''
       this.setName = query.setName ? query.setName : ''
       this.scrollItemMap = {}
 
@@ -184,7 +184,7 @@ export default {
 
       apiGetData(apiURL.poetryList, params)
         .then(data => {
-          const list = data.data
+          const { total, list } = data.data
 
           if (isRefresh) {
             this.poetries = list
@@ -208,7 +208,7 @@ export default {
             currentYearMonth = tempYearMonth
           })
           this.isDataReady = true
-          this.isEnd = this.poetries.length === data.totalCount
+          this.isEnd = this.poetries.length === total
 
           this.$refs.sgScroll.success()
           isRefresh && this.$refs.sgScroll.onScrollToTop()

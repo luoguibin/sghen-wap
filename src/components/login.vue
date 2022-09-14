@@ -5,7 +5,7 @@
       <sg-form ref="form" :formData="formData" :formRules="formRules">
         <div class="login-captcha" slot="captchaValue">
           <input v-model="formData.captchaValue" v-focus-within />
-          <img v-if="captcha.id" :src="captcha.base64" @click="onGetCaptcha" />
+          <span v-if="captcha.id" class="svg-box" v-html="captcha.svgData" @click="onGetCaptcha"></span>
         </div>
         <div class="login-code" slot="code">
           <input v-model="formData.code" v-focus-within />
@@ -122,11 +122,11 @@ export default {
         {
           key: 'captchaValue',
           slot: true,
-          label: '图形运算',
+          label: '图形验证',
           hidden: true,
           required: false,
           validator: (v, rule) => {
-            return v ? '' : '请输入图形运算结果'
+            return v ? '' : '请输入图形验证结果'
           },
           _error: ''
         },
@@ -153,7 +153,7 @@ export default {
       ],
       captcha: {
         id: '',
-        base64: ''
+        svgData: ''
       },
       smsLoading: false,
       countdown: 0
@@ -212,6 +212,7 @@ export default {
       item = this.formRules.find(o => o.key === 'code')
       item.hidden = isPwType
       item.required = !isPwType
+      this.formData.code = ''
 
       item = this.formRules.find(o => o.key === 'captchaValue')
       item.hidden = isPwType
@@ -225,7 +226,8 @@ export default {
     },
     onGetCaptcha () {
       apiGetData(apiURL.captcha).then(resp => {
-        this.captcha = resp.data
+        const { key: id, svgData } = resp.data
+        this.captcha = { id, svgData }
       })
     },
     onGetSmsCode () {
@@ -235,9 +237,9 @@ export default {
         }
         this.smsLoading = true
         const params = {
-          phone: this.formData.phone,
-          captchaId: this.captcha.id,
-          captchaValue: this.formData.captchaValue
+          mobile: this.formData.phone,
+          key: this.captcha.id,
+          code: this.formData.captchaValue
         }
         apiPostData(apiURL.smsCode, params)
           .then(() => {
@@ -312,6 +314,18 @@ export default {
     align-items: center;
     input {
       flex: 1;
+    }
+    .svg-box {
+      display: inline-block;
+      width: 150px;
+      height: 39px;
+      overflow: hidden;
+      /deep/ {
+        svg {
+          width: 100%;
+          height: 100%;
+        }
+      }
     }
   }
   .login-code {

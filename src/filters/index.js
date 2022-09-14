@@ -61,13 +61,15 @@ export const imgSrcFilter = function (v, type) {
   }
   let path
   if (v.indexOf('.') === 0) {
-    if (v.indexOf('./file') === 0) {
-      path = '/sapi' + v.substr(1)
+    if (v.indexOf('./public') === 0) {
+      path = '/napi' + v.substr(1)
+    } else if (v.indexOf('./file') === 0) {
+      path = '/napi/public' + v.substr(1)
     } else {
-      path = '/sapi/file/poetry/img' + v.substr(1)
+      path = '/napi/public/file/poetry/img' + v.substr(1)
     }
   } else {
-    path = '/sapi/file/poetry/img/' + v
+    path = '/napi/public/file/poetry/img/' + v
   }
   return path
 }
