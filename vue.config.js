@@ -5,7 +5,7 @@ module.exports = {
   lintOnSave: true,
   runtimeCompiler: true,
 
-  publicPath: process.env.NODE_ENV === 'production' ? '/sghen-wap/' : './',
+  publicPath: process.env.NODE_ENV === 'production' ? '/poetry/' : './',
 
   chainWebpack: config => {
     // config
@@ -65,23 +65,35 @@ module.exports = {
     // https: false,
     // hotOnly: false,
     proxy: {
-      '/sapi/': {
+      '/sapi/file': {
         target: 'https://www.sghen.cn',
         ws: false,
         secure: true,
         changeOrigin: true
-        // pathRewrite: {
-        //   '^/rng': ''
-        // }
+      },
+      // '/napi/dynamic-api/poetry/hot-word': {
+      //   target: 'https://www.sghen.cn',
+      //   ws: false,
+      //   secure: true,
+      //   changeOrigin: true
+      // },
+      '/sapi/v1': {
+        target: 'https://www.sghen.cn',
+        ws: false,
+        secure: true,
+        changeOrigin: true,
+        pathRewrite: {
+          // '/sapi/v1': '/v1'
+        }
       },
       '/napi/': {
-        target: 'https://www.sghen.cn',
+        target: 'http://127.0.0.1:8282',
         ws: false,
         secure: true,
-        changeOrigin: true
-        // pathRewrite: {
-        //   '/napi/': '/'
-        // }
+        changeOrigin: true,
+        pathRewrite: {
+          '/napi/': '/'
+        }
       }
     }
   }
