@@ -65,35 +65,14 @@ module.exports = {
     // https: false,
     // hotOnly: false,
     proxy: {
-      '/sapi/file': {
-        target: 'https://www.sghen.cn',
-        ws: false,
-        secure: true,
-        changeOrigin: true
-      },
-      // '/napi/dynamic-api/poetry/hot-word': {
-      //   target: 'https://www.sghen.cn',
-      //   ws: false,
-      //   secure: true,
-      //   changeOrigin: true
-      // },
-      '/sapi/v1': {
-        target: 'https://www.sghen.cn',
-        ws: false,
-        secure: true,
-        changeOrigin: true,
-        pathRewrite: {
-          // '/sapi/v1': '/v1'
-        }
-      },
       '/napi/': {
-        target: 'http://127.0.0.1:8282',
+        target: 'https://www.sghen.cn',
         ws: false,
         secure: true,
         changeOrigin: true,
-        pathRewrite: {
-          '/napi/': '/'
-        }
+        // pathRewrite: {
+        //   '/napi/': '/'
+        // }
       }
     }
   }
