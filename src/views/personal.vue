@@ -485,13 +485,22 @@ export default {
         return
       }
       e.target.value = ''
+
+      const words = zipFile.name.split(/\.|\//)
+      const suffix = words.pop()
+      if (!suffix || suffix !== 'zip') {
+        this.$toast('请上传.zip文件')
+        return
+      }
       const formData = new FormData()
       formData.append('file', zipFile)
+
+      const type = words.pop()
       apiPostUpload(apiURL.upload, formData, { pathType: 'deploy' })
         .then(() => {
           apiPostData(apiURL.servicesUrl, {
             serviceName: 'deploy',
-            type: 'poetry'
+            type
           })
             .then(() => {
               this.$toast('自动解压部署中')
