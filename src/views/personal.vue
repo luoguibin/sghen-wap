@@ -1,7 +1,7 @@
 <template>
   <div :class="{ personal: true, 'personal-editing': isEditing }">
     <sg-header @back="onBack">
-      <span>个人中心</span>
+      <span @click="onStartDeploy">个人中心</span>
       <sg-button
         v-if="isSelf"
         slot="right"
@@ -109,6 +109,8 @@
         ></image-editor>
       </div>
     </div>
+
+    <input ref="fileInput" type="file" accept=".zip" @change="handleFileChange" hidden />
 
     <!-- 系统消息新增 -->
     <div class="sg-mask sys-msg-mask" v-if="newMsgVisible">
@@ -226,7 +228,8 @@ export default {
       phone: (state) => state.auth.phone
     }),
     ...mapGetters({
-      selfPublicInfo: 'auth/selfPublicInfo'
+      selfPublicInfo: 'auth/selfPublicInfo',
+      isLogin: 'auth/isLogin'
     })
   },
 
@@ -468,6 +471,35 @@ export default {
           }
         })
       })
+    },
+
+    onStartDeploy () {
+      if (!this.isLogin) {
+        return
+      }
+      this.$refs.fileInput.click()
+    },
+    handleFileChange (e) {
+      const [zipFile] = e.target.files
+      if (!zipFile) {
+        return
+      }
+      e.target.value = ''
+      const formData = new FormData()
+      formData.append('file', zipFile)
+      apiPostUpload(apiURL.upload, formData, { pathType: 'deploy' })
+        .then(() => {
+          apiPostData(apiURL.servicesUrl, {
+            serviceName: 'deploy',
+            type: 'poetry'
+          })
+            .then(() => {
+              this.$toast('自动解压部署中')
+            })
+            .finally(() => {
+              this.loading = false
+            })
+        })
     },
 
     ...mapActions({
