@@ -69,7 +69,7 @@ module.exports = {
         target: 'https://www.sghen.cn',
         ws: false,
         secure: true,
-        changeOrigin: true,
+        changeOrigin: true
         // pathRewrite: {
         //   '/napi/': '/'
         // }
