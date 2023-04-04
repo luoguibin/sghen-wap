@@ -76,7 +76,7 @@ export const base64ToFile = function (base64Data, fileName) {
  */
 export const toEmotionImages = function (v = '') {
   return v.replace(/#EM[0-9]{3}/g, function (a) {
-    return `<img src="/sapi/file/emotions/${a.substr(3, 3)}.gif" />`
+    return `<img src="/napi/public/file/emotions/${a.substr(3, 3)}.gif" />`
   })
 }
 /**

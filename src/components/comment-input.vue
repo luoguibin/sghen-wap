@@ -96,7 +96,7 @@ export default {
       if (v.length !== 6) {
         return v
       }
-      return `/sapi/file/emotions/${v.substr(3, 3)}.gif`
+      return `/napi/public/file/emotions/${v.substr(3, 3)}.gif`
     }
   },
 
