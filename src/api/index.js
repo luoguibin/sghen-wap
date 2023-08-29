@@ -35,6 +35,7 @@ export const apiPostUpload = (url, data, params, call) =>
     method: 'post',
     params,
     data,
+    _upload: true,
     timeout: 60 * 1000,
     headers: { 'Content-Type': 'multipart/form-data' },
     onUploadProgress: e => {

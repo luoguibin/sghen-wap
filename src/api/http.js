@@ -2,7 +2,7 @@ import axios from 'axios'
 import Qs from 'qs'
 import store from '@/store'
 import router from '@/router'
-import { aesDecrypt } from '@/utils/crypto'
+import { aesDecrypt, aesEncrypt } from '@/utils/crypto'
 
 axios.defaults.timeout = 100000
 
@@ -35,6 +35,15 @@ axios.interceptors.request.use(
     if (config.data && !config.headers['Content-Type']) {
       config.headers['Content-Type'] = 'application/x-www-form-urlencoded'
       config.data = Qs.stringify(config.data)
+    }
+
+    if (!config._upload) {
+      if (config.params) {
+        config.params = { q: aesEncrypt(JSON.stringify(config.params)) }
+      }
+      if (config.data) {
+        config.data = Qs.stringify({ d: aesEncrypt(config.data) })
+      }
     }
 
     return config
