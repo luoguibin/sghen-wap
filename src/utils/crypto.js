@@ -1,0 +1,34 @@
+import { MD5, enc, mode, pad, AES } from 'crypto-js'
+import Base64 from 'crypto-js/enc-base64'
+// TODO: crypto-js的core中加载了所有crypto包。。。
+export const baseMd5 = function (v) {
+  return Base64.stringify(MD5(v))
+}
+
+const cryptConfig = {
+  paw: '',
+  iv: ''
+}
+export const init = function () {
+  const paw = '1'
+  const iv = '2'
+  // 十六位十六进制数作为密钥
+  cryptConfig.paw = enc.Utf8.parse(paw)
+  // 十六位十六进制数作为密钥偏移量
+  cryptConfig.iv = enc.Utf8.parse(iv)
+}
+
+// 加密方法
+export const encrypt = function (word) {
+  const key = enc.Utf8.parse(cryptConfig.paw)
+  const srcs = enc.Utf8.parse(word)
+  const encrypted = AES.encrypt(srcs, key, { iv: cryptConfig.iv, mode: mode.ECB, padding: pad.Pkcs7 })
+  return encrypted.toString()
+}
+
+// 解密方法
+export const decrypt = function (word) {
+  const key = enc.Utf8.parse(cryptConfig.paw)
+  const decrypt = AES.decrypt(word, key, { iv: cryptConfig.iv, mode: mode.ECB, padding: pad.Pkcs7 })
+  return enc.Utf8.stringify(decrypt).toString()
+}

@@ -1,4 +1,5 @@
 import { apiURL, apiPostData } from '@/api'
+import { baseMd5 } from '@/utils/crypto'
 
 const storeAuth = {
   namespaced: true,
@@ -55,20 +56,12 @@ const storeAuth = {
           })
         }
         if (data.pw) {
-          // todo: crypto-js的core中加载了所有crypto包。。。
-          require(['crypto-js/enc-base64.js', 'crypto-js/md5.js'], function (Base64, MD5) {
-            data.pw = Base64.stringify(MD5(data.pw))
-            if (!data.isCreateUser) {
-              data.random = '' + Date.now()
-              data.pw = Base64.stringify(MD5(data.pw + data.random))
-            }
-            func(data, resolve, reject)
-          }, function (err) {
-            if (err) {
-              reject(new Error('配置文件加载失败'))
-              window._sgGlobal.$toast('配置文件加载失败')
-            }
-          })
+          data.pw = baseMd5(data.pw)
+          if (!data.isCreateUser) {
+            data.random = '' + Date.now()
+            data.pw = baseMd5(data.pw + data.random)
+          }
+          func(data, resolve, reject)
         } else {
           func(data, resolve, reject)
         }

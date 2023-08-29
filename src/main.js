@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import store from './store'
 import router from './router'
+import { init as cryptoInit } from './utils/crypto'
 import Xss from 'xss'
 import './ui/index'
 import './directives'
@@ -20,6 +21,8 @@ Vue.prototype.$toastLogin = function (msg = '请#{ 登陆 }后再操作', params
       this.$router.push({ name: 'login', query: { redirect: router.currentRoute.fullPath } })
     } })
 }
+
+cryptoInit()
 
 new Vue({
   router,
