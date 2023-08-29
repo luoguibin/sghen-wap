@@ -2,6 +2,7 @@ import axios from 'axios'
 import Qs from 'qs'
 import store from '@/store'
 import router from '@/router'
+import { aesDecrypt } from '@/utils/crypto'
 
 axios.defaults.timeout = 100000
 
@@ -68,6 +69,10 @@ axios.interceptors.response.use(
     // if (res.config.url.includes('/sapi/v1/')) {
     //   resetObjectId(data)
     // }
+
+    if (data.apicrypt) {
+      data.data = JSON.parse(aesDecrypt(data.data))
+    }
 
     return data
   },
