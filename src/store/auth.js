@@ -9,7 +9,8 @@ const storeAuth = {
     userAvatar: '',
     mood: '',
     phone: '',
-    token: ''
+    token: '',
+    level: 0,
   },
   getters: {
     selfPublicInfo (state) {
@@ -34,6 +35,7 @@ const storeAuth = {
       state.phone = data.phone
       state.mood = data.mood
       state.token = data.token
+      state.level = data.level
     }
   },
   actions: {
