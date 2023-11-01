@@ -99,6 +99,11 @@ export const apiURL = {
   // 根据年度诗词创建数获取诗词作者列表
   poetryUserListYear: `${nodePreffix}/dynamic-api/v2/user/poetry/year-create`,
 
+  // 诗词相关统计
+  censusPoetryYM: `${nodePreffix}/dynamic-api/v2/census/poetry-ym`,
+  censusPraiseYM: `${nodePreffix}/dynamic-api/v2/census/praise-ym`,
+  censusCommentYM: `${nodePreffix}/dynamic-api/v2/census/comment-ym`,
+
   // 评论创建
   commentCreate: `${nodePreffix}/dynamic-api/v2/poetry-comment/create`,
   // 评论删除

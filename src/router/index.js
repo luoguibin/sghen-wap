@@ -73,6 +73,14 @@ const routes = [
     }
   },
   {
+    path: '/poetry-census',
+    name: 'poetry-census',
+    component: () => import(/* webpackChunkName: 'poetry-census' */'@/views/poetry-census'),
+    meta: {
+      auth: true
+    }
+  },
+  {
     path: '/sg-components',
     name: 'sg-components',
     component: () => import(/* webpackChunkName: 'sg-components' */'@/views/sg-components')
