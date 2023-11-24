@@ -91,7 +91,7 @@ export const apiURL = {
   poetSetDelete: `${nodePreffix}/dynamic-api/v2/poetry-set/delete`,
 
   // 诗词词频列表
-  poetryHotWord: `${nodePreffix}/dynamic-api/poetry/hot-word`,
+  poetryHotWord: `${nodePreffix}/dynamic-api/v2/poetry/hot-word`,
   // 热门诗词选集
   poetrySetPopular: `${nodePreffix}/dynamic-api/v2/poetry-set/popular`,
   // 年度诗词选集
