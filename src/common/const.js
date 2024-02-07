@@ -16,5 +16,6 @@ export const MSG_TYPE = {
   SYS_BLESS: { label: '系统祝福', value: 1001 },
   USER: { label: '用户消息', value: 2000 },
   USER_CREATE: { label: '账户消息', value: 2001 },
-  PEOTRY: { label: '诗词消息', value: 3000 }
+  PEOTRY: { label: '诗词消息', value: 3000 },
+  SMS_BLESS_SPRING: { label: '春节祝福', value: 4001 }
 }
